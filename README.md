@@ -4,8 +4,15 @@ A simple Hello World Chrome extension using React.
 
 # Getting Started with Create React App
 
+Add origin (if you haven't done so already)
 ```sh
-   git clone https://github.com/UNLV-CS472-672/2025-S-GROUP3-RebelRemind.git
+   git remote add origin https://github.com/UNLV-CS472-672/2025-S-GROUP3-RebelRemind.git
+```
+
+Pull the latest changes from the remote repo
+```sh
+   git checkout main
+   git pull origin main
 ```
 
 
