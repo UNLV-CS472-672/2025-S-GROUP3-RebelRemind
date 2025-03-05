@@ -19,7 +19,7 @@ Pull the latest changes from the remote repo
 ## Installing dependencies
 
 ```sh
-   cd rebel_extension
+   cd rebel-extension
 ```
 ```sh
    npm install
