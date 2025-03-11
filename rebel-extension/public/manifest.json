@@ -1,14 +1,28 @@
 {
-    "manifest_version": 3,
-    "name": "RebelRemind",
-    "version": "1.0",
-    "action": {
-      "default_popup": "index.html"
-    },
-    "background": {
-      "service_worker": "background.js"
-    },
-    "permissions": ["storage", "activeTab", "scripting"],
-    "host_permissions": ["http://localhost:3001/*"]
+  "manifest_version": 3,
+  "name": "RebelRemind",
+  "version": "1.0",
+  "action": {
+    "default_popup": "index.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "identity"
+  ],
+  "host_permissions": [
+    "http://localhost:3001/*"
+  ],
+  "oauth2": {
+    "client_id": "79022561637-v6gffnn0h388bj9rt9dkfiheacmhgb24.apps.googleusercontent.com",
+    "scopes": [
+      "openid",
+      "email",
+      "profile"
+    ]
   }
-  
+}

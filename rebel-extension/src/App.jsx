@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 
 import "./App.css";
+import LoginButton from "./components/LoginButton";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -43,9 +44,9 @@ function App() {
             ? `${schedule}`
             : "Gathering your UNLV schedule (count must be > 5)..."}
         </p>
+        <LoginButton />
       </div>
-    </>
-  );
+    </>);
 }
 
 export default App;

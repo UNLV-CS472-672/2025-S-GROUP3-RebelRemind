@@ -1,6 +1,6 @@
-importScripts('./myscripts/example-script.js');
+importScripts('./scripts/example-script.js');
+importScripts('./scripts/identity-script.js');
 
 chrome.runtime.onInstalled.addListener(() => {
-    console.log("Extension installed!");
-  });
-  
+  console.log("Extension installed!");
+});
