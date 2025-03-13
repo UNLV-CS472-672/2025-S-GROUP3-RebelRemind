@@ -24,39 +24,21 @@ body {
   position: absolute;
   top: 15px;
   right: 15px;
-  border: 1.5px solid black;
-  object-fit: cover;
   object-position: center;
   
 }
 
-.user-pic:hover {
-  transform: scale(1.5); /* Zooms in on hover */
-
-
-}
 
 .assignments, .events {
   background-color: white;
   border-radius: 10px;
   width: 85%;
   padding: 15px;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-  margin: 10px auto; /* Centering the sections */
 }
 
-.assignments .canvas-button {
-  background-color: gray;
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 10px;
-  margin-top: 10px;
-  cursor: pointer;
-}
+.assignments button {
+  color: black;
 
-.assignments .canvas-button:hover {
-  background-color: crimson;
 }
 
 /* Dropdown Arrow Button - Make it plain for all sections */
@@ -68,23 +50,3 @@ body {
   color: black;
   padding: 5px;
 }
-
-.dropdown-button:hover {
-  color: gray;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Keeps text & arrow button apart */
-  width: 100%;
-}
-
-.section-header img {
-  height: 40px;
-  width: 40px;
-  margin-right: 5px;
-  margin-left: 0;
-}
-
-
