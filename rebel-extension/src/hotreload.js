@@ -1,4 +1,14 @@
-// Reload extension when files change
+/**
+ * This file enables hot-reloading for our Chrome extension during development.
+ * 
+ * This script forces the extension to reload when a change is detected.
+ * 
+ * It listens for file updates and automatically reloads the extension.
+ * 
+ * This eliminates the need to manually reload from chrome://extensions/.
+ * 
+ */ 
+
 const filesInDirectory = (dir) =>
   new Promise((resolve) =>
     dir.createReader().readEntries((entries) =>
