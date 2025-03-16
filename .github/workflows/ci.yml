@@ -2,11 +2,6 @@ name: CI - Test & Lint
 
 on:
   pull_request:
-    branches:
-      - main
-      - dev
-      - frontend
-      - backend
 
 jobs:
   build:
