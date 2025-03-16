@@ -35,6 +35,10 @@ jobs:
           node-version: "18"
 
       - name: Install dependencies
+        run: npm install
+        working-directory: rebel-extension
+
+      - name: Build backend
         run: npm rum dev
         working-directory: backend
 
