@@ -9,6 +9,7 @@ import Counter from "./components/Counter";
 function App() {
   return (
     <>
+      Hello
       <Counter />
       <LoginButton />
     </>
