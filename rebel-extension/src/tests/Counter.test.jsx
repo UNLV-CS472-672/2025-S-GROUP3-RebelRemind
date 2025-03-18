@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import Counter from "./Counter";
+import Counter from "../components/Counter";
 
 // Mock Chrome's runtime messaging API
 beforeAll(() => {

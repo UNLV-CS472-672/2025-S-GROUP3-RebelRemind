@@ -3,10 +3,6 @@ name: CI - Test & Lint
 on:
   pull_request:
   push:
-    branches:
-      - main
-      - dev
-  workflow_dispatch:
 
 jobs:
   build:
