@@ -89,5 +89,5 @@ If an API call was made directly from the React javascript, it would only be all
 ```
 
 ```sh
-   npm jest
+   npm test
 ```
