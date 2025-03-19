@@ -1,18 +1,21 @@
-import { useEffect, useState, useRef } from "react";
-
 import "./App.css";
 import LoginButton from "./components/LoginButton";
 import Counter from "./components/Counter";
 import AccordionMenu from "./components/AccordionMenu";
+import UserProfile from "./components/UserProfile";
+import useAuth from "../public/hooks/useAuth";
 
-/* This file defines the main UI layout for our Chrome extension’s popup or tab interface. */
-
+/**
+ * Main UI Layout for the Chrome Extension.
+ */
 function App() {
+  const isAuthenticated = useAuth();
+
   return (
     <>
       <Counter />
-      <LoginButton />
       <AccordionMenu />
+      {isAuthenticated ? <UserProfile /> : <LoginButton />}
     </>
     
   );
