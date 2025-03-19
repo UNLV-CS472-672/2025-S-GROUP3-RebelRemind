@@ -16,7 +16,8 @@
     "identity"
   ],
   "host_permissions": [
-    "http://localhost:3001/*"
+    "http://localhost:3001/*",
+    "https://unlv.instructure.com/*"
   ],
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnELBMRwWNYDRAUAiOD1boCMGxdhIMp72vEn2cmf0Kt/a6jN2/I13USk/ZXNQFGPomBPmNkBzA163bZs+PH7vsc7HQSa0Tctx28ekWcsIRYEbz6zFKhsnJXP1D1oHBxURitZi0D3lGJnZSskzcRjV43pRJg8m3OKvNy5JOPw9GgWGtNV4p+b3qZVPaHd/oafY3alH9f2U1Fk7YH6OVwfpehVuZ/a6Hn9SMr8IPkD2PfAFov4OLNHL1YaMKCzGZLWKQBKVWLQGQBYxesSakefgUfOViOb5Go4YkR+3eHdEgh7cPQECEuJrPCOMQqH5B99RSPQPLRG4AfZb3imBuZYHJwIDAQAB",
   "oauth2": {

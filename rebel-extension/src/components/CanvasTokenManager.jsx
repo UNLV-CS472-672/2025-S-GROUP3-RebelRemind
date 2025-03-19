@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 const CanvasTokenManager = () => {
     const [canvasToken, setCanvasToken] = useState(""); // State for storing the token
     const [showToken, setShowToken] = useState(false); // State for toggling token visibility
+    const [courseID, setCourseID] = useState(""); // State for storing the token
 
     /**
      * Effect Hook: Load the stored Canvas PAT when the component mounts.
@@ -26,6 +27,14 @@ const CanvasTokenManager = () => {
         chrome.storage.local.get("canvasPAT", (data) => {
             if (data.canvasPAT) {
                 setCanvasToken(data.canvasPAT);
+            }
+        });
+    }, []);
+
+    useEffect(() => {
+        chrome.storage.local.get("courseID", (data) => {
+            if (data.courseID) {
+                setCourseID(data.courseID);
             }
         });
     }, []);
@@ -43,6 +52,18 @@ const CanvasTokenManager = () => {
         chrome.storage.local.set({ canvasPAT: canvasToken }, () => {
             console.log("Canvas PAT saved.");
             alert("Your Canvas token has been securely saved.");
+        });
+    };
+
+    const saveCourseID = () => {
+        if (!courseID.trim()) {
+            alert("Please enter a valid course ID.");
+            return;
+        }
+
+        chrome.storage.local.set({ courseID: courseID }, () => {
+            console.log("Course ID saved.");
+            alert("Your course ID has been saved.");
         });
     };
 
@@ -75,6 +96,24 @@ const CanvasTokenManager = () => {
                 className="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
             >
                 Save Token
+            </button>
+
+            <div className="relative">
+                <input
+                    type="text"
+                    placeholder="Enter Course ID"
+                    value={courseID}
+                    onChange={(e) => setCourseID(e.target.value)}
+                    className="border p-2 rounded w-full text-gray-700"
+                />
+            </div>
+
+            {/* Save Button */}
+            <button
+                onClick={saveCourseID}
+                className="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+            >
+                Save Course ID
             </button>
         </div>
     );
