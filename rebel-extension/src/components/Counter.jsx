@@ -24,6 +24,7 @@ function Counter() {
     const [schedule, setSchedule] = useState(""); // Stores retrieved schedule
     const [isFetchingSchedule, setIsFetchingSchedule] = useState(false); // Tracks if schedule is being fetched
     const hasFetched = useRef(false); // Ensures schedule is fetched only once
+    const [canvasIntegration, setCanvasIntegration] = useState(false);
 
     /**
      * useEffect - Sends count value to the background script to get its square.
@@ -46,12 +47,38 @@ function Counter() {
         if (count > 5 && !hasFetched.current) {
             hasFetched.current = true;
             setIsFetchingSchedule(true); // Start loading indicator
-
-            chrome.runtime.sendMessage({ type: "GET_SCHEDULE" }, (response) => {
-                setIsFetchingSchedule(false); // Stop loading indicator
-
-                if (response) setSchedule(response.message);
-                else setSchedule("No response from background script.");
+            new Promise ((resolve) => {
+                chrome.runtime.sendMessage({ type: "GET_PREFERENCES" }, (response) => {
+                    if (response && response.preferences) {
+                        const canvasIntegrationPreference = response.preferences.canvasIntegration;
+                        if (canvasIntegrationPreference) {
+                            setCanvasIntegration(true);
+                            resolve(canvasIntegrationPreference);
+                        }
+                        else {
+                            setCanvasIntegration(false);
+                            alert("Canvas Integration is disabled!")
+                            resolve(canvasIntegrationPreference);
+                        }
+                    } else {
+                        setCanvasIntegration(false);
+                        alert("No preferences set!");
+                        resolve(false);
+                    }
+                });
+            }).then((canvasIntegrationPreference) => {
+                if(canvasIntegrationPreference) {
+                    chrome.runtime.sendMessage({ type: "GET_SCHEDULE" }, (response) => {
+                        setIsFetchingSchedule(false); // Stop loading indicator
+    
+                        if (response) setSchedule(response.message);
+                        else setSchedule("No response from background script.");
+                    });
+                }
+                else {
+                    setIsFetchingSchedule(false);
+                    setSchedule("Unable to fetch schedule");
+                }
             });
         }
     }, [count]);
@@ -80,7 +107,7 @@ function Counter() {
                 {isFetchingSchedule
                     ? "Please wait..." // Show while fetching
                     : schedule
-                    ? `${schedule}`
+                    ? canvasIntegration ? `${schedule}`: "Canvas Integration is disabled, cannot display schedule!"
                     : "Gathering your UNLV schedule (count must be > 5)..."}
             </p>
         </div>
