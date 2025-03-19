@@ -1,8 +1,22 @@
+/* This file contains styles specific to App.jsx. */
 #root {
-  max-width: 1280px;
+  max-width: 2000px;
+  min-width: 450px;
+  background-color: crimson;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+}
+
+.accordion-button{
+	--bs-accordion-btn-color: black;
+	--bs-accordion-btn-bg: gray;
+	--bs-accordion-active-color: black;
+	--bs-accordion-active-bg: lightgray;
+}
+
+.accordion-body{
+  text-align: left;
 }
 
 .logo {
