@@ -1,6 +1,7 @@
 import "./App.css";
 import LoginButton from "./components/LoginButton";
 import Counter from "./components/Counter";
+import AccordionMenu from "./components/AccordionMenu";
 import UserProfile from "./components/UserProfile";
 import useAuth from "../public/hooks/useAuth";
 
@@ -13,8 +14,10 @@ function App() {
   return (
     <>
       <Counter />
+      <AccordionMenu />
       {isAuthenticated ? <UserProfile /> : <LoginButton />}
     </>
+    
   );
 }
 
