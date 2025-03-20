@@ -1,4 +1,5 @@
-/* Global Styles for the Entire Extension */
+/* Chandni's Accordion Menu */
+/* This  is for the indexing chrome extension looks*/
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -29,6 +30,7 @@ body {
   display: flex;
   place-items: center;
   min-width: 320px;
+  /* min-height: 100vh; */
   min-height: auto;
 }
 
