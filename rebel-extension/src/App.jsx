@@ -2,6 +2,8 @@ import "./App.css";
 import LoginButton from "./components/LoginButton";
 import Counter from "./components/Counter";
 import AccordionMenu from "./components/AccordionMenu";
+import ChangeMenu from "./components/ChangeMenu";
+import CalendarMenu from "./components/CalendarMenu";
 import UserProfile from "./components/UserProfile";
 import useAuth from "../public/hooks/useAuth";
 
@@ -15,6 +17,8 @@ function App() {
     <>
       <Counter />
       <AccordionMenu />
+      <ChangeMenu />
+      
       {isAuthenticated ? <UserProfile /> : <LoginButton />}
     </>
     
