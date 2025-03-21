@@ -48,7 +48,7 @@ def involvement_center():
 
 import requests
 import json
-import DateTime
+import datetime
 
 query = "endsAfter=2025-03-14&orderByField=endsOn&orderByDirection=ascending&status=Approved&take=200"
 url = "https://involvementcenter.unlv.edu/api/discovery/event/search?"

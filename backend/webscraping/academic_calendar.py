@@ -7,7 +7,7 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from bs4 import BeautifulSoup
 from webdriver_manager.chrome import ChromeDriverManager
 
-def extract_calendar_data(filename="academicCalendar.txt"):
+def default(filename="academicCalendar.txt"):
     """
     Extracts calendar events from the UNLV catalog page using Selenium and BeautifulSoup,
     adding "Date:" and "Event:" prefixes.
@@ -68,6 +68,3 @@ def extract_calendar_data(filename="academicCalendar.txt"):
         print(f"An error occurred: {e}")
     finally:
         driver.quit()
-
-
-extract_calendar_data()

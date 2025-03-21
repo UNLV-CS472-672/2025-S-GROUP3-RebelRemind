@@ -67,6 +67,5 @@ api.add_resource(User_Info, "/user_id/<int:user_id>")
 
 api.add_resource(User_List, "/user_list")
 
-if __name__ == "__main__":
+def default():
 	app.run(host='0.0.0.0', port=5000, debug=True)
-
