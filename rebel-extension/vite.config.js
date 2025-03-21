@@ -8,6 +8,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: "index.html",
+        sidepanel: "sidepanel-index.html",
       },
       output: {
         entryFileNames: "assets/[name].js",

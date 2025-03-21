@@ -6,6 +6,7 @@ import ChangeMenu from "./components/ChangeMenu";
 import CalendarMenu from "./components/CalendarMenu";
 import UserProfile from "./components/UserProfile";
 import useAuth from "../public/hooks/useAuth";
+import SidePanelButton from "./components/SidePanelButton";
 
 /**
  * Main UI Layout for the Chrome Extension.
@@ -20,8 +21,8 @@ function App() {
       <ChangeMenu />
       
       {isAuthenticated ? <UserProfile /> : <LoginButton />}
+      <SidePanelButton />
     </>
-    
   );
 }
 
