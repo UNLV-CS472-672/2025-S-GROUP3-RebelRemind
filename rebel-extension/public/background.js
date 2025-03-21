@@ -48,7 +48,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
      */
     case "GET_SCHEDULE":
       handleGetSchedule(sendResponse);
-        getAssignments(); // Added call to canvas-script for making the Canvas API call.
+      getAssignments(); // Added call to canvas-script for making the Canvas API call.
       return true;
 
     /**
@@ -107,5 +107,5 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     default:
       console.warn("Received unknown message type:", message.type);
       break;
-    }
+  }
 });
