@@ -13,6 +13,7 @@
 
 import { handlePostCount, handleGetSchedule } from "./scripts/counter-script.js";
 import { authenticateUser } from "./scripts/identity-script.js";
+import { getAssignments } from "./scripts/canvas-script.js";
 
 /**
  * Listens for the Chrome extension installation event.
@@ -47,6 +48,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
      */
     case "GET_SCHEDULE":
       handleGetSchedule(sendResponse);
+      getAssignments(); // Added call to canvas-script for making the Canvas API call.
       return true;
 
     /**
