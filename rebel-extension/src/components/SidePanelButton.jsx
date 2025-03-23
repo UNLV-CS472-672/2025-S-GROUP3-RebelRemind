@@ -21,7 +21,9 @@ function SidePanelButton() {
 
   return (
     <div>
-      <button onClick={handleOpenSidePanel}>Open Side Panel</button>
+      <button onClick={handleOpenSidePanel}>
+        Your UNLV Events at a Glance! --&gt;
+      </button>
     </div>
   );
 }

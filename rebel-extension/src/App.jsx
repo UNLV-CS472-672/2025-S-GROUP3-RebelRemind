@@ -1,28 +1,20 @@
 import "./App.css";
-import LoginButton from "./components/LoginButton";
-import Counter from "./components/Counter";
-import AccordionMenu from "./components/AccordionMenu";
-import ChangeMenu from "./components/ChangeMenu";
-import CalendarMenu from "./components/CalendarMenu";
-import UserProfile from "./components/UserProfile";
-import useAuth from "../public/hooks/useAuth";
-import SidePanelButton from "./components/SidePanelButton";
+import React from "react";
+import { HashRouter as Router, Routes, Route, Link } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import SettingPage from "./pages/SettingPage";
 
 /**
  * Main UI Layout for the Chrome Extension.
  */
 function App() {
-  const isAuthenticated = useAuth();
-
   return (
-    <>
-      <Counter />
-      <AccordionMenu />
-      <ChangeMenu />
-      
-      {isAuthenticated ? <UserProfile /> : <LoginButton />}
-      <SidePanelButton />
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/settings" element={<SettingPage />} />
+      </Routes>
+    </Router>
   );
 }
 

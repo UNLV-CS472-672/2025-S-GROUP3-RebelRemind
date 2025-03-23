@@ -29,6 +29,29 @@ chrome.runtime.onInstalled.addListener(() => {
   console.log("Extension installed!");
 });
 
+//region Chrome Login
+/**
+ * This section is meant to handle all functions that need to be ran when the user logs into Chrome
+ *
+ * If you want to set a function to only run the first time of the day they are logged into Chrome, use
+ * within the if statement
+ *
+ * If you want the function to run everytime they log into Chrome, place outside the if statement
+ *
+ * If you need something to run everytime the pop up is open, you can add it in the App.jsx for the pop up, Or
+ * add a functionality in the frontend to call a script here.
+ */
+chrome.runtime.onStartup.addListener(() => {
+  if (checkDailyTask()) {
+    // Functions only to be done once a day.
+    // I don't recommend Canvas or assignments because Professors might add new stuff midday so we should update as much as possible.
+  }
+  // Functions that should be ran anytime the user logins to Google. Will be run in background.
+  //
+});
+
+//region Message Listener
+
 /**
  * Handles incoming messages from content scripts, popup scripts, or other parts of the extension.
  * Uses a `switch` statement to route different message types to the appropriate handlers.
@@ -52,8 +75,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
      * Calls `handleGetSchedule()` to fetch schedule data.
      */
     case "GET_SCHEDULE":
-      handleGetSchedule(sendResponse);
-      getAssignments(); // Added call to canvas-script for making the Canvas API call.
+      sendResponse(getAssignments()); // Added call to canvas-script for making the Canvas API call.
       return true;
 
     /**

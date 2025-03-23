@@ -14,7 +14,7 @@ function SidePanelApp() {
 
   return (
     <>
-      <DailyOrWeeklyPanel />
+      <AccordionMenu />
     </>
   );
 }
