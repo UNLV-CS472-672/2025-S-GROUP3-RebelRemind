@@ -1,12 +1,16 @@
 import requests
 import json
 
-BASE = "http://127.0.0.1:5000/"
+BASE = "http://127.0.0.1:5050/"
 
 def default():
     # Retrieve results obtained from webscraping
-    with open('events.json', 'r', encoding='utf-8') as f:
-        events = json.load(f)
+    try:
+        with open('events.json', 'r', encoding='utf-8') as f:
+            events = json.load(f)
+    except FileNotFoundError:
+        print(f"Error: events.json not found")
+        return
 
     # PUT events into database
     id = 0

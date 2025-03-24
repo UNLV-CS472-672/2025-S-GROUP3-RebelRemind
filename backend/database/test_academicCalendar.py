@@ -2,9 +2,9 @@ import requests
 import json
 import os
 
-BASE = "http://127.0.0.1:5000/"
+BASE = "http://127.0.0.1:5050/"
 
-def test_calendar():
+def default():
     """
     Tests the Calendar API endpoints:
     1. Reads calendar data from 'events1.json'.
@@ -20,10 +20,10 @@ def test_calendar():
 
     # Retrieve calendar data from JSON
     try:
-        with open(calendar_file_path, 'r', encoding='utf-8') as f:
+        with open('calendar_events.json', 'r', encoding='utf-8') as f:
             calendar_events = json.load(f)
     except FileNotFoundError:
-        print(f"Error: calendar_events.json not found at {calendar_file_path}")
+        print(f"Error: calendar_events.json not found")
         return
 
     # PUT calendar events into the database
@@ -31,17 +31,17 @@ def test_calendar():
     for event in calendar_events:
         calendar_id += 1
         put_data = {
-            "event": event['Event'],
+            "name": event['Event'],
             "date": event['Date']
         }
-        response = requests.put(BASE + f"calendar_id/{calendar_id}", json=put_data) # Use json= for the request body
+        response = requests.put(BASE + f"event_id/{calendar_id}", json=put_data) # Use json= for the request body
 
         if response.status_code != 201:
             print(f"Error adding event {calendar_id}: {response.status_code} - {response.text}")
             return
 
     # GET calendar list
-    response = requests.get(BASE + "calendar_list")
+    response = requests.get(BASE + "event_list")
     if response.status_code != 200:
         print(f"Error getting calendar list: {response.status_code} - {response.text}")
         return
@@ -59,11 +59,11 @@ def test_calendar():
     else:
         for i in range(len(calendar_events)):
             # Ensure that the fields matches
-            if retrieved_data[i]['event'] != calendar_events[i]['Event'] or retrieved_data[i]['date'] != calendar_events[i]['Date']:
+            if retrieved_data[i]['name'] != calendar_events[i]['Event'] or retrieved_data[i]['date'] != calendar_events[i]['Date']:
                 print("Error: Data in the database does not match data in the json file.")
                 break
         else:
             print("Great! The calendar matches the JSON file!")
 
 if __name__ == '__main__':
-    test_calendar()
+    default()

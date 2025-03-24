@@ -29,7 +29,7 @@ class EventModel(db.Model):
 		return f"Event_Info(id = {id}, name = {name}, date = {date}, time = {time}, location = {location})" # type: ignore
 
 # leave commented to prevent data overwrite or delete
-#db.create_all()
+db.create_all()
 
 # Parser for User model
 user_put_args = reqparse.RequestParser()
@@ -135,10 +135,10 @@ api.add_resource(Event_List, "/event_list")
 
 # default function to run API
 def default():
-	app.run(host='0.0.0.0', port=5000, debug=True)
+	app.run(host='0.0.0.0', port=5050, debug=True)
 
 if __name__ == '__main__':
     with app.app_context():
-     #  db.drop_all()
+        db.drop_all()
         db.create_all()  # Create tables within the application context
         default()  # Run the app after creating the tables

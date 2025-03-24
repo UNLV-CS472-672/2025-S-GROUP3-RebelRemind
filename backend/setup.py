@@ -15,7 +15,8 @@ setup(
             'rebel_coverage = webscraping.rebel_coverage:default',
             'unlv_calendar = webscraping.unlv_calendar:default',
             'serve_data = database.serve_data:default',
-            'test_data = database.test_data:default'
+            'test_data = database.test_data:default',
+            'test_academicCalendar = database.test_academicCalendar:default'
         ]
     }
 )
