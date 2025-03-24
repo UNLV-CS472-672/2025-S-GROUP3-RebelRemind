@@ -1,12 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 
-import Calendar from 'react-calendar';
-import "./Calendar.css";
+import Calendar from "react-calendar";
+import "./css/Calendar.css";
 import "../App.css";
 
 /**
- * Calendar Menu Component - Creates a calendar that takes in the current date 
- *	(from locale or machine) and displays it upon selection "Calendar View" 
+ * Calendar Menu Component - Creates a calendar that takes in the current date
+ *	(from locale or machine) and displays it upon selection "Calendar View"
  *	from the "Change" button menu.
  * Uses react-calendar to display and format the menu.
  *
@@ -21,7 +21,7 @@ import "../App.css";
  * - Calendar.css for styling.
  *
  * Authored by: Jeremy Besitula
- * 
+ *
  * Put into component ChangeMenu.jsx by Jeremy Besitula
  * @returns {JSX.Element} The react-calendar component UI.
  */
@@ -33,13 +33,7 @@ function CalendarMenu() {
     setValue(nextValue);
   }
 
-  return (
-    <Calendar
-      onChange={onChange}
-      value={value}
-      calendarType = "gregory"
-    />
-  );
+  return <Calendar onChange={onChange} value={value} calendarType="gregory" />;
 }
 
 export default CalendarMenu;
