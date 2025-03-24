@@ -118,11 +118,12 @@ export async function getCourses() {
 
         for(const course of allCourses) {
             if(!course.access_restricted_by_date) { // Finds courses that student is actively enrolled in.
-                activeCourses.push(course.id);
+                activeCourses.push(course);
             }
         }
         for (const course of activeCourses) { // Get assignments for all active courses.
-            getAssignments(course);
+            console.log("Course Name: ", course.name);
+            await getAssignments(course.id);
         }
 
     } catch (error) {
