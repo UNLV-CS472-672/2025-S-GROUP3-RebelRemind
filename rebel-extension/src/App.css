@@ -10,6 +10,7 @@
 
 .accordion {
   padding: 1rem;
+  width: 450px;
 }
 
 .accordion-button {
@@ -23,6 +24,7 @@
   text-align: left;
 }
 
+/*
 .react-calendar {
   width: 350px;
   max-width: 100%;
@@ -31,6 +33,7 @@
   font-family: "Arial", "Helvetica", sans-serif;
   line-height: 1.125em;
 }
+Residual CSS from obselete library, keeping for backtracking/testing, remove later.*/
 
 .dropdown {
   padding: 0.5rem;

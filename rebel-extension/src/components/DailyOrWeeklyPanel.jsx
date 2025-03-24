@@ -5,7 +5,7 @@ import DailyReminders from "./DailyReminders";
 
 // 🔸 Main component with buttons and logic
 function DailyOrWeeklyPanel() {
-  const [activeSide, setActiveSide] = useState("left");
+  const [activeSide, setActiveSide] = useState(null);
 
   return (
     <div style={{ padding: "1rem" }}>
@@ -38,7 +38,7 @@ function DailyOrWeeklyPanel() {
       </div>
 
       {/* Conditional render */}
-      {activeSide === "left" ? <DailyReminders /> : <WeeklyReminders />}
+      {activeSide === null ? null :  activeSide === "left" ? <DailyReminders /> : <WeeklyReminders />  }
     </div>
   );
 }

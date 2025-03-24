@@ -1,22 +1,20 @@
 import { useEffect, useState, useRef } from "react";
 
-import Accordion from "react-bootstrap/Accordion";
-import "bootstrap/dist/css/bootstrap.min.css";
+import WeeklyCalendar from "./WeeklyCalendar.jsx";
 
 /**
- * Reminders Accordion Menu Component - Creates a drop-down style menu that displays the three (3) main submenus of the extension.
- * Uses React Bootstrap to display and format the menu.
+ * Reminders Calendar Component - Main container file that can be used to display the Weekly Calendar.
+ *				  Can then be used to include other components on top or below the Calendar.
+ * Uses React Bootstrap and react-big-calendar to display and format the menu.
  *
  * Features:
- * - Used to mock weekly reminders?
- * 	- Upcoming Assignments
- * 	- Your Events
- *	- UNLV Events
+ * - DailyCalendar.jsx
+ *	- Displays Calendar UI
  *
- * Authored by: Billy Estrada
+ * Original Documentation provided by: Billy Estrada
  *
- * Copied from: Jeremy Besitula (Accordian Menu)
- *
+ * New Documentation provided by: Jeremy Besitula (Accordion Menu)
+ * 
  * Put into component WeeklyReminders.jsx by Jeremy Besitula
  * @returns {JSX.Element} The WeeklyReminders component UI.
  */
@@ -444,8 +442,14 @@ function WeeklyReminders() {
   }, []);
 
   return (
-    <Accordion defaultActiveKey="0">
-      {daysOfWeek.map((day, index) => (
+  <div>
+     <WeeklyCalendar />
+  </div>
+  );
+}
+export default WeeklyReminders;
+/*
+{daysOfWeek.map((day, index) => (
         <Accordion.Item eventKey={index.toString()} key={day}>
           <Accordion.Header>{day}</Accordion.Header>
           <Accordion.Body>
@@ -461,8 +465,4 @@ function WeeklyReminders() {
           </Accordion.Body>
         </Accordion.Item>
       ))}
-    </Accordion>
-  );
-}
-
-export default WeeklyReminders;
+*/

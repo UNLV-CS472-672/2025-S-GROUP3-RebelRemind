@@ -1,7 +1,5 @@
 import "./css/HomePage.css";
 
-import ChangeMenu from "../components/ChangeMenu";
-import CalendarMenu from "../components/CalendarMenu";
 import DailyOrWeeklyPanel from "../components/DailyOrWeeklyPanel";
 import SidePanelButton from "../components/SidePanelButton";
 
@@ -14,11 +12,14 @@ function HomePage() {
   const navigate = useNavigate();
 
   return (
-    <>
-      <button onClick={() => navigate("/settings")}> ⚙️ </button>
+    <div >
+      <button 
+        style={{ display: 'flex', justifyContent: 'flex-end', marginLeft: 'auto' }}
+        onClick={() => navigate("/settings")}> ⚙️  
+      </button>
       <DailyOrWeeklyPanel />
       <SidePanelButton />
-    </>
+    </div>
   );
 }
 
