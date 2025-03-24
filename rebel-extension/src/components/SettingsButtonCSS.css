@@ -44,3 +44,7 @@
 .settings-options button:hover {
   background-color: #333;
 }
+
+.settings-options input[type="color"] {
+  margin-top: 10px;
+}
