@@ -5,7 +5,7 @@ import Counter from "./components/Counter";
 import AccordionMenu from "./components/AccordionMenu";
 import ChangeMenu from "./components/ChangeMenu";
 import CalendarMenu from "./components/CalendarMenu";
-import CloseButton from "./components/CloseButton";
+import CloseButton from "./components/CloseButton";  // Keep the X button
 import CanvasLogin from "./components/CanvasLogin";
 import UserProfile from "./components/UserProfile";
 import useAuth from "../public/hooks/useAuth";
@@ -16,12 +16,17 @@ import SettingsButton from "./components/SettingsButton";
  */
 function App() {
   const isAuthenticated = useAuth();
-  const [backgroundColor, setBackgroundColor] = useState("crimson");  // Default background color
+  
+  // Use crimson as the default color
+  const [backgroundColor, setBackgroundColor] = useState(
+    localStorage.getItem("backgroundColor") || "crimson"
+  );
 
-  // Set background color globally when it changes
+  // Set the background color globally
   useEffect(() => {
-    document.body.style.backgroundColor = backgroundColor;  // Update body background color
-    document.body.style.setProperty('--app-background', backgroundColor);  // Set a global CSS variable for background
+    document.documentElement.style.setProperty("--app-background", backgroundColor);
+    document.body.style.backgroundColor = backgroundColor;  
+    localStorage.setItem("backgroundColor", backgroundColor);  // Store color persistently
   }, [backgroundColor]);
 
   return (
@@ -30,10 +35,14 @@ function App() {
         position: "relative",
         padding: "10px",
         color: "white",
+        minHeight: "100vh",
+        transition: "background-color 0.3s ease",
+        backgroundColor: backgroundColor,  // Ensure the background color applies here
       }}
     >
-      <CloseButton /> {/* Close Button */}
-      <SettingsButton setColor={setBackgroundColor} /> {/* Pass setColor as prop */}
+      <CloseButton /> 
+
+      <SettingsButton setColor={setBackgroundColor} />
       
       <Counter />
       <AccordionMenu />

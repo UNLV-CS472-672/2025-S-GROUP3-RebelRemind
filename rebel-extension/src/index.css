@@ -7,7 +7,8 @@
   
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  
+  background-color: var(--app-background, crimson); /* Default background */
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -29,11 +30,9 @@ body {
   display: flex;
   place-items: center;
   min-width: 320px;
-  min-height: 100vh;  /* Ensure full-height for background */
-  background-color: crimson; /* This is the default color (white), or you can set it to crimson or any color you want */
-  transition: background-color 0.3s ease; /* Optional: Smooth transition for color change */
+  min-height: 100vh; 
+  background-color: var(--app-background, crimson); /* Apply background globally */
 }
-  
 
 h1 {
   font-size: 3.2em;

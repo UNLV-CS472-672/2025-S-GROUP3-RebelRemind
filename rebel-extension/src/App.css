@@ -4,25 +4,23 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-  background-color: var(--bg-color, crimson); 
+  background-color: var(--app-background, crimson); /* Use dynamic background color */
   transition: background-color 0.3s ease; 
 }
 
-.accordion{
+.accordion {
   padding: 1rem;
 }
 
-.accordion-button{
+.accordion-button {
   --bs-accordion-btn-color: black;
   --bs-accordion-btn-bg: gray;
   --bs-accordion-active-color: black;
   --bs-accordion-active-bg: lightgray;
-	
 }
 
-.accordion-body{
+.accordion-body {
   text-align: left;
-  
 }
 
 .react-calendar {
@@ -34,9 +32,9 @@
   line-height: 1.125em;
 }
 
-.dropdown{
+.dropdown {
   padding: 0.5rem;
-  margin-left: 50% 
+  margin-left: 50%;
 }
 
 .logo {
@@ -45,9 +43,11 @@
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -85,8 +85,8 @@
   color: white;
   font-size: 15px;
   cursor: pointer;
-  padding: 5px; /* Optional: Adds space around the text */
-  border-radius: 0; /* Optional: Adds rounded corners */
+  padding: 5px; /* Adds space around the text */
+  border-radius: 0; 
   outline: none;
 }
 
@@ -95,7 +95,7 @@
   border-color: white; /* Change border color on hover */
 }
 
-/* Confirmation box asking if they are sure to exit button styling */
+/* Confirmation box styling */
 .confirmation-box {
   position: fixed;
   top: 50%;
@@ -129,7 +129,6 @@
   background-color: lightgray;
 }
 
-
 /* Styles for the Login with Canvas button */
 .login-button-container {
   display: flex;
@@ -156,4 +155,57 @@
 
 .login-button:focus {
   outline: none; /* Remove focus outline */
+}
+
+/* Settings button styling */
+.settings-button-container {
+  position: absolute;
+  top: 10px;
+  left: 4px;
+  z-index: 1000;
+}
+
+.settings-button {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.settings-button:hover {
+  color: #ccc;
+}
+
+.settings-options {
+  position: absolute;
+  top: 30px;
+  background-color: black;
+  color: white;
+  border-radius: 5px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+}
+
+.settings-options button {
+  background-color: gray;
+  border: none;
+  color: white;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 8px 12px;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.settings-options button:hover {
+  background-color: #333;
+}
+
+.settings-options input[type="color"] {
+  margin-top: 10px;
+  border: none;
+  width: 40px;
+  height: 40px;
 }

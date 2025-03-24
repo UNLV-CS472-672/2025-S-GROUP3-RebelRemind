@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import "./SettingsButtonCSS.css";
 
-const SettingsButton = ({ setColor }) => {  // Receive setColor as a prop
+const SettingsButton = ({ setColor }) => {
   const [showSettings, setShowSettings] = useState(false);
-  const [showColorPicker, setShowColorPicker] = useState(false); // Added state to control color picker visibility
-  const [selectedColor, setSelectedColor] = useState("#ffffff"); // Default color
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [selectedColor, setSelectedColor] = useState("crimson");  // Match default color
 
   // Toggle visibility of settings options
   const toggleSettings = () => setShowSettings(!showSettings);
@@ -13,7 +13,7 @@ const SettingsButton = ({ setColor }) => {  // Receive setColor as a prop
   const handleColorChange = (event) => {
     const color = event.target.value;
     setSelectedColor(color);  // Set the selected color
-    setColor(color);  // Update the background color in App.jsx
+    setColor(color);           // Update the background color in App.jsx
   };
 
   // Toggle the color picker visibility
@@ -33,7 +33,7 @@ const SettingsButton = ({ setColor }) => {  // Receive setColor as a prop
             <input
               type="color"
               value={selectedColor}
-              onChange={handleColorChange}  // Ensure onChange is correctly set
+              onChange={handleColorChange}
               title="Choose your color"
               style={{ width: "40px", height: "40px", border: "none" }}
             />
