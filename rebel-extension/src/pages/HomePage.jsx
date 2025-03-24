@@ -1,7 +1,7 @@
 import "./css/HomePage.css";
 
-import ChangeMenu from "../components/ChangeMenu";
-import CalendarMenu from "../components/CalendarMenu";
+
+import CloseButton from "../components/CloseButton";
 import DailyOrWeeklyPanel from "../components/DailyOrWeeklyPanel";
 import SidePanelButton from "../components/SidePanelButton";
 
@@ -15,6 +15,7 @@ function HomePage() {
 
   return (
     <>
+      <CloseButton />
       <button onClick={() => navigate("/settings")}> ⚙️ </button>
       <DailyOrWeeklyPanel />
       <SidePanelButton />

@@ -15,7 +15,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
  *
  * Authored by: Billy Estrada
  *
- * Copied from: Jeremy Besitula (Accordian Menu)
+ * Copied from: Jeremy Besitula (Accordion Menu)
  *
  * Put into component DailyReminders.jsx by Jeremy Besitula
  * @returns {JSX.Element} The DailyReminders component UI.
