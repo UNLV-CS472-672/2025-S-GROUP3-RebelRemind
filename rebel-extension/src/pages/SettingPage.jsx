@@ -22,14 +22,17 @@ function SettingPage() {
     });
   }, []);
 
-  // Save + apply new background color
   const handleColorChange = (event) => {
     const newColor = event.target.value;
     setSelectedColor(newColor);
     chrome.storage.sync.set({ backgroundColor: newColor });
     document.documentElement.style.setProperty("--app-background", newColor);
     document.body.style.backgroundColor = newColor;
+  
+    // Notify side panel (and any other listeners)
+    chrome.runtime.sendMessage({ type: "COLOR_UPDATED", color: newColor });
   };
+  
 
   return (
     <>
