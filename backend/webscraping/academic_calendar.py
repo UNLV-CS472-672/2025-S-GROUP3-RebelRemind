@@ -6,11 +6,12 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from bs4 import BeautifulSoup
 from webdriver_manager.chrome import ChromeDriverManager
+import json
 
-def default(filename="academicCalendar.txt"):
+def default(filename="calendar_events.json"):
     """
     Extracts calendar events from the UNLV catalog page using Selenium and BeautifulSoup,
-    adding "Date:" and "Event:" prefixes.
+    and saves the data to a JSON file.
     """
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service)
@@ -48,15 +49,14 @@ def default(filename="academicCalendar.txt"):
                 if len(cells) == 2:  # Ensure it's a date/event row
                     date_cell = cells[0].text.strip()
                     event_cell = cells[1].text.strip()
-                    calendar_data.append(f"Date: {date_cell}\nEvent: {event_cell}")
+                    calendar_data.append({"Date": date_cell, "Event": event_cell})
 
         # Remove the last three lines' notices
         calendar_data = calendar_data[:-3]
 
-        # Write the cleaned data to the output file
+        # Write the cleaned data to the output file in JSON format
         with open(filename, "w", encoding="utf-8") as f:
-            for item in calendar_data:
-                f.write(item + "\n\n")  # Added extra newline for readability
+            json.dump(calendar_data, f, indent=4) # indent for readability
 
         print(f"Calendar data written to {filename}")
 
@@ -68,3 +68,6 @@ def default(filename="academicCalendar.txt"):
         print(f"An error occurred: {e}")
     finally:
         driver.quit()
+
+if __name__ == '__main__':
+    default()

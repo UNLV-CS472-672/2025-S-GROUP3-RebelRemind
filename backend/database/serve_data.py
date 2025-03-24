@@ -29,7 +29,7 @@ class EventModel(db.Model):
 		return f"Event_Info(id = {id}, name = {name}, date = {date}, time = {time}, location = {location})" # type: ignore
 
 # leave commented to prevent data overwrite or delete
-db.create_all()
+#db.create_all()
 
 # Parser for User model
 user_put_args = reqparse.RequestParser()

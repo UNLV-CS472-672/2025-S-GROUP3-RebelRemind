@@ -8,21 +8,19 @@
   text-align: center;
 }
 
-.accordion{
+.accordion {
   padding: 1rem;
 }
 
-.accordion-button{
+.accordion-button {
   --bs-accordion-btn-color: black;
   --bs-accordion-btn-bg: gray;
   --bs-accordion-active-color: black;
   --bs-accordion-active-bg: lightgray;
-	
 }
 
-.accordion-body{
+.accordion-body {
   text-align: left;
-  
 }
 
 .react-calendar {
@@ -30,13 +28,13 @@
   max-width: 100%;
   background: black;
   border: 1px solid #a0a096;
-  font-family: 'Arial', 'Helvetica', sans-serif;
+  font-family: "Arial", "Helvetica", sans-serif;
   line-height: 1.125em;
 }
 
-.dropdown{
+.dropdown {
   padding: 0.5rem;
-  margin-left: 50% 
+  margin-left: 50%;
 }
 
 .logo {
@@ -73,4 +71,87 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Close button styling */
+.close-button {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  background: transparent;
+  border: 2px solid white;  /* Add a white border */
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 5px; /* Optional: Adds space around the text */
+  border-radius: 0; /* Optional: Adds rounded corners */
+  outline: none;
+}
+
+.close-button:hover {
+  color: white;
+  border-color: white; /* Change border color on hover */
+}
+
+/* Confirmation box asking if they are sure to exit button styling */
+.confirmation-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: black;
+  color: white;
+  padding: 20px;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 9999;
+}
+
+.confirmation-box .button-container {
+  display: flex; /* Use flexbox for buttons */
+  justify-content: center; /* Center the buttons horizontally */
+}
+
+.confirmation-box button {
+  background-color: white;
+  color: black;
+  border: none;
+  padding: 10px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.confirmation-box button:hover {
+  background-color: lightgray;
+}
+
+
+/* Styles for the Login with Canvas button */
+.login-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.login-button {
+  padding: 10px 20px;
+  background-color: #2e77b8; /* Canvas blue color */
+  color: white;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: #1e5a85; /* Darker blue on hover */
+}
+
+.login-button:focus {
+  outline: none; /* Remove focus outline */
 }
