@@ -93,6 +93,9 @@ export async function getCourses() {
             });
 
             if (!response.ok) {
+                if (response.status == 401) {
+                    console.log("There may be an issue with your Canvas Access Token. Please check that and try again!");
+                }
                 throw new Error(`HTTP Error: ${response.status}`);
             }
 

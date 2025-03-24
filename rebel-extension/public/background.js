@@ -71,7 +71,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     /**
      * Retrieves the user's schedule from a background API.
-     * Calls `handleGetSchedule()` to fetch schedule data.
      */
     case "GET_SCHEDULE":
       sendResponse(getCourses()); // Added call to canvas-script for making the Canvas API call.
