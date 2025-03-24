@@ -32,3 +32,6 @@ def map_event(event_json):
         'time': time,
         'location': event_json['location']
     }
+
+if __name__ == '__main__':
+    default()

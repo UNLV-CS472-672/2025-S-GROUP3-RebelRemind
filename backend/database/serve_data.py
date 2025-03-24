@@ -15,7 +15,7 @@ class UserModel(db.Model):
 	nshe = db.Column(db.String(15), nullable=False, unique=True)
 
 	def __repr__(self):
-		return f"User_Info(id = {id}, first_name = {first_name}, last_name = {last_name}, nshe = {nshe})"
+		return f"User_Info(id = {id}, first_name = {first_name}, last_name = {last_name}, nshe = {nshe})" # type: ignore
 
 # Create Event model table for database
 class EventModel(db.Model):
@@ -26,7 +26,7 @@ class EventModel(db.Model):
 	location = db.Column(db.String(100))
 
 	def __repr__(self):
-		return f"Event_Info(id = {id}, name = {name}, date = {date}, time = {time}, location = {location})"
+		return f"Event_Info(id = {id}, name = {name}, date = {date}, time = {time}, location = {location})" # type: ignore
 
 # leave commented to prevent data overwrite or delete
 db.create_all()
@@ -136,3 +136,9 @@ api.add_resource(Event_List, "/event_list")
 # default function to run API
 def default():
 	app.run(host='0.0.0.0', port=5000, debug=True)
+
+if __name__ == '__main__':
+    with app.app_context():
+     #  db.drop_all()
+        db.create_all()  # Create tables within the application context
+        default()  # Run the app after creating the tables
