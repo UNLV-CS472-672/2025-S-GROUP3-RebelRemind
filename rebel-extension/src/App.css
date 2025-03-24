@@ -1,11 +1,11 @@
-/* This file contains styles specific to App.jsx. */
 #root {
   max-width: 1000px;
   min-width: 450px;
-  background-color: crimson;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  background-color: var(--bg-color, crimson); 
+  transition: background-color 0.3s ease; 
 }
 
 .accordion{

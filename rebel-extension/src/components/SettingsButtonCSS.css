@@ -1,10 +1,10 @@
 /* src/components/SettingsButton.css */
 
 .settings-button-container {
-  position: absolute; /* Position this button absolutely */
-  top: 10px; /* Adjust distance from top */
-  left: 4px; /* Adjust distance from left */
-  z-index: 1000; /* Ensure it appears on top of other content */
+  position: absolute; 
+  top: 10px; 
+  left: 4px; 
+  z-index: 1000; 
 }
 
 .settings-button {
@@ -17,12 +17,12 @@
 }
 
 .settings-button:hover {
-  color: #ccc; /* Change color on hover */
+  color: #ccc; 
 }
 
 .settings-options {
   position: absolute;
-  top: 30px; /* Position the settings options below the button */
+  top: 30px; 
   background-color: black;
   color: white;
   border-radius: 5px;

@@ -1,14 +1,13 @@
-/* Global Styles for the Entire Extension */
+/* Global Styles for the Entire Extension */ 
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
+  
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -20,6 +19,7 @@ a {
   color: #646cff;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #535bf2;
 }
@@ -29,8 +29,11 @@ body {
   display: flex;
   place-items: center;
   min-width: 320px;
-  min-height: auto;
+  min-height: 100vh;  /* Ensure full-height for background */
+  background-color: crimson; /* This is the default color (white), or you can set it to crimson or any color you want */
+  transition: background-color 0.3s ease; /* Optional: Smooth transition for color change */
 }
+  
 
 h1 {
   font-size: 3.2em;
@@ -48,9 +51,11 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
