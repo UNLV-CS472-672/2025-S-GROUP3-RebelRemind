@@ -32,6 +32,7 @@ body {
   min-width: 320px;
   min-height: 100vh; 
   background-color: var(--app-background, crimson); /* Apply background globally */
+  transition: background-color 0.3s ease; 
 }
 
 h1 {
