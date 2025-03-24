@@ -12,6 +12,8 @@ import DailyCalendar from "./DailyCalendar.jsx";
  *	- Displays Calendar UI
  *
  * Original Documentation provided by: Billy Estrada
+ * Authored by: Billy Estrada
+ * Copied from: Jeremy Besitula (Accordion Menu)
  *
  * New Documentation provided by: Jeremy Besitula (Accordion Menu)
  * 

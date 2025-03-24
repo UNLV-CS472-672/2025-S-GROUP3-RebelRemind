@@ -33,7 +33,7 @@ function DailyOrWeeklyPanel() {
             borderRadius: "4px",
           }}
         >
-          WeeklyReminders
+          Weekly Reminders
         </button>
       </div>
 

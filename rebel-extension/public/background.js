@@ -18,7 +18,6 @@ import {
 import { authenticateUser } from "./scripts/identity-script.js";
 import { getAssignments } from "./scripts/canvas-script.js";
 import { openSidePanel } from "./scripts/sidepanel.js";
-import { weeklyReminders } from "./scripts/weekly-reminders.js";
 
 /**
  * Listens for the Chrome extension installation event.
@@ -132,14 +131,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
      */
     case "OPEN_SIDEPANEL":
       openSidePanel(sendResponse);
-
-    /**
-     * Takes in a list of assignments from Canvas and returns the name and date of assignments due this week`.
-     * Returns object of weekdays with empty arrays if none
-     */
-    case "GET_WEEKLY_REMINDERS":
-      weeklyReminders(message, sendResponse);
-      return true;
 
     /**
      * Default case: Logs an unrecognized message type.

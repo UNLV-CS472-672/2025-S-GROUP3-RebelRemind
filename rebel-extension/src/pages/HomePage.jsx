@@ -1,5 +1,5 @@
 import "./css/HomePage.css";
-
+import CloseButton from "../components/CloseButton";
 import DailyOrWeeklyPanel from "../components/DailyOrWeeklyPanel";
 import SidePanelButton from "../components/SidePanelButton";
 
@@ -13,10 +13,10 @@ function HomePage() {
 
   return (
     <div >
-      <button 
+      <CloseButton />
+      <button
         style={{ display: 'flex', justifyContent: 'flex-end', marginLeft: 'auto' }}
-        onClick={() => navigate("/settings")}> ⚙️  
-      </button>
+        onClick={() => navigate("/settings")}> ⚙️ </button>
       <DailyOrWeeklyPanel />
       <SidePanelButton />
     </div>
