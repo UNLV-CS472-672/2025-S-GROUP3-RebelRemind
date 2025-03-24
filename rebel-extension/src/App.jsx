@@ -26,7 +26,7 @@ function App() {
   useEffect(() => {
     document.documentElement.style.setProperty("--app-background", backgroundColor);
     document.body.style.backgroundColor = backgroundColor;  
-    localStorage.setItem("backgroundColor", backgroundColor);  // Store color persistently
+    localStorage.setItem("backgroundColor", backgroundColor); 
   }, [backgroundColor]);
 
   return (

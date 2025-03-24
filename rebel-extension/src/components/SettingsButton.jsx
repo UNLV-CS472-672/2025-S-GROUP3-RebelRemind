@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./SettingsButtonCSS.css";
+import "./SettingsButton.css";
 
 const SettingsButton = ({ setColor }) => {
   const [showSettings, setShowSettings] = useState(false);
