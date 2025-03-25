@@ -4,7 +4,7 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-  background-color: var(--app-background, crimson); /* Use dynamic background color */
+  background-color: var(--app-background, "#8b0000"); /* Use dynamic background color */
   transition: background-color 0.3s ease; 
 }
 

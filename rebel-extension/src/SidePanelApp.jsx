@@ -16,7 +16,7 @@ function SidePanelApp() {
   useEffect(() => {
     // Initial load
     chrome.storage.sync.get("backgroundColor", (data) => {
-      const color = data.backgroundColor || "crimson";
+      const color = data.backgroundColor || "#8b0000";
       document.documentElement.style.setProperty("--app-background", color);
       document.body.style.backgroundColor = color;
     });
