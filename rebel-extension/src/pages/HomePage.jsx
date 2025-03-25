@@ -3,6 +3,7 @@ import "./css/HomePage.css";
 
 import CloseButton from "../components/CloseButton";
 import DailyOrWeeklyPanel from "../components/DailyOrWeeklyPanel";
+import GetAssignmentsButton from "../components/GetAssignmentsButton";
 import SidePanelButton from "../components/SidePanelButton";
 
 import { useNavigate } from "react-router-dom";
@@ -18,6 +19,7 @@ function HomePage() {
       <CloseButton />
       <button onClick={() => navigate("/settings")}> ⚙️ </button>
       <DailyOrWeeklyPanel />
+      <GetAssignmentsButton />
       <SidePanelButton />
     </>
   );
