@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import json
 
 # Flask API
 BASE = "http://127.0.0.1:5050/"
@@ -14,7 +15,7 @@ def scrape_cal():
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "html.parser")
         
-        events = []
+        events = []  # Initialize an empty list to hold events
         event_id = 1  # Initialize event ID counter
 
         # Loop through each event on the page
@@ -45,11 +46,15 @@ def scrape_cal():
             api_response = requests.put(BASE + f"event_id/{event_id}", json=event_data)
             if api_response.status_code == 201:
                 pass
-            
+
+            events.append(event_data)  # Add event data to the events list
+
             event_id += 1  # Increment event ID
-        
+        with open('scraped_UNLVEvents.json', 'w') as json_file:
+            json.dump(events, json_file, indent=4)  # Write events as formatted JSON
+
     else:
-        print(f"❌ Failed to access the page. Status code: {response.status_code}")
+        print(f"Failed to access the page. Status code: {response.status_code}")
 
 if __name__ == "__main__":
     scrape_cal()
