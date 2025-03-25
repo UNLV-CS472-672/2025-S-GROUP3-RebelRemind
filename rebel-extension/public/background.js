@@ -16,7 +16,7 @@ import {
   handleGetSchedule,
 } from "./scripts/counter-script.js";
 import { authenticateUser } from "./scripts/identity-script.js";
-import { getAssignments } from "./scripts/canvas-script.js";
+import { getCourses } from "./scripts/canvas-script.js";
 import { openSidePanel } from "./scripts/sidepanel.js";
 
 /**
@@ -71,10 +71,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     /**
      * Retrieves the user's schedule from a background API.
-     * Calls `handleGetSchedule()` to fetch schedule data.
      */
     case "GET_SCHEDULE":
-      sendResponse(getAssignments()); // Added call to canvas-script for making the Canvas API call.
+      sendResponse(getCourses()); // Added call to canvas-script for making the Canvas API call.
       return true;
 
     /**

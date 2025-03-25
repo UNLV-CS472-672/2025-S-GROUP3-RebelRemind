@@ -75,11 +75,11 @@ class User_Get_By_NSSHE(Resource):
 		return result
 	
 class User_List(Resource):
-	@marshal_with(resource_fields)
+@marshal_with(resource_fields)
 	def get(self):
 		result = UserModel.query.all()
 		if not result:
-			abort(404, message="Table is empty")
+			abort(404, message="No users found")
 		return result
 
 class User_Add(Resource):
@@ -127,7 +127,13 @@ api.add_resource(Event_Add, "/event_add")
 # Get list of events
 api.add_resource(Event_List, "/event_list")
 
-if __name__ == "__main__":
-	app.run(host='0.0.0.0', port=5000, debug=True)
+# default function to run API
+def default():
+	app.run(host='0.0.0.0', port=5050, debug=False)
 
-
+if __name__ == '__main__':
+	with app.app_context():
+		db.session.query(CalendarModel).delete()  # Delete only events
+		db.session.commit()
+		db.create_all()  # Ensure tables exist
+		default()
