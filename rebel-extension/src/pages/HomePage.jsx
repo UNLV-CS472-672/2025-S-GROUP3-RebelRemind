@@ -1,6 +1,6 @@
 import "./css/HomePage.css";
 import CloseButton from "../components/CloseButton";
-import DailyOrWeeklyPanel from "../components/DailyOrWeeklyPanel";
+import AccordionMenu from "../components/AccordionMenu";
 import SidePanelButton from "../components/SidePanelButton";
 
 import { useNavigate } from "react-router-dom";
@@ -17,7 +17,7 @@ function HomePage() {
       <button
         style={{ display: 'flex', justifyContent: 'flex-end', marginLeft: 'auto' }}
         onClick={() => navigate("/settings")}> ⚙️ </button>
-      <DailyOrWeeklyPanel />
+      <AccordionMenu />
       <SidePanelButton />
     </div>
   );

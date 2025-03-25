@@ -47,7 +47,8 @@ function CalendarMenu() {
     	  <Calendar
       	  localizer={localizer}
       	  //events={myEventsList}	TO DO: MyEventsList MIGHT be the assignments list from Gunnar's API (TBD)
-          view= 'day'
+          defaultView= 'week'
+          views= {['week', 'day']}
       	  startAccessor="start"
       	  endAccessor="end"
       	  style={{ height: 500 }}
