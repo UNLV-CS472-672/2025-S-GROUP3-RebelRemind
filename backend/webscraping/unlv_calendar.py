@@ -8,7 +8,7 @@ BASE = "http://127.0.0.1:5050/"
 # URL of the UNLV event calendar
 url = "https://www.unlv.edu/calendar"
 
-def scrape_cal():
+def default():
     # Make request inside function
     response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
     
@@ -43,7 +43,7 @@ def scrape_cal():
             }
 
             # Send event data to Flask API
-            api_response = requests.put(BASE + f"event_id/{event_id}", json=event_data)
+            api_response = requests.put(BASE + f"unlvcalendar_id/{event_id}", json=event_data)
             if api_response.status_code == 201:
                 pass
 
@@ -57,4 +57,4 @@ def scrape_cal():
         print(f"Failed to access the page. Status code: {response.status_code}")
 
 if __name__ == "__main__":
-    scrape_cal()
+    default()

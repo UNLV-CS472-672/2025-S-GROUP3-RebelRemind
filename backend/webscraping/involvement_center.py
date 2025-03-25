@@ -7,6 +7,8 @@ url = "https://involvementcenter.unlv.edu/api/discovery/event/search?"
 query = f"endsAfter={datetime.today()}&orderByField=endsOn&orderByDirection=ascending&status=Approved&take=9999"
 tz = timezone("America/Los_Angeles")
 
+BASE = "http://127.0.0.1:5050/"
+
 def default():
     response = requests.get(url+query)
 
@@ -15,8 +17,14 @@ def default():
     events = json_data['value']
 
     results = []
+    id = 0
+    
     for event in events:
-        results.append(map_event(event))
+        id += 1
+        event = map_event(event)
+        # PUT events into database
+        response = requests.put(BASE + f"involvementcenter_id/{id}", event)
+        results.append(event)
 
     with open('events.json', 'w', encoding='utf-8') as f:
         json.dump(results, f, indent=4)
