@@ -18,7 +18,7 @@ function HomePage() {
       <button
         style={{ display: 'flex', justifyContent: 'flex-end', marginLeft: 'auto' }}
         onClick={() => navigate("/settings")}> ⚙️ </button>
-      <AccordionMenu />
+      <AccordionMenu />    
       <GetAssignmentsButton />
       <SidePanelButton />
     </div>

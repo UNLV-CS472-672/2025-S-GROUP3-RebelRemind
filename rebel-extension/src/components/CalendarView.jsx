@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import "../App.css";
 import "react-big-calendar/lib/css/react-big-calendar.css"
+import calendarEvents from "./calendarEvents";
 
 //date-fns localizer for big-calendar
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
@@ -9,6 +10,8 @@ import parse from 'date-fns/parse'
 import startOfWeek from 'date-fns/startOfWeek'
 import getDay from 'date-fns/getDay'
 import enUS from 'date-fns/locale/en-US'
+import { setHours } from "date-fns";
+import { setMinutes } from "date-fns";
 
 /**
  * Calendar Menu Component - Creates a calendar that takes in the current date
@@ -42,16 +45,22 @@ function CalendarMenu() {
   	locales,
 	})
 
+	const minLimit = setMinutes(setHours(new Date(), 7), 0);
+	const maxLimit = setMinutes(setHours(new Date(), 22), 0);
+
 	return (
-  	<div>
+  	<div >
     	  <Calendar
       	  localizer={localizer}
-      	  //events={myEventsList}	TO DO: MyEventsList MIGHT be the assignments list from Gunnar's API (TBD)
-          defaultView= 'week'
-          views= {['week', 'day']}
+      	  events={calendarEvents}	
+          defaultView= 'day'		
+          views= {['day', 'week']}	
       	  startAccessor="start"
       	  endAccessor="end"
-      	  style={{ height: 500 }}
+      	  min= {minLimit}
+      	  max= {maxLimit}
+      	  defaultDate = {new Date()}
+      	  style={{ height: 600 }}
     	  />
   	</div>
 	);  
