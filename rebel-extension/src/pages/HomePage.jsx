@@ -1,6 +1,7 @@
 import "./css/HomePage.css";
 import CloseButton from "../components/CloseButton";
 import AccordionMenu from "../components/AccordionMenu";
+import GetAssignmentsButton from "../components/GetAssignmentsButton";
 import SidePanelButton from "../components/SidePanelButton";
 
 import { useNavigate } from "react-router-dom";
@@ -18,6 +19,7 @@ function HomePage() {
         style={{ display: 'flex', justifyContent: 'flex-end', marginLeft: 'auto' }}
         onClick={() => navigate("/settings")}> ⚙️ </button>
       <AccordionMenu />
+      <GetAssignmentsButton />
       <SidePanelButton />
     </div>
   );
