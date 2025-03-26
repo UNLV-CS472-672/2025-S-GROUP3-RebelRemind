@@ -1,4 +1,4 @@
-// ✅ mock useNavigate before importing the component
+// mock useNavigate before importing the component
 const mockNavigate = jest.fn();
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),

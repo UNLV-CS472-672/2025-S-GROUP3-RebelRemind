@@ -113,7 +113,7 @@
 
 .reset-button {
   margin-top: 10px;
-  background-color: linear-gradient(to bottom right, #dc143c, #f8d7da);
+  background-color: #dc143c;
   color: white;
   border: none;
   padding: 8px 14px;
