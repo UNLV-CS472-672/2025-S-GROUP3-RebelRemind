@@ -6,9 +6,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from bs4 import BeautifulSoup
 from webdriver_manager.chrome import ChromeDriverManager
-import json
+import requests
+from database import BASE
 
-def default(filename="calendar_events.json"):
+def default():
     """
     Extracts calendar events from the UNLV catalog page using Selenium and BeautifulSoup,
     and saves the data to a JSON file.
@@ -54,11 +55,21 @@ def default(filename="calendar_events.json"):
         # Remove the last three lines' notices
         calendar_data = calendar_data[:-3]
 
-        # Write the cleaned data to the output file in JSON format
-        with open(filename, "w", encoding="utf-8") as f:
-            json.dump(calendar_data, f, indent=4) # indent for readability
+        # PUT calendar events into the database
+        calendar_id = 0
+        for event in calendar_data:
+            calendar_id += 1
+            put_data = {
+                "name": event['Event'],
+                "date": event['Date']
+            }
+            response = requests.put(BASE + f"academiccalendar_id/{calendar_id}", json=put_data) # Use json= for the request body
 
-        print(f"Calendar data written to {filename}")
+            if response.status_code != 201:
+                print(f"Error adding event {calendar_id}: {response.status_code} - {response.text}")
+                return
+
+        print(f"Calendar data added to database")
 
     except TimeoutException:
         print("Timed out waiting for the main content to load.")

@@ -4,29 +4,22 @@ Test Cases for User and Event Web Service
 import unittest
 import requests
 import json
+from database import BASE
 from database.serve_data import app, db
 from http import HTTPStatus
 
-# Swap BASE comments if you want to use a local host (127.0.0.1) or persistant web host
-BASE = "http://127.0.0.1:5050/"
-#BASE = "http://franklopez.tech:5000/"
-
 class TestEndpoints(unittest.TestCase):
-    def setUp(self):
-        # Set up the Flask test client
-        self.app = app.test_client()
-        self.app.testing = True
-        with self.app:
-            with self.app.app_context():
-                db.create_all()
-                yield self.app
-                db.drop_all()
+    @classmethod
+    def setUpClass(cls):
+        with app.app_context():
+            db.drop_all()
+            db.create_all()
     
     """Test cases for User API"""
 
     def test_create_user(self):
         # Test PUT request to create a user
-        response = self.app.put('/user_id/1', json={
+        response = requests.get(BASE + '/user_id/1', json={
             "first_name": "Marge",
             "last_name": "Simpson",
             "nshe": "2000444999"
@@ -36,7 +29,7 @@ class TestEndpoints(unittest.TestCase):
 
     def test_get_user(self):
         # Test GET request to retrieve the  user
-        response = self.app.get('/user_id/1')
+        response = requests.get(BASE + '/user_id/1')
         assert response.status_code == HTTPStatus.OK
         assert response.json["first_name"] == "Marge"
 
@@ -44,7 +37,7 @@ class TestEndpoints(unittest.TestCase):
     
     def test_create_event(self):
         # Test PUT request to create an academic calendar event
-        response = self.app.post('/academiccalendar_id/1', json={
+        response = requests.put(BASE + '/academiccalendar_id/1', json={
             "name": "Spring Break",
             "date": "Monday, March 17, 2025"
         })
@@ -53,7 +46,7 @@ class TestEndpoints(unittest.TestCase):
 
     def test_get_event(self):
         # Test GET request to retrieve the academic calendar event
-        response = self.app.get('/academiccalendar_id/1')
+        response = requests.get(BASE + '/academiccalendar_id/1')
         assert response.status_code == HTTPStatus.OK
         assert response.json["name"] == "Spring Break"
 
@@ -61,7 +54,7 @@ class TestEndpoints(unittest.TestCase):
 
     def test_create_event(self):
         # Test PUT request to create an involvement center event
-        response = self.app.post('/involvementcenter_id/1', json={
+        response = requests.put(BASE + '/involvementcenter_id/1', json={
             "name": "Info Session",
             "date": "Tuesday, March 25, 2025",
             "time": "10:00 AM PDT",
@@ -72,7 +65,7 @@ class TestEndpoints(unittest.TestCase):
 
     def test_get_event(self):
         # Test GET request to retrieve the involvement center event
-        response = self.app.get('/involvementcenter_id/1')
+        response = requests.get(BASE + '/involvementcenter_id/1')
         assert response.status_code == HTTPStatus.OK
         assert response.json["name"] == "Info Session"
 
@@ -80,7 +73,7 @@ class TestEndpoints(unittest.TestCase):
 
     def test_create_event(self):
         # Test PUT request to create a rebel coverage event
-        response = self.app.post('/rebelcoverage_id/1', json={
+        response = requests.put(BASE + '/rebelcoverage_id/1', json={
             "name": "Super Bowl",
             "date": "Tuesday, February 25, 2026",
             "time": "12:00 PM PST",
@@ -91,7 +84,7 @@ class TestEndpoints(unittest.TestCase):
 
     def test_get_event(self):
         # Test GET request to retrieve the rebel coverage event
-        response = self.app.get('/rebelcoverage_id/1')
+        response = requests.get(BASE + '/rebelcoverage_id/1')
         assert response.status_code == HTTPStatus.OK
         assert response.json["name"] == "Super Bowl"
 
@@ -99,7 +92,7 @@ class TestEndpoints(unittest.TestCase):
 
     def test_create_event(self):
         # Test PUT request to create a unlv calendar event
-        response = self.app.post('/unlvcalendar_id/1', json={
+        response = requests.put(BASE + '/unlvcalendar_id/1', json={
             "name": "Info Session",
             "date": "Tuesday, March 25, 2025",
             "time": "10:00 AM PDT",
@@ -110,7 +103,7 @@ class TestEndpoints(unittest.TestCase):
 
     def test_get_event(self):
         # Test GET request to retrieve the unlv calendar event
-        response = self.app.get('/unlvcalendar_id/1')
+        response = requests.get(BASE + '/unlvcalendar_id/1')
         assert response.status_code == HTTPStatus.OK
         assert response.json["name"] == "Info Session"
 
@@ -118,13 +111,13 @@ class TestEndpoints(unittest.TestCase):
 
     def test_create_daily(self):
         # Test PUT request to create a daily
-        response = self.app.post('/daily/Tuesday, March 25, 2025')
+        response = requests.put(BASE + '/daily/Tuesday, March 25, 2025')
         assert response.status_code == HTTPStatus.CREATED
         assert response.json["date"] == "Tuesday, March 25, 2025"
 
     def test_get_daily(self):
         # Test GET request to retrieve the daily events
-        response = self.app.get('/daily/Tuesday, March 25, 2025')
+        response = requests.get(BASE + '/daily/Tuesday, March 25, 2025')
         assert response.status_code == HTTPStatus.OK
         assert response.json["date"] == "Tuesday, March 25, 2025"
 

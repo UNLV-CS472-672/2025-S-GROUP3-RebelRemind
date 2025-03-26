@@ -1,9 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-import json
-
-# Flask API
-BASE = "http://127.0.0.1:5050/"
+from database import BASE
 
 # URL of the UNLV event calendar
 url = "https://www.unlv.edu/calendar"
@@ -50,8 +47,6 @@ def default():
             events.append(event_data)  # Add event data to the events list
 
             event_id += 1  # Increment event ID
-        with open('scraped_UNLVEvents.json', 'w') as json_file:
-            json.dump(events, json_file, indent=4)  # Write events as formatted JSON
 
     else:
         print(f"Failed to access the page. Status code: {response.status_code}")
