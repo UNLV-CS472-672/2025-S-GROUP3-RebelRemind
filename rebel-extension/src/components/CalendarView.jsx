@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import "../App.css";
-import "react-big-calendar/lib/css/react-big-calendar.css"
+import "./css/CalendarView.css";
 import calendarEvents from "./calendarEvents";
 
 //date-fns localizer for big-calendar
@@ -46,7 +46,7 @@ function CalendarMenu() {
 	})
 
 	const minLimit = setMinutes(setHours(new Date(), 7), 0);
-	const maxLimit = setMinutes(setHours(new Date(), 22), 0);
+	const maxLimit = setMinutes(setHours(new Date(), 23), 59);
 
 	return (
   	<div >
