@@ -82,36 +82,22 @@ Residual CSS from obselete library, keeping for backtracking/testing, remove lat
 /* Close button styling */
 .close-button {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 40px;
-  height: 40px;
-  border: 2px solid white;
-  background-color: transparent;
+  top: 1px;
+  right: 1px;
+  background: transparent;
+  border: 2px solid white;  /* Add a white border */
+  color: white;
+  font-size: 15px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  z-index: 9999;
+  padding: 5px; /* Adds space around the text */
+  border-radius: 0; 
+  outline: none;
 }
 
-.confirmation-box .button-container {
-  display: flex; /* Use flexbox for buttons */
-  justify-content: center; /* Center the buttons horizontally */
+.close-button:hover {
+  color: white;
+  border-color: white; /* Change border color on hover */
 }
-
-.confirmation-box button {
-  background-color: white;
-  color: black;
-  border: none;
-  padding: 10px;
-  margin: 5px;
-  cursor: pointer;
-}
-
-.confirmation-box button:hover {
-  background-color: lightgray;
-}
-
 
 /* Styles for the Login with Canvas button */
 .login-button-container {
