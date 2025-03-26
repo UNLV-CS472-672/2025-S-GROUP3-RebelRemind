@@ -58,8 +58,8 @@ describe("SettingPage", () => {
     fireEvent.click(screen.getByRole("button", { name: /back to original/i }));
 
     await waitFor(() => {
-      expect(global.chrome.storage.sync.set).toHaveBeenCalledWith({ backgroundColor: "#8b0000" });
-      expect(global.chrome.runtime.sendMessage).toHaveBeenCalledWith({ type: "COLOR_UPDATED", color: "#8b0000" });
+      expect(global.chrome.storage.sync.set).toHaveBeenCalledWith({ backgroundColor: "#dc143c" });
+      expect(global.chrome.runtime.sendMessage).toHaveBeenCalledWith({ type: "COLOR_UPDATED", color: "#dc143c"});
     });
   });
 
