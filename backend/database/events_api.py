@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import json
 from datetime import datetime, timedelta
 from collections import defaultdict
@@ -103,6 +103,36 @@ def get_combined_events():
         return jsonify({"error": f"File error: {str(e)}"}), 500
 
     return jsonify(weekly_grouped), 200
+
+
+@app.route('/calendar-events/by-week', methods=['GET'])
+def get_events_by_week():
+    start_date_str = request.headers.get('start-date')
+    if not start_date_str:
+        return jsonify({"error": "Missing 'start-date' header"}), 400
+
+    date_obj = parse_date(start_date_str)
+    if not date_obj:
+        return jsonify({"error": "Invalid date format. Use YYYY-MM-DD or 'Monday, March 25, 2025'"}), 400
+
+    week_key = format_week_range(date_obj)
+    weekly_grouped = defaultdict(lambda: defaultdict(list))
+
+    # Filepaths
+    base_path = os.path.join("..", "webscraping")
+    academic_file = os.path.join(base_path, "calendar_events.json")
+    unlv_file = os.path.join(base_path, "scraped_UNLVEvents.json")
+    involvement_file = os.path.join(base_path, "events.json")
+
+    try:
+        extract_academic_calendar_events(academic_file, "Academic Calendar", weekly_grouped)
+        extract_unlv_calendar_events(unlv_file, "UNLV Calendar", weekly_grouped)
+        extract_involvement_center_events(involvement_file, "Involvement Center", weekly_grouped)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        return jsonify({"error": f"File error: {str(e)}"}), 500
+
+    events = weekly_grouped.get(week_key, {})
+    return jsonify({week_key: events}), 200
 
 # --- Run ---
 
