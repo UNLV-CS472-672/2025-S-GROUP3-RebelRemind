@@ -71,6 +71,7 @@ function CalendarMenu() {
           views= {['day', 'week']}	
       	  startAccessor="start"
       	  endAccessor="end"
+		  allDayAccessor="allDay"
       	  min= {minLimit}
       	  max= {maxLimit}
       	  defaultDate = {new Date()}
@@ -109,8 +110,9 @@ const getUserEvents = async () => {
 				const userEvents = data.userEvents;
 				const userCalendarEvents = userEvents.map(event => ({
 					title: event.title,
-					start: new Date(`${event.date}T${event.startTime}:00`),
-					end: new Date(`${event.date}T${event.endTime}:00`),
+					start: event.allDay ? new Date (`${event.date}T00:00:00`) : new Date(`${event.date}T${event.startTime}:00`),
+					end: event.allDay ? new Date (`${event.date}T00:00:00`) : new Date(`${event.date}T${event.endTime}:00`),
+					allDay: event.allDay,
 					description: event.desc
 				}))
 				resolve(userCalendarEvents);
