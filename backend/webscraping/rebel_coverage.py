@@ -6,49 +6,54 @@ from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 import requests
 import json
+from database import BASE
 
-# Swap BASE comments if you want to use a local host (127.0.0.1) or persistant web host
-BASE = "http://127.0.0.1:5000/"
-#BASE = "http://franklopez.tech:5000/"
+def default():
+    #service = Service(executable_path='./chromedriver-linux64/chromedriver')
+    service = Service(ChromeDriverManager().install())
 
-#service = Service(executable_path='./chromedriver-linux64/chromedriver')
-service = Service(ChromeDriverManager().install())
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless=new")
+    driver = webdriver.Chrome(service=service, options=options)
+    url = 'https://unlvrebels.com/coverage'
 
-options = webdriver.ChromeOptions()
-options.add_argument("--headless=new")
-driver = webdriver.Chrome(service=service, options=options)
-url = 'https://unlvrebels.com/coverage'
+    # Open the webpage
+    driver.get(url)
 
-# Open the webpage
-driver.get(url)
+    # Wait for page to load before proceeding
+    driver.implicitly_wait(0)
 
-# Wait for page to load before proceeding
-driver.implicitly_wait(0)
+    table = driver.find_element(By.TAG_NAME, 'table')
 
-table = driver.find_element(By.TAG_NAME, 'table')
+    matches = table.find_elements(By.TAG_NAME, 'tr')
 
-matches = table.find_elements(By.TAG_NAME, 'tr')
+    # Print list of dates with their events
+    weekdays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']
+    data_table = []
+    matches = matches[1:]
 
-# Print list of dates with their events
-weekdays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']
-data_table = []
-matches = matches[1:]
+    event_date = ''
 
-event_date = ''
+    for match in matches:
+        if any(day in match.text for day in weekdays):
+            #data_table.append([match.text])
+            event_date = match.text
+        else:
+            #data_table[-1].append(match.text)
+            data_table.append({"name": match.text, "date": event_date})
 
-for match in matches:
-    if any(day in match.text for day in weekdays):
-        #data_table.append([match.text])
-        event_date = match.text
-    else:
-        #data_table[-1].append(match.text)
-        data_table.append({"name": match.text, "date": event_date})
+    #print(data_table)
 
-#print(data_table)
-for i in range(len(data_table)):
-    #print(data_table[i])
-    #requests.put(BASE + "event_add", json={"name": data_table[i][0], "date": data_table[i][1]})
+    id = 0
+
+    for i in range(len(data_table)):
+        id += 1
+        requests.put(BASE + f"rebelcoverage_id/{id}", json={"name": data_table[i]["name"], "date": data_table[i]["date"]})
+        
     with open('scraped_RebelCoverage.json', 'w') as json_file:
-        json.dump(data_table,json_file, indent=4)
+        json.dump(data_table, json_file, indent=4)
 
-driver.quit()
+    driver.quit()
+
+if __name__ == '__main__':
+    default()

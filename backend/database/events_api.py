@@ -137,5 +137,8 @@ def get_events_by_day():
 
 # --- Run ---
 
+def default():
+    app.run(port=5000, debug=True)
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    default()

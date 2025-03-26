@@ -7,15 +7,18 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from bs4 import BeautifulSoup
 from webdriver_manager.chrome import ChromeDriverManager
 import requests
+import json
 from database import BASE
 
-def default():
+def default(filename="calendar_events.json"):
     """
     Extracts calendar events from the UNLV catalog page using Selenium and BeautifulSoup,
     and saves the data to a JSON file.
     """
     service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service)
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless=new")
+    driver = webdriver.Chrome(service=service, options=options)
     url = "https://catalog.unlv.edu/content.php?catoid=47&navoid=14311"
 
     try:
@@ -54,6 +57,12 @@ def default():
 
         # Remove the last three lines' notices
         calendar_data = calendar_data[:-3]
+            
+        # Write the cleaned data to the output file in JSON format
+        with open(filename, "w", encoding="utf-8") as f:
+            json.dump(calendar_data, f, indent=4) # indent for readability
+
+        print(f"Calendar data written to {filename}")
 
         # PUT calendar events into the database
         calendar_id = 0

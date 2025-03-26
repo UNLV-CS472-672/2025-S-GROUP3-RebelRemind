@@ -1,4 +1,5 @@
 import requests
+import json
 from datetime import datetime
 from pytz import timezone
 from database import BASE
@@ -23,6 +24,9 @@ def default():
         # PUT events into database
         response = requests.put(BASE + f"involvementcenter_id/{id}", event)
         results.append(event)
+    
+    with open('events.json', 'w', encoding='utf-8') as f:
+        json.dump(results, f, indent=4)
 
 def map_event(event_json):
     dt = event_json['startsOn']
