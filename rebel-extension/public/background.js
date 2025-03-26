@@ -36,14 +36,14 @@ chrome.runtime.onInstalled.addListener(() => {
  * If you need something to run everytime the pop up is open, you can add it in the App.jsx for the pop up, Or
  * add a functionality in the frontend to call a script here.
  */
-chrome.runtime.onStartup.addListener(() => {
-  if (checkDailyTask()) {
-    // Functions only to be done once a day.
-    // I don't recommend Canvas or assignments because Professors might add new stuff midday so we should update as much as possible.
-  }
-  // Functions that should be ran anytime the user logins to Google. Will be run in background.
-  //
-});
+// chrome.runtime.onStartup.addListener(() => {
+//   if (checkDailyTask()) {
+//     // Functions only to be done once a day.
+//     // I don't recommend Canvas or assignments because Professors might add new stuff midday so we should update as much as possible.
+//   }
+//   // Functions that should be ran anytime the user logins to Google. Will be run in background.
+//   //
+// });
 
 //region Message Listener
 

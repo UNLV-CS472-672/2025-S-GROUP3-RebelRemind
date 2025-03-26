@@ -21,13 +21,13 @@ describe("SidePanelButton", () => {
     render(<SidePanelButton />);
 
     expect(
-      screen.getByText(/Your UNLV Events at a Glance! -->/i)
+      screen.getByText(/Calendar View -->/i)
     ).toBeInTheDocument();
   });
 
   test("open side panel", () => {
     const { getByText } = render(<SidePanelButton />);
-    const button = getByText(/Your UNLV Events at a Glance/i);
+    const button = getByText(/Calendar View/i);
 
     fireEvent.click(button);
 
@@ -38,7 +38,7 @@ describe("SidePanelButton", () => {
 
   test("check window closed", async () => {
     const { getByText } = render(<SidePanelButton />);
-    const button = getByText(/Your UNLV Events at a Glance/i);
+    const button = getByText(/Calendar View/i);
 
     fireEvent.click(button);
 
