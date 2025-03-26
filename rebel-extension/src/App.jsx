@@ -3,7 +3,7 @@ import React from "react";
 import { HashRouter as Router, Routes, Route, Link } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import SettingPage from "./pages/SettingPage";
-
+import PomodoroPage from "./pages/Pomodoro";
 
 /**
  * Main UI Layout for the Chrome Extension.
@@ -14,6 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/settings" element={<SettingPage />} />
+        <Route path="/pomodoro" element={<PomodoroPage />} />
       </Routes>
     </Router>
   );

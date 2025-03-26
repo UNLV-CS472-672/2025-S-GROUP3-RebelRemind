@@ -19,16 +19,83 @@ import { authenticateUser } from "./scripts/identity-script.js";
 import { getCourses } from "./scripts/canvas-script.js";
 import { openSidePanel } from "./scripts/sidepanel.js";
 
+// background.js
 /**
  * Listens for the Chrome extension installation event.
  * This event triggers once when the extension is installed or updated.
  * Used to initialize default settings or guide users on first install.
  */
+let timerInterval;
+let isRunning = false;
+let minutes = 25;
+let seconds = 0;
+
+// Initialize default timer state
 chrome.runtime.onInstalled.addListener(() => {
-  console.log("Extension installed!");
+  chrome.storage.local.set({ minutes: 25, seconds: 0, isRunning: false });
 });
 
-//region Chrome Login
+// Start the timer
+function startTimer() {
+  if (isRunning) return;
+
+  isRunning = true;
+  chrome.storage.local.set({ isRunning: true });
+
+  timerInterval = setInterval(() => {
+    if (minutes === 0 && seconds === 0) {
+      clearInterval(timerInterval);
+      isRunning = false;
+      chrome.storage.local.set({ isRunning: false });
+
+      chrome.notifications.create({
+        type: "basic",
+        iconUrl: "icon.png",
+        title: "Pomodoro Timer",
+        message: "Time's up! Take a break!",
+      });
+
+      return;
+    }
+
+    if (seconds === 0) {
+      minutes--;
+      seconds = 59;
+    } else {
+      seconds--;
+    }
+
+    chrome.storage.local.set({ minutes, seconds });
+  }, 1000);
+}
+
+// Pause the timer
+function pauseTimer() {
+  clearInterval(timerInterval);
+  isRunning = false;
+  chrome.storage.local.set({ isRunning: false });
+}
+
+// Reset the timer with a custom time
+function resetTimer(customMinutes = 25) {
+  clearInterval(timerInterval);
+  isRunning = false;
+  minutes = customMinutes;
+  seconds = 0;
+  chrome.storage.local.set({ minutes, seconds, isRunning: false });
+}
+
+// Listen for messages from the popup
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "start") startTimer();
+  if (request.action === "pause") pauseTimer();
+  if (request.action === "reset") resetTimer(request.minutes || 25); // FIX: Now resets to correct time
+  if (request.action === "getStatus") {
+    sendResponse({ minutes, seconds, isRunning });
+  }
+});
+
+
 /**
  * This section is meant to handle all functions that need to be ran when the user logs into Chrome
  *

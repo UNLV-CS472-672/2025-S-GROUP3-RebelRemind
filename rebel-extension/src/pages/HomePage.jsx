@@ -5,7 +5,6 @@ import CloseButton from "../components/CloseButton";
 import DailyOrWeeklyPanel from "../components/DailyOrWeeklyPanel";
 import GetAssignmentsButton from "../components/GetAssignmentsButton";
 import SidePanelButton from "../components/SidePanelButton";
-import PomodoroTimer from "../components/PomodoroTimer";
 
 import { useNavigate } from "react-router-dom";
 
@@ -22,7 +21,7 @@ function HomePage() {
       <DailyOrWeeklyPanel />
       <GetAssignmentsButton />
       <SidePanelButton />
-      <PomodoroTimer /> 
+      <button onClick={() => navigate("/pomodoro")}> Pomodoro </button>
     </>
   );
 }

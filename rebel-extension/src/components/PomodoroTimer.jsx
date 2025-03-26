@@ -27,134 +27,76 @@
  * and focus with audible reminders for the timer's completion.
  */
 
-
 import React, { useState, useEffect, useRef } from "react";
-import FinishAlarm from "../components/FinishAlarm.mp3"; // Ensure the path is correct
+import FinishAlarm from "../assets/FinishAlarm.mp3";
+import "./css/Pomodoro.css";
 
 function PomodoroTimer() {
-  const [minutes, setMinutes] = useState(25); // Default 25 minutes
+  const [minutes, setMinutes] = useState(25);
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const alarmRef = useRef(null);
 
-  // Initialize audio
   useEffect(() => {
-    console.log("Initializing audio...");
     alarmRef.current = new Audio(FinishAlarm);
-    alarmRef.current.load(); // Preload the audio
-    alarmRef.current.oncanplaythrough = () => {
-      console.log("Audio loaded successfully");
-    };
-    alarmRef.current.onerror = (error) => {
-      console.error("Error loading audio:", error);
-    };
+    alarmRef.current.load();
+
+    // Load initial state from background script
+    chrome.storage.local.get(["minutes", "seconds", "isRunning"], (data) => {
+      if (data.minutes !== undefined) setMinutes(data.minutes);
+      if (data.seconds !== undefined) setSeconds(data.seconds);
+      if (data.isRunning !== undefined) setIsRunning(data.isRunning);
+    });
+
+    // Listen for real-time updates
+    chrome.storage.onChanged.addListener((changes) => {
+      if (changes.minutes) setMinutes(changes.minutes.newValue);
+      if (changes.seconds) setSeconds(changes.seconds.newValue);
+      if (changes.isRunning) setIsRunning(changes.isRunning.newValue);
+    });
 
     return () => {
-      alarmRef.current = null; // Cleanup on unmount
+      chrome.storage.onChanged.removeListener(() => {});
     };
   }, []);
 
-  // Start Timer Logic
-  useEffect(() => {
-    let timer;
-    if (isRunning) {
-      timer = setInterval(() => {
-        console.log(`Timer running: ${minutes}:${seconds}`);
-
-        if (minutes === 0 && seconds === 0) {
-          console.log("Timer reached 00:00");
-          setIsRunning(false); // Stop the timer when reaching 00:00
-
-          // Directly play the sound when the timer hits 00:00
-          alarmRef.current.play().then(() => {
-            console.log("Alarm played successfully");
-          }).catch((error) => {
-            console.error("Error playing alarm:", error);
-          });
-        } else {
-          if (seconds === 0) {
-            setMinutes((prev) => prev - 1); // Decrease minute
-            setSeconds(59); // Reset seconds to 59
-          } else {
-            setSeconds((prev) => prev - 1); // Decrease seconds
-          }
-        }
-      }, 1000);
-    } else {
-      clearInterval(timer);
-    }
-
-    return () => clearInterval(timer);
-  }, [isRunning, minutes, seconds]); // Effect re-runs when state changes
-
   const handleStart = () => {
-    if (minutes > 0 || seconds > 0) {
-      setIsRunning(true);
-    }
+    chrome.runtime.sendMessage({ action: "start" });
+    setIsRunning(true);
   };
 
   const handlePause = () => {
+    chrome.runtime.sendMessage({ action: "pause" });
     setIsRunning(false);
   };
 
-  const handleReset = () => {
+  const handleReset = (customMinutes = 25) => {
+    chrome.runtime.sendMessage({ action: "reset", minutes: customMinutes });
     setIsRunning(false);
-    setMinutes(25); // Reset minutes to default Pomodoro time
-    setSeconds(0); // Reset seconds
-  };
-
-  const handleShortBreak = () => {
-    setIsRunning(false); // Stop the current timer if running
-    setMinutes(5); // Set timer for short break
+    setMinutes(customMinutes);
     setSeconds(0);
   };
 
-  const handleLongBreak = () => {
-    setIsRunning(false); // Stop the current timer if running
-    setMinutes(15); // Set timer for long break
-    setSeconds(0);
-  };
+  const handleShortBreak = () => handleReset(5);
+  const handleLongBreak = () => handleReset(15);
 
   return (
     <div className="pomodoro-container">
       <h3>Pomodoro Timer</h3>
 
-      {/* User Input for Minutes & Seconds */}
-      <div className="input-group">
-        <input
-          type="number"
-          value={minutes}
-          onChange={(e) => setMinutes(Math.max(0, parseInt(e.target.value) || 0))}
-          disabled={isRunning}
-          min="0"
-        />
-        <span>:</span>
-        <input
-          type="number"
-          value={seconds}
-          onChange={(e) => setSeconds(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
-          disabled={isRunning}
-          min="0"
-          max="59"
-        />
-      </div>
-
-      {/* Timer Display */}
       <div className="timer-display">
         {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
       </div>
 
-      {/* Timer Controls */}
       <div className="timer-buttons">
         {!isRunning ? (
           <button onClick={handleStart}>Start</button>
         ) : (
           <button onClick={handlePause}>Pause</button>
         )}
-        <button onClick={handleReset}>Reset</button>
+        <button onClick={() => handleReset(25)}>Reset</button>
       </div>
 
-      {/* Break Options */}
       <div className="break-options">
         <button onClick={handleShortBreak}>Short Break (5 mins)</button>
         <button onClick={handleLongBreak}>Long Break (15 mins)</button>
