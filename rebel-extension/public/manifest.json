@@ -3,17 +3,17 @@
   "name": "RebelRemind",
   "version": "1.0",
   "icons" : {
-    "16": "logo_16x16.png",
-    "48": "logo_48x48.png",
-    "128": "logo_128x128.png"
+    "16": "images/logo_16x16.png",
+    "48": "images/logo_48x48.png",
+    "128": "images/logo_128x128.png"
 
   },
   "action": {
     "default_popup": "index.html",
     "default_icon" : {
-      "16": "logo_16x16.png",
-      "48": "logo_48x48.png",
-      "128": "logo_128x128.png"
+      "16": "images/logo_16x16.png",
+      "48": "images/logo_48x48.png",
+      "128": "images/logo_128x128.png"
     },
     "default_title": "Rebel Remind"
   },

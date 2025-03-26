@@ -1,11 +1,5 @@
 [
     {
-        "name": "UNLV Dance: Geometries - Streaming",
-        "date": "Monday, March 24, 2025",
-        "time": "(All day)",
-        "location": ""
-    },
-    {
         "name": "UNLV Dance: Syncopations - Streaming",
         "date": "Monday, March 24, 2025",
         "time": "(All day)",
@@ -13,6 +7,12 @@
     },
     {
         "name": "UNLV Dance: Nexus - Streaming",
+        "date": "Monday, March 24, 2025",
+        "time": "(All day)",
+        "location": ""
+    },
+    {
+        "name": "UNLV Dance: Geometries - Streaming",
         "date": "Monday, March 24, 2025",
         "time": "(All day)",
         "location": ""
@@ -114,6 +114,12 @@
         "location": "Lee and Thomas Beam Music Center\n        Doc Rando Hall"
     },
     {
+        "name": "UNLV Dance: Geometries - Streaming",
+        "date": "Tuesday, March 25, 2025",
+        "time": "(All day)",
+        "location": ""
+    },
+    {
         "name": "UNLV Dance: Syncopations - Streaming",
         "date": "Tuesday, March 25, 2025",
         "time": "(All day)",
@@ -126,16 +132,22 @@
         "location": ""
     },
     {
-        "name": "UNLV Dance: Geometries - Streaming",
-        "date": "Tuesday, March 25, 2025",
-        "time": "(All day)",
-        "location": ""
-    },
-    {
         "name": "Thesis Defense: Joseph Soderberg",
         "date": "Tuesday, March 25, 2025",
         "time": "9am",
         "location": "Shadow Lane Advanced Dental Education\n        228"
+    },
+    {
+        "name": "Color Made",
+        "date": "Tuesday, March 25, 2025",
+        "time": "10am",
+        "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art, West Gallery"
+    },
+    {
+        "name": "Women's Rights Are Human Rights: International Posters on Gender-Based Inequality",
+        "date": "Tuesday, March 25, 2025",
+        "time": "10am",
+        "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art, WorkShop Gallery"
     },
     {
         "name": "Rebels Give Kick Off",
@@ -162,16 +174,10 @@
         "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art, East Gallery"
     },
     {
-        "name": "Color Made",
+        "name": "Picturing Your Potential: Crafting Vision Boards",
         "date": "Tuesday, March 25, 2025",
-        "time": "10am",
-        "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art, West Gallery"
-    },
-    {
-        "name": "Women's Rights Are Human Rights: International Posters on Gender-Based Inequality",
-        "date": "Tuesday, March 25, 2025",
-        "time": "10am",
-        "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art, WorkShop Gallery"
+        "time": "11am",
+        "location": "Student Services Complex - Building A\n        The Coaching Spot (254), SSC-A"
     },
     {
         "name": "Thesis Defense: Usama Al Abdullah",
@@ -180,16 +186,16 @@
         "location": "Shadow Lane Advanced Dental Education\n        228"
     },
     {
-        "name": "Picturing Your Potential: Crafting Vision Boards",
-        "date": "Tuesday, March 25, 2025",
-        "time": "11am",
-        "location": "Student Services Complex - Building A\n        The Coaching Spot (254), SSC-A"
-    },
-    {
         "name": "Slackline & Slushies",
         "date": "Tuesday, March 25, 2025",
         "time": "11:30am",
         "location": "SRWC Lawn"
+    },
+    {
+        "name": "Pre-Med Mentoring Session for Rural Students",
+        "date": "Tuesday, March 25, 2025",
+        "time": "12pm",
+        "location": "Virtually via Google Meet"
     },
     {
         "name": "Thesis Defense: Pamela Paula C. Pioquinto",
@@ -202,12 +208,6 @@
         "date": "Tuesday, March 25, 2025",
         "time": "12pm",
         "location": "Virtual"
-    },
-    {
-        "name": "Pre-Med Mentoring Session for Rural Students",
-        "date": "Tuesday, March 25, 2025",
-        "time": "12pm",
-        "location": "Virtually via Google Meet"
     },
     {
         "name": "Providing Information and Responding to Questions (RSI):",
@@ -228,12 +228,6 @@
         "location": "RSVP to receive location details."
     },
     {
-        "name": "Office Etiquette and Culture",
-        "date": "Tuesday, March 25, 2025",
-        "time": "5pm",
-        "location": "Online"
-    },
-    {
         "name": "Power of Your Tribe: Lessons in Sisterhood",
         "date": "Tuesday, March 25, 2025",
         "time": "5pm",
@@ -244,6 +238,12 @@
         "date": "Tuesday, March 25, 2025",
         "time": "5pm",
         "location": "Student Recreation & Wellness Center\n        Meet in SRWC Lobby at 4:45 PM"
+    },
+    {
+        "name": "Office Etiquette and Culture",
+        "date": "Tuesday, March 25, 2025",
+        "time": "5pm",
+        "location": "Online"
     },
     {
         "name": "Kirk Kerkorian School of Medicine at UNLV: Application Workshop for 2025-2026 AMCAS Cycle",
@@ -282,22 +282,28 @@
         "location": "Alumni Amphitheatre"
     },
     {
+        "name": "AL AMANECER",
+        "date": "Wednesday, March 26, 2025",
+        "time": "10am",
+        "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art Window Gallery"
+    },
+    {
         "name": "UNLV Garden Volunteer Day",
         "date": "Wednesday, March 26, 2025",
         "time": "10am",
         "location": "Campus Community Garden\n        The garden is located right next to the UNLV Rebel Recycling Center, closest to parking lots T & R, right next to the Stan Fulton Building for International Gaming."
     },
     {
-        "name": "Yoko Kondo Konopik: On Canvas",
-        "date": "Wednesday, March 26, 2025",
-        "time": "10am",
-        "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art, East Gallery"
-    },
-    {
         "name": "Dissertation Defense: Kelly Collier",
         "date": "Wednesday, March 26, 2025",
         "time": "10am",
         "location": "William D. Carlson Education\n        357 and Virtual"
+    },
+    {
+        "name": "Yoko Kondo Konopik: On Canvas",
+        "date": "Wednesday, March 26, 2025",
+        "time": "10am",
+        "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art, East Gallery"
     },
     {
         "name": "Color Made",
@@ -310,12 +316,6 @@
         "date": "Wednesday, March 26, 2025",
         "time": "10am",
         "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art, WorkShop Gallery"
-    },
-    {
-        "name": "AL AMANECER",
-        "date": "Wednesday, March 26, 2025",
-        "time": "10am",
-        "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art Window Gallery"
     },
     {
         "name": "First Gen Forward Workshop: Thinking About Summer Sessions",
@@ -360,18 +360,6 @@
         "location": "Beverly Rogers Literature and Law Building\n        RLL 101"
     },
     {
-        "name": "Pre-Med Veterans Mentoring Session",
-        "date": "Wednesday, March 26, 2025",
-        "time": "12pm",
-        "location": "Virtually via Google Meet"
-    },
-    {
-        "name": "NTT Gathering (online)",
-        "date": "Wednesday, March 26, 2025",
-        "time": "12pm",
-        "location": "Online"
-    },
-    {
         "name": "Thesis Defense: Kaylie Kurland",
         "date": "Wednesday, March 26, 2025",
         "time": "12pm",
@@ -384,16 +372,22 @@
         "location": ""
     },
     {
+        "name": "Pre-Med Veterans Mentoring Session",
+        "date": "Wednesday, March 26, 2025",
+        "time": "12pm",
+        "location": "Virtually via Google Meet"
+    },
+    {
+        "name": "NTT Gathering (online)",
+        "date": "Wednesday, March 26, 2025",
+        "time": "12pm",
+        "location": "Online"
+    },
+    {
         "name": "Walking Wednesdays",
         "date": "Wednesday, March 26, 2025",
         "time": "12:15pm",
         "location": "Alumni Amphitheatre"
-    },
-    {
-        "name": "The Research Paper: Titles and Abstracts",
-        "date": "Wednesday, March 26, 2025",
-        "time": "1pm",
-        "location": "Virtual"
     },
     {
         "name": "Nursing: BSN Program Virtual Information Session",
@@ -402,16 +396,22 @@
         "location": "Virtual"
     },
     {
-        "name": "APIME-FSA Black Fire Innovation Tour",
+        "name": "The Research Paper: Titles and Abstracts",
         "date": "Wednesday, March 26, 2025",
-        "time": "4pm",
-        "location": "Black Fire Innovation\r\n8400 W Sunset Rd Ste 400\r\nLas Vegas, NV  89113"
+        "time": "1pm",
+        "location": "Virtual"
     },
     {
         "name": "Game Time",
         "date": "Wednesday, March 26, 2025",
         "time": "4pm",
         "location": "University Gateway Building\n        200 - Gateway Commons Lounge. From the elevator, walk forward and into the lobby. The front desk staff will direct you to the area on the left."
+    },
+    {
+        "name": "APIME-FSA Black Fire Innovation Tour",
+        "date": "Wednesday, March 26, 2025",
+        "time": "4pm",
+        "location": "Black Fire Innovation\r\n8400 W Sunset Rd Ste 400\r\nLas Vegas, NV  89113"
     },
     {
         "name": "African American Alumni Club - Virtual Alumni Meeting",
@@ -444,6 +444,12 @@
         "location": "Artemus W. Ham Concert Hall"
     },
     {
+        "name": "UNLV Dance: Syncopations - Streaming",
+        "date": "Thursday, March 27, 2025",
+        "time": "(All day)",
+        "location": ""
+    },
+    {
         "name": "UNLV Dance: Nexus - Streaming",
         "date": "Thursday, March 27, 2025",
         "time": "(All day)",
@@ -462,22 +468,10 @@
         "location": ""
     },
     {
-        "name": "UNLV Dance: Syncopations - Streaming",
-        "date": "Thursday, March 27, 2025",
-        "time": "(All day)",
-        "location": ""
-    },
-    {
         "name": "Small Animal Care with UNLVolunteers",
         "date": "Thursday, March 27, 2025",
         "time": "8:30am",
         "location": "Meeting Spot: First Floor Eating Bar"
-    },
-    {
-        "name": "Meet with a TIAA Representative on Campus",
-        "date": "Thursday, March 27, 2025",
-        "time": "9am",
-        "location": "CSB room 132"
     },
     {
         "name": "Dissertation Defense: Elias Malek",
@@ -490,6 +484,12 @@
         "date": "Thursday, March 27, 2025",
         "time": "9am",
         "location": "Hospitality Hall\n        4th Floor"
+    },
+    {
+        "name": "Meet with a TIAA Representative on Campus",
+        "date": "Thursday, March 27, 2025",
+        "time": "9am",
+        "location": "CSB room 132"
     },
     {
         "name": "Yoko Kondo Konopik: On Canvas",
@@ -528,10 +528,10 @@
         "location": "Greenspun Hall\n        Conference Room"
     },
     {
-        "name": "A Conversation with Chief of Police Arnold Vasquez, UPD Southern Command",
+        "name": "Dissertation Defense: Ariana Lucia Garcia",
         "date": "Thursday, March 27, 2025",
         "time": "12pm",
-        "location": "Via Zoom"
+        "location": "William D. Carlson Education\n        Room 315A and Virtual via Zoom"
     },
     {
         "name": "Thriving Authentically - Middle Eastern (APIME Heritage Month)",
@@ -544,12 +544,6 @@
         "date": "Thursday, March 27, 2025",
         "time": "12pm",
         "location": "Marjorie Barrick Museum of Art / Harry Reid Center"
-    },
-    {
-        "name": "Dissertation Defense: Ariana Lucia Garcia",
-        "date": "Thursday, March 27, 2025",
-        "time": "12pm",
-        "location": "William D. Carlson Education\n        Room 315A and Virtual via Zoom"
     },
     {
         "name": "Thesis Defense: Hoor Ul Ain",
@@ -594,16 +588,16 @@
         "location": "Virtual"
     },
     {
-        "name": "Question. Persuade. Refer. (QPR) Training",
-        "date": "Thursday, March 27, 2025",
-        "time": "3pm",
-        "location": "Student Recreation & Wellness Center\n        Health Education Room 1502, First floor of SRWC"
-    },
-    {
         "name": "Coaching x FYE: ReThink Thriving at UNLV",
         "date": "Thursday, March 27, 2025",
         "time": "3pm",
         "location": "Virtual"
+    },
+    {
+        "name": "Question. Persuade. Refer. (QPR) Training",
+        "date": "Thursday, March 27, 2025",
+        "time": "3pm",
+        "location": "Student Recreation & Wellness Center\n        Health Education Room 1502, First floor of SRWC"
     },
     {
         "name": "Global Thursday: Language Exchange Program",
@@ -618,16 +612,16 @@
         "location": "Student Recreation & Wellness Center\n        SRWC Climbing Wall"
     },
     {
-        "name": "College of Hospitality - March Alumni Mixer - RebelsGive!",
-        "date": "Thursday, March 27, 2025",
-        "time": "5:30pm",
-        "location": "Flowing Tide Pub\r\n9860 S Las Vegas Blvd, Las Vegas, NV 89183"
-    },
-    {
         "name": "Saltman Center 2025 Memorial Beecroft Lecture",
         "date": "Thursday, March 27, 2025",
         "time": "5:30pm",
         "location": "William S. Boyd School of Law\n        Thomas & Mack Moot Court Facility"
+    },
+    {
+        "name": "College of Hospitality - March Alumni Mixer - RebelsGive!",
+        "date": "Thursday, March 27, 2025",
+        "time": "5:30pm",
+        "location": "Flowing Tide Pub\r\n9860 S Las Vegas Blvd, Las Vegas, NV 89183"
     },
     {
         "name": "Intro to Bike Tuning",
@@ -642,16 +636,22 @@
         "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art, Auditorium"
     },
     {
+        "name": "Nevada Conservatory Theatre: Wolf Play - Pay-What-You-Can Preview Performance",
+        "date": "Thursday, March 27, 2025",
+        "time": "7:30pm",
+        "location": "Alta Ham Fine Arts\n        Black Box Theatre"
+    },
+    {
         "name": "Doctor of Musical Arts Chamber Recital with Soprano Emily Dirks",
         "date": "Thursday, March 27, 2025",
         "time": "7:30pm",
         "location": "Lee and Thomas Beam Music Center\n        Dr. Arturo Rando-Grillot Hall"
     },
     {
-        "name": "Nevada Conservatory Theatre: Wolf Play - Pay-What-You-Can Preview Performance",
-        "date": "Thursday, March 27, 2025",
-        "time": "7:30pm",
-        "location": "Alta Ham Fine Arts\n        Black Box Theatre"
+        "name": "UNLV Dance: Geometries - Streaming",
+        "date": "Friday, March 28, 2025",
+        "time": "(All day)",
+        "location": ""
     },
     {
         "name": "UNLV Dance: Syncopations - Streaming",
@@ -661,12 +661,6 @@
     },
     {
         "name": "UNLV Dance: Nexus - Streaming",
-        "date": "Friday, March 28, 2025",
-        "time": "(All day)",
-        "location": ""
-    },
-    {
-        "name": "UNLV Dance: Geometries - Streaming",
         "date": "Friday, March 28, 2025",
         "time": "(All day)",
         "location": ""
@@ -682,6 +676,12 @@
         "date": "Friday, March 28, 2025",
         "time": "9am",
         "location": "Zoom Webinar"
+    },
+    {
+        "name": "Color Made",
+        "date": "Friday, March 28, 2025",
+        "time": "10am",
+        "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art, West Gallery"
     },
     {
         "name": "Women's Rights Are Human Rights: International Posters on Gender-Based Inequality",
@@ -700,12 +700,6 @@
         "date": "Friday, March 28, 2025",
         "time": "10am",
         "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art, East Gallery"
-    },
-    {
-        "name": "Color Made",
-        "date": "Friday, March 28, 2025",
-        "time": "10am",
-        "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art, West Gallery"
     },
     {
         "name": "First Generation Essay Contest Reading for 2024 Winners",
@@ -858,18 +852,6 @@
         "location": "Virtual"
     },
     {
-        "name": "Yoko Kondo Konopik: On Canvas",
-        "date": "Saturday, March 29, 2025",
-        "time": "10am",
-        "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art, East Gallery"
-    },
-    {
-        "name": "Color Made",
-        "date": "Saturday, March 29, 2025",
-        "time": "10am",
-        "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art, West Gallery"
-    },
-    {
         "name": "Women's Rights Are Human Rights: International Posters on Gender-Based Inequality",
         "date": "Saturday, March 29, 2025",
         "time": "10am",
@@ -882,6 +864,24 @@
         "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art Window Gallery"
     },
     {
+        "name": "Yoko Kondo Konopik: On Canvas",
+        "date": "Saturday, March 29, 2025",
+        "time": "10am",
+        "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art, East Gallery"
+    },
+    {
+        "name": "Color Made",
+        "date": "Saturday, March 29, 2025",
+        "time": "10am",
+        "location": "Marjorie Barrick Museum of Art / Harry Reid Center\n        Marjorie Barrick Museum of Art, West Gallery"
+    },
+    {
+        "name": "DIY Tape Loop Workshop with Patrick Rios",
+        "date": "Saturday, March 29, 2025",
+        "time": "12pm",
+        "location": "Marjorie Barrick Museum of Art / Harry Reid Center"
+    },
+    {
         "name": "Family Swim at the SRWC Pool",
         "date": "Saturday, March 29, 2025",
         "time": "12pm",
@@ -892,12 +892,6 @@
         "date": "Saturday, March 29, 2025",
         "time": "12pm",
         "location": "Dave & Busters, Orange\r\n\r\n20 City Blvd W\r\nOrange, CA, 92868"
-    },
-    {
-        "name": "DIY Tape Loop Workshop with Patrick Rios",
-        "date": "Saturday, March 29, 2025",
-        "time": "12pm",
-        "location": "Marjorie Barrick Museum of Art / Harry Reid Center"
     },
     {
         "name": "Nevada Conservatory Theatre: Wolf Play (2 p.m.)",
@@ -924,6 +918,12 @@
         "location": "Alta Ham Fine Arts\n        Black Box Theatre"
     },
     {
+        "name": "UNLV Dance: Syncopations - Streaming",
+        "date": "Sunday, March 30, 2025",
+        "time": "(All day)",
+        "location": ""
+    },
+    {
         "name": "UNLV Dance: Nexus - Streaming",
         "date": "Sunday, March 30, 2025",
         "time": "(All day)",
@@ -931,12 +931,6 @@
     },
     {
         "name": "UNLV Dance: Geometries - Streaming",
-        "date": "Sunday, March 30, 2025",
-        "time": "(All day)",
-        "location": ""
-    },
-    {
-        "name": "UNLV Dance: Syncopations - Streaming",
         "date": "Sunday, March 30, 2025",
         "time": "(All day)",
         "location": ""

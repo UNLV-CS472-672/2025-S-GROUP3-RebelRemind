@@ -1,26 +1,27 @@
 import { useEffect, useState } from "react";
 
-const DEFAULT_COLOR = "#8b0000";
+const DEFAULT_COLOR = "#dc143c"; 
 
 const useApplyBackgroundColor = () => {
   const [selectedColor, setSelectedColor] = useState(DEFAULT_COLOR);
 
-  // Apply color to document
-  const applyColor = (color) => {
-    document.documentElement.style.setProperty("--app-background", color);
-    document.body.style.backgroundColor = color;
+  // Apply a gradient based on the base color
+  const applyColor = (baseColor) => {
+    const gradient = `linear-gradient(to bottom right, ${baseColor}, #f8d7da)`;
+    document.documentElement.style.setProperty("--app-background", gradient);
+    document.body.style.background = gradient;
   };
 
-  // Load color on mount
+  // Load saved color from chrome storage and apply it
   useEffect(() => {
     chrome.storage.sync.get("backgroundColor", (data) => {
-      const color = data.backgroundColor || DEFAULT_COLOR;
-      setSelectedColor(color);
-      applyColor(color);
+      const baseColor = data.backgroundColor || DEFAULT_COLOR;
+      setSelectedColor(baseColor);     // for input
+      applyColor(baseColor);           // for background
     });
   }, []);
 
-  // Update color
+  // When user picks a new color
   const handleColorChange = (event) => {
     const newColor = event.target.value;
     setSelectedColor(newColor);
