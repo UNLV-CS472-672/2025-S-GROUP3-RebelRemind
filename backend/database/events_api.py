@@ -62,7 +62,8 @@ def get_combined_events():
     weekly_grouped = defaultdict(lambda: defaultdict(list))
     daily_grouped = defaultdict(lambda: defaultdict(list))
 
-    base_path = os.path.join("..", "webscraping")
+    base_path = ".."
+
     event_files = [
         ("calendar_events.json", "Academic Calendar"),
         ("scraped_UNLVEvents.json", "UNLV Calendar"),
@@ -91,7 +92,8 @@ def get_events_by_week():
     weekly_grouped = defaultdict(lambda: defaultdict(list))
     daily_grouped = defaultdict(lambda: defaultdict(list))
 
-    base_path = os.path.join("..", "webscraping")
+    base_path = ".."
+
     event_files = [
         ("calendar_events.json", "Academic Calendar"),
         ("scraped_UNLVEvents.json", "UNLV Calendar"),
@@ -120,7 +122,8 @@ def get_events_by_day():
     weekly_grouped = defaultdict(lambda: defaultdict(list))
     daily_grouped = defaultdict(lambda: defaultdict(list))
 
-    base_path = os.path.join("..", "webscraping")
+    base_path = ".."
+
     event_files = [
         ("calendar_events.json", "Academic Calendar"),
         ("scraped_UNLVEvents.json", "UNLV Calendar"),
