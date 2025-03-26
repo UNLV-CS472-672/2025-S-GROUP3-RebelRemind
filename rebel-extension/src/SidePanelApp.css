@@ -2,7 +2,7 @@
 #sidepanel-root {
   max-width: 2000px;
   min-width: 450px;
-  background-color: var(--app-background, #8b0000);;
+  background: var(--app-background, linear-gradient(to bottom right, #dc143c, #f8d7da));
   margin: 0 auto;
   padding: 2rem;
   text-align: center;

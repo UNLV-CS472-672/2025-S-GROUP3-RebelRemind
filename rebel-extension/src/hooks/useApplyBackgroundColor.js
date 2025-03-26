@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 
-const DEFAULT_COLOR = "#8b0000";
+const DEFAULT_COLOR = "linear-gradient(to bottom right, #dc143c, #f8d7da)";
 
 const useApplyBackgroundColor = () => {
   const [selectedColor, setSelectedColor] = useState(DEFAULT_COLOR);
 
   // Apply color to document
   const applyColor = (color) => {
-    document.documentElement.style.setProperty("--app-background", color);
-    document.body.style.backgroundColor = color;
+    const gradient = `linear-gradient(to bottom right, ${color}, #f8d7da)`;
+    document.documentElement.style.setProperty("--app-background", gradient);
+    document.body.style.background = gradient;
   };
 
   // Load color on mount

@@ -16,6 +16,7 @@ function HomePage() {
 
   return (
     <>
+      <img src="/images/rebel-remind.png" alt="Rebel Remind Logo" className="rebel-remind-logo" />
       <CloseButton />
       <button onClick={() => navigate("/settings")}> ⚙️ </button>
       <DailyOrWeeklyPanel />

@@ -2,11 +2,21 @@
 #root {
   max-width: 1000px;
   min-width: 450px;
-  background-color: var(--app-background, "#8b0000");
+  background: var(--app-background, linear-gradient(to bottom right, #dc143c, #f8d7da));
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0;
   text-align: center;
 }
+
+.rebel-remind-logo {
+  width: 100%;            
+  max-width: 500px;       
+  display: block;         
+  margin-bottom: 10px;         
+  padding: 0;             
+  object-fit: contain;    
+}
+
 
 .accordion {
   padding: 1rem;

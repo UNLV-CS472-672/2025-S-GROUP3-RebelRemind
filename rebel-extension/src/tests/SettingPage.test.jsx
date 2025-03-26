@@ -1,20 +1,27 @@
+// ✅ mock useNavigate before importing the component
+const mockNavigate = jest.fn();
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
+  useNavigate: () => mockNavigate,
+}));
+
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import SettingPage from "../pages/SettingPage";
 import * as useAuthHook from "../../public/hooks/useAuth";
 
-// mock useAuth
+const DEFAULT_COLOR = "linear-gradient(to bottom right, #dc143c, #f8d7da)";
+
 jest.mock("../../public/hooks/useAuth", () => ({
   __esModule: true,
   default: jest.fn()
 }));
 
-// mock chrome APIs
 beforeAll(() => {
   global.chrome = {
     storage: {
       sync: {
-        get: jest.fn((key, callback) => callback({ backgroundColor: "#8b0000" })),
+        get: jest.fn((key, callback) => callback({ backgroundColor: DEFAULT_COLOR })),
         set: jest.fn()
       }
     },
@@ -26,7 +33,8 @@ beforeAll(() => {
 
 describe("SettingPage", () => {
   beforeEach(() => {
-    useAuthHook.default.mockReturnValue(false); // pretend user is not logged in
+    useAuthHook.default.mockReturnValue(false);
+    mockNavigate.mockClear(); // clear previous calls
   });
 
   const renderWithRouter = (ui) => render(<MemoryRouter>{ui}</MemoryRouter>);
@@ -57,11 +65,19 @@ describe("SettingPage", () => {
     fireEvent.click(resetButton);
 
     await waitFor(() => {
-      expect(global.chrome.storage.sync.set).toHaveBeenCalledWith({ backgroundColor: "#8b0000" });
+      expect(global.chrome.storage.sync.set).toHaveBeenCalledWith({ backgroundColor: DEFAULT_COLOR });
       expect(global.chrome.runtime.sendMessage).toHaveBeenCalledWith({
         type: "COLOR_UPDATED",
-        color: "#8b0000"
+        color: DEFAULT_COLOR
       });
     });
+  });
+
+  it("navigates back when ⬅️ Back button is clicked", () => {
+    renderWithRouter(<SettingPage />);
+    const backButton = screen.getByRole("button", { name: /⬅️ back/i });
+    fireEvent.click(backButton);
+
+    expect(mockNavigate).toHaveBeenCalledWith("/");
   });
 });

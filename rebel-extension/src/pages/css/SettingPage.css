@@ -2,12 +2,13 @@
 #root {
   max-width: 1000px;
   min-width: 450px;
-  background-color: var(--app-background, #8b0000);
+  background: var(--app-background, linear-gradient(to bottom right, #dc143c, #f8d7da));
   transition: background-color 0.3s ease; 
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
 }
+
 
 .accordion {
   padding: 1rem;
@@ -78,7 +79,7 @@
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background-color: var(--app-background, #8b0000);
+  background: var(--app-background, linear-gradient(to bottom right, #dc143c, #f8d7da));
   border: 1.5px dashed #fff;
   border-radius: 10px;
   text-align: center;
@@ -112,7 +113,7 @@
 
 .reset-button {
   margin-top: 10px;
-  background-color: #8b0000;
+  background-color: linear-gradient(to bottom right, #dc143c, #f8d7da);
   color: white;
   border: none;
   padding: 8px 14px;
@@ -133,19 +134,3 @@
   gap: 0.5rem;
   margin-top: 0.5rem;
 }
-
-.reset-button {
-  background-color: #8b0000;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s ease;
-}
-
-.reset-button:hover {
-  background-color: #b01030;
-}
-

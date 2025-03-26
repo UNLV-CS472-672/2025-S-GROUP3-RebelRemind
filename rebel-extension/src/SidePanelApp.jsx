@@ -13,30 +13,32 @@ import { useEffect } from "react"
 function SidePanelApp() {
   const isAuthenticated = useAuth();
 
-  useEffect(() => {
-    // Initial load
-    chrome.storage.sync.get("backgroundColor", (data) => {
-      const color = data.backgroundColor || "#8b0000";
-      document.documentElement.style.setProperty("--app-background", color);
-      document.body.style.backgroundColor = color;
-    });
-  
-    // Listen for color update messages
-    const handleColorUpdate = (msg) => {
-      if (msg.type === "COLOR_UPDATED") {
-        document.documentElement.style.setProperty("--app-background", msg.color);
-        document.body.style.backgroundColor = msg.color;
-      }
-    };
-  
-    chrome.runtime.onMessage.addListener(handleColorUpdate);
-  
-    // Cleanup
-    return () => {
-      chrome.runtime.onMessage.removeListener(handleColorUpdate);
-    };
-  }, []);
-  
+    useEffect(() => {
+      const applyGradient = (baseColor) => {
+        const gradient = `linear-gradient(to bottom right, ${baseColor}, #f8d7da)`;
+        document.documentElement.style.setProperty("--app-background", gradient);
+        document.body.style.background = gradient;
+      };
+    
+      chrome.storage.sync.get("backgroundColor", (data) => {
+        const color = data.backgroundColor || "#dc143c";
+        applyGradient(color);
+      });
+    
+      const handleColorUpdate = (msg) => {
+        if (msg.type === "COLOR_UPDATED") {
+          applyGradient(msg.color);
+        }
+      };
+    
+      chrome.runtime.onMessage.addListener(handleColorUpdate);
+    
+      return () => {
+        chrome.runtime.onMessage.removeListener(handleColorUpdate);
+      };
+    }, []);
+    
+    
 
   return (
     <>
