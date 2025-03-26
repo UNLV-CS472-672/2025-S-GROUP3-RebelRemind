@@ -147,8 +147,10 @@ export async function getCourses() {
         chrome.storage.local.set({ Canvas_Assignments: allAssignments }, () => {
             console.log("Assignments Stored!");
         });
+        return true;
 
     } catch (error) {
         console.error("Error fetching events:", error);
+        return false;
     }
 }
