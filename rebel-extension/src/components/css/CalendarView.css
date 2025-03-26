@@ -631,12 +631,20 @@ button.rbc-input::-moz-focus-inner {
   border-top:none;
 }
 
-.rbc-time-gutter.rbc-time-column{
-  background-color: crimson;
+.rbc-time-gutter.rbc-time-column {
+  background-color: gray;
 }
 
-.rbc-label.rbc-time-header-gutter{
-  background-color: crimson;
+.rbc-label.rbc-time-header-gutter {
+  background-color: gray;
+}
+
+.rbc-label, .rbc-header, .rbc-toolbar-label {
+  color: white;
+}
+
+.rbc-header.rbc-today {
+  color: black;
 }
 
 .rbc-time-view-resources .rbc-time-gutter,
