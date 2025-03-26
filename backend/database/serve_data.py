@@ -1,12 +1,15 @@
 """
 User and Events API Implementation
 """
-from database import app, db
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api, Resource, reqparse, abort, fields, marshal_with
 from http import HTTPStatus
 
+app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 api = Api(app)
+db = SQLAlchemy(app)
 
 # Create User table for database
 class User(db.Model):
@@ -69,9 +72,6 @@ class Daily(db.Model):
 	involvement_center = db.relationship("InvolvementCenter", backref="daily", lazy=True)
 	rebel_coverage = db.relationship("RebelCoverage", backref="daily", lazy=True)
 	unlv_calendar = db.relationship("UNLVCalendar", backref="daily", lazy=True)
-
-# leave commented to prevent data overwrite or delete
-db.create_all()
 
 # Parser for User table
 user_put_args = reqparse.RequestParser()
@@ -402,9 +402,9 @@ api.add_resource(Daily_List, "/daily")
 
 # default function to run API
 def default():
-	app.run(host='0.0.0.0', port=5050, debug=True)
+	with app.app_context():
+		db.create_all()
+		app.run(host='0.0.0.0', port=5050, debug=True)
 
 if __name__ == '__main__':
-	with app.app_context():
-		#db.create_all()  # Ensure tables exist
-		default()
+	default()
