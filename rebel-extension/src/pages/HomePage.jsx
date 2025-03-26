@@ -1,8 +1,6 @@
 import "./css/HomePage.css";
-
-
 import CloseButton from "../components/CloseButton";
-import DailyOrWeeklyPanel from "../components/DailyOrWeeklyPanel";
+import AccordionMenu from "../components/AccordionMenu";
 import GetAssignmentsButton from "../components/GetAssignmentsButton";
 import SidePanelButton from "../components/SidePanelButton";
 
@@ -15,18 +13,20 @@ function HomePage() {
   const navigate = useNavigate();
 
   return (
-    <>
+    <div >
       <img src="/images/rebel-remind.png" alt="Rebel Remind Logo" className="rebel-remind-logo" />
       <CloseButton />
-      <button onClick={() => navigate("/settings")}> ⚙️ </button>
-      <DailyOrWeeklyPanel />
+      <button
+        style={{ display: 'flex', justifyContent: 'flex-end', marginLeft: 'auto' }}
+        onClick={() => navigate("/settings")}> ⚙️ </button>
+      <AccordionMenu />    
       <GetAssignmentsButton />
       <br />
       <button onClick={() => navigate("/user-events")}> Personalize Events </button>
       <br />
       <br />
       <SidePanelButton />
-    </>
+    </div>
   );
 }
 

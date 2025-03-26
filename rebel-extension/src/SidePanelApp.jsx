@@ -2,9 +2,9 @@ import "./SidePanelApp.css";
 import LoginButton from "./components/LoginButton";
 import Counter from "./components/Counter";
 import AccordionMenu from "./components/AccordionMenu";
+import CalendarView from "./components/CalendarView";
 import UserProfile from "./components/UserProfile";
 import useAuth from "../public/hooks/useAuth";
-import DailyOrWeeklyPanel from "./components/DailyOrWeeklyPanel";
 import { useEffect } from "react"
 
 /**
@@ -41,9 +41,9 @@ function SidePanelApp() {
     
 
   return (
-    <>
-      <AccordionMenu />
-    </>
+    <div>
+      <CalendarView />
+    </div>
   );
 }
 
