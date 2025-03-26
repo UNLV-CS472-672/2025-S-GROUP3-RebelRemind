@@ -35,6 +35,7 @@ function PomodoroTimer() {
   const [minutes, setMinutes] = useState(25);
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
+  const [showEditBoxes, setShowEditBoxes] = useState(true); // State to manage visibility of edit boxes
   const alarmRef = useRef(null);
 
   useEffect(() => {
@@ -61,13 +62,17 @@ function PomodoroTimer() {
   }, []);
 
   const handleStart = () => {
-    chrome.runtime.sendMessage({ action: "start" });
+    chrome.storage.local.set({ minutes, seconds }, () => { // SET MINUTES AND SECONDS TO USER INPUT
+      chrome.runtime.sendMessage({ action: "start" });
+    });
     setIsRunning(true);
+    setShowEditBoxes(false); // Hide edit timer boxes when timer starts
   };
 
   const handlePause = () => {
     chrome.runtime.sendMessage({ action: "pause" });
     setIsRunning(false);
+    setShowEditBoxes(true); // Show edit timer boxes when timer pauses
   };
 
   const handleReset = (customMinutes = 25) => {
@@ -75,6 +80,7 @@ function PomodoroTimer() {
     setIsRunning(false);
     setMinutes(customMinutes);
     setSeconds(0);
+    setShowEditBoxes(true); // Show edit timer boxes when timer resets
   };
 
   const handleShortBreak = () => handleReset(5);
@@ -83,6 +89,28 @@ function PomodoroTimer() {
   return (
     <div className="pomodoro-container">
       <h3>Pomodoro Timer</h3>
+
+      {/* Conditionally render the edit timer boxes */}
+      {showEditBoxes && (
+        <div className="input-group">
+          <input
+            type="number"
+            value={minutes}
+            onChange={(e) => setMinutes(Math.max(0, parseInt(e.target.value) || 0))}
+            disabled={isRunning}
+            min="0"
+          />
+          <span>:</span>
+          <input
+            type="number"
+            value={seconds}
+            onChange={(e) => setSeconds(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
+            disabled={isRunning}
+            min="0"
+            max="59"
+          />
+        </div>
+      )}
 
       <div className="timer-display">
         {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}

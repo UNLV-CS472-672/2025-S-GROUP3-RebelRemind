@@ -39,8 +39,12 @@ chrome.runtime.onInstalled.addListener(() => {
 function startTimer() {
   if (isRunning) return;
 
+  chrome.storage.local.get(["minutes", "seconds"], (data) => { // GET USER INPUT FOR MINUTES AND SECONDS
+    minutes = data.minutes ?? 25;
+    seconds = data.seconds ?? 0;
+  });
+  
   isRunning = true;
-  chrome.storage.local.set({ isRunning: true });
 
   timerInterval = setInterval(() => {
     if (minutes === 0 && seconds === 0) {
@@ -107,14 +111,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
  * If you need something to run everytime the pop up is open, you can add it in the App.jsx for the pop up, Or
  * add a functionality in the frontend to call a script here.
  */
-chrome.runtime.onStartup.addListener(() => {
-  if (checkDailyTask()) {
-    // Functions only to be done once a day.
-    // I don't recommend Canvas or assignments because Professors might add new stuff midday so we should update as much as possible.
-  }
-  // Functions that should be ran anytime the user logins to Google. Will be run in background.
-  //
-});
+// chrome.runtime.onStartup.addListener(() => {
+//   if (checkDailyTask()) {
+//     // Functions only to be done once a day.
+//     // I don't recommend Canvas or assignments because Professors might add new stuff midday so we should update as much as possible.
+//   }
+//   // Functions that should be ran anytime the user logins to Google. Will be run in background.
+//   //
+// });
 
 //region Message Listener
 
@@ -197,6 +201,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
      */
     case "OPEN_SIDEPANEL":
       openSidePanel(sendResponse);
+      return true;
+
+    /**
+     * Reloads "Your Custom Events" list in UserEventsPage by broadcasting message from UserEventInput.jsx
+     */
+    case "EVENT_CREATED":
+      chrome.runtime.sendMessage({ type: "EVENT_CREATED" }); // broadcast
+      break;
 
     /**
      * Default case: Logs an unrecognized message type.

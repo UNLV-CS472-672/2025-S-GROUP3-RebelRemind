@@ -2,7 +2,7 @@
 #root {
   max-width: 1000px;
   min-width: 450px;
-  background-color: crimson;
+  background-color: var(--app-background, "#8b0000");
   margin: 0 auto;
   padding: 2rem;
   text-align: center;

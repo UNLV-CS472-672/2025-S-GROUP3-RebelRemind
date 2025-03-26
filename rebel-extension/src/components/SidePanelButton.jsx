@@ -22,7 +22,7 @@ function SidePanelButton() {
   return (
     <div>
       <button onClick={handleOpenSidePanel}>
-        Your UNLV Events at a Glance! --&gt;
+        Calendar View --&gt;
       </button>
     </div>
   );
