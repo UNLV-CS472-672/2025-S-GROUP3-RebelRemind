@@ -35,25 +35,30 @@ function PomodoroTimer() {
   const [minutes, setMinutes] = useState(25);
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
-  const [showEditBoxes, setShowEditBoxes] = useState(true); // State to manage visibility of edit boxes
-  const alarmRef = useRef(null);
+  const [showEditBoxes, setShowEditBoxes] = useState(true);
+  const [isTimerDone, setIsTimerDone] = useState(false); // Track timer done state
+  const alarmRef = useRef(new Audio(FinishAlarm)); // Load the alarm sound
 
   useEffect(() => {
-    alarmRef.current = new Audio(FinishAlarm);
+    // Ensure the alarm is preloaded
     alarmRef.current.load();
 
-    // Load initial state from background script
     chrome.storage.local.get(["minutes", "seconds", "isRunning"], (data) => {
       if (data.minutes !== undefined) setMinutes(data.minutes);
       if (data.seconds !== undefined) setSeconds(data.seconds);
-      if (data.isRunning !== undefined) setIsRunning(data.isRunning);
+      if (data.isRunning !== undefined) {
+        setIsRunning(data.isRunning);
+        setShowEditBoxes(!data.isRunning);
+      }
     });
 
-    // Listen for real-time updates
     chrome.storage.onChanged.addListener((changes) => {
       if (changes.minutes) setMinutes(changes.minutes.newValue);
       if (changes.seconds) setSeconds(changes.seconds.newValue);
-      if (changes.isRunning) setIsRunning(changes.isRunning.newValue);
+      if (changes.isRunning) {
+        setIsRunning(changes.isRunning.newValue);
+        setShowEditBoxes(!changes.isRunning.newValue);
+      }
     });
 
     return () => {
@@ -61,26 +66,45 @@ function PomodoroTimer() {
     };
   }, []);
 
+  // Play alarm when timer reaches 0:00
+  useEffect(() => {
+    if (minutes === 0 && seconds === 0 && isRunning) {
+      alarmRef.current.play().catch((error) => {
+        console.error("Audio playback failed:", error);
+      });
+      setIsRunning(false);
+      setIsTimerDone(true); // Set timer done
+      setShowEditBoxes(true);
+      chrome.storage.local.set({ isRunning: false });
+
+      // Trigger notification when time's up
+      chrome.runtime.sendMessage({ action: "timeUpNotification" });
+    }
+  }, [minutes, seconds, isRunning]);
+
   const handleStart = () => {
-    chrome.storage.local.set({ minutes, seconds }, () => { // SET MINUTES AND SECONDS TO USER INPUT
+    chrome.storage.local.set({ minutes, seconds, isRunning: true }, () => {
       chrome.runtime.sendMessage({ action: "start" });
     });
     setIsRunning(true);
-    setShowEditBoxes(false); // Hide edit timer boxes when timer starts
+    setIsTimerDone(false); // Reset the "Timer Done" flag
+    setShowEditBoxes(false);
   };
 
   const handlePause = () => {
     chrome.runtime.sendMessage({ action: "pause" });
     setIsRunning(false);
-    setShowEditBoxes(true); // Show edit timer boxes when timer pauses
+    setShowEditBoxes(true);
   };
 
   const handleReset = (customMinutes = 25) => {
     chrome.runtime.sendMessage({ action: "reset", minutes: customMinutes });
+    chrome.storage.local.set({ isRunning: false }, () => {});
     setIsRunning(false);
     setMinutes(customMinutes);
     setSeconds(0);
-    setShowEditBoxes(true); // Show edit timer boxes when timer resets
+    setShowEditBoxes(true);
+    setIsTimerDone(false); // Reset when resetting timer
   };
 
   const handleShortBreak = () => handleReset(5);
@@ -90,7 +114,12 @@ function PomodoroTimer() {
     <div className="pomodoro-container">
       <h3>Pomodoro Timer</h3>
 
-      {/* Conditionally render the edit timer boxes */}
+      {isTimerDone && (
+        <div className="timer-done-message">
+          <p>Timer is up! Time to take a Break!</p>
+        </div>
+      )}
+
       {showEditBoxes && (
         <div className="input-group">
           <input

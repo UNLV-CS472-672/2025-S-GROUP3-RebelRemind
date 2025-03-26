@@ -52,12 +52,22 @@ function startTimer() {
       isRunning = false;
       chrome.storage.local.set({ isRunning: false });
 
-      chrome.notifications.create({
-        type: "basic",
-        iconUrl: "icon.png",
-        title: "Pomodoro Timer",
-        message: "Time's up! Take a break!",
-      });
+    //   chrome.notifications.create("", {
+    //     type: "basic",
+    //     iconUrl: "images/icon.png", // Ensure this matches the actual path
+    //     title: "Pomodoro Timer",
+    //     message: "Time's up! Take a break!",
+    // });
+
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.action === "timeUpNotification") {
+        chrome.notifications.create("timerDone", {
+          type: "basic",
+          title: "Pomodoro Timer",
+          message: "Timer is up! Time to take a break!", // Text-only notification
+        });
+      }
+    });
 
       return;
     }
