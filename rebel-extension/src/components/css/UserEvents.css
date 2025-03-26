@@ -1,0 +1,203 @@
+/* CSS for UserEventInput.jsx and UserEventList.jsx */
+
+/* UserEventInput */
+
+.text-inputs {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-left: 30px;
+}
+
+/* Shared styling */
+.event-title,
+.event-desc-input {
+    width: 92%;
+    padding: 0.5rem;
+}
+
+.event-title {
+    width: 60%;
+}
+
+/* Specific to textarea */
+.event-desc-input {
+    field-sizing: content;
+    min-block-size: 10vh;
+    max-block-size: 30vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.event-row {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: center;
+    /* center the row inside parent */
+    width: 80%;
+    margin: 0 auto;
+    /* center horizontally */
+}
+
+.event-col-left,
+.event-col-right {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+}
+
+.event-col-right {
+    align-items: flex-end;
+}
+
+.time-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.time-label {
+    width: 50px;
+    /* fixed width so both labels align */
+    margin-right: 0.2rem;
+    color: #777;
+    font-size: 0.95rem;
+    text-align: right;
+}
+
+.event-input {
+    flex: 1;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background-color: #111;
+    color: #fff;
+}
+
+/* UserEventList */
+
+.event-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.event-dropdown-item {
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 0.5rem;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.event-dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f9fafb;
+    padding: 10px 12px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.event-dropdown-header:hover {
+    background-color: #f1f5f9;
+}
+
+.event-dropdown-details {
+    background-color: #fff;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    color: #333;
+    border-top: 1px solid #eee;
+}
+
+.delete-btn {
+    background-color: #e53e3e;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.delete-btn:hover {
+    background-color: #c53030;
+}
+
+.dropdown-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dropdown-icon {
+    font-size: 0.9rem;
+    color: #555;
+    transition: transform 0.2s ease;
+}
+
+.tab-nav {
+    display: flex;
+    justify-content: center;
+    border-bottom: 2px solid #f1f1f1;
+    margin-bottom: 1rem;
+    gap: 1.5rem;
+    padding-left: 4px;
+}
+
+.tab-item {
+    padding: 0.5rem 0;
+    cursor: pointer;
+    font-weight: 500;
+    color: #6b7280;
+    /* Tailwind gray-500 */
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.tab-item:hover {
+    color: #374151;
+    /* gray-700 */
+}
+
+.tab-item.active {
+    color: #b91c1c;
+    /* red-700 */
+    border-bottom: 2px solid #b91c1c;
+}
+
+.event-subheader {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin: 1rem 0 0.5rem;
+    color: #374151;
+    text-align: left;
+    /* Tailwind gray-700 */
+}
+
+.edit-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.edit-label {
+    width: 100px;
+    text-align: right;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.edit-input,
+.edit-textarea {
+    flex: 1;
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
