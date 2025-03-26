@@ -20,6 +20,10 @@ function HomePage() {
         onClick={() => navigate("/settings")}> ⚙️ </button>
       <AccordionMenu />    
       <GetAssignmentsButton />
+      <br />
+      <button onClick={() => navigate("/user-events")}> Personalize Events </button>
+      <br />
+      <br />
       <SidePanelButton />
     </div>
   );

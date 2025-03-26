@@ -66,7 +66,7 @@ class User_Info(Resource):
 	# GET items from User model table
 	@marshal_with(user_resource_fields)
 	def get(self, user_id):
-		result = UserModel.query.filter_by(id=user_id).first()
+		result = UserModel.query.get(user_id)
 		if not result:
 			abort(404, message="Could not find user with that id")
 		return result
@@ -75,7 +75,7 @@ class User_Info(Resource):
 	@marshal_with(user_resource_fields)
 	def put(self, user_id):
 		args = user_put_args.parse_args()
-		result = UserModel.query.filter_by(id=user_id).first()
+		result = UserModel.query.get(user_id)
 		if result:
 			abort(409, message="User id taken...")
 
@@ -109,11 +109,11 @@ class Event_Info(Resource):
 
 # List all items in User model table
 class User_List(Resource):
-	@marshal_with(event_resource_fields)
+	@marshal_with(user_resource_fields)
 	def get(self):
 		result = UserModel.query.all()
 		if not result:
-			abort(404, message="Table is empty")
+			abort(404, message="No users found")
 		return result
 
 # List all items in Event model table
@@ -135,10 +135,11 @@ api.add_resource(Event_List, "/event_list")
 
 # default function to run API
 def default():
-	app.run(host='0.0.0.0', port=5050, debug=True)
+	app.run(host='0.0.0.0', port=5050, debug=False)
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.drop_all()
-        db.create_all()  # Create tables within the application context
-        default()  # Run the app after creating the tables
+	with app.app_context():
+		db.session.query(EventModel).delete()  # Delete only events
+		db.session.commit()
+		db.create_all()  # Ensure tables exist
+		default()
