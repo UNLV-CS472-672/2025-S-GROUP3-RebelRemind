@@ -8,6 +8,17 @@
   text-align: center;
 }
 
+.rebel-remind-logo {
+  width: 100%;            
+  max-width: 500px;       
+  display: block;         
+  margin-bottom: 10px;         
+  padding: 0;             
+  object-fit: contain;    
+}
+
+
+
 .accordion {
   padding: 1rem;
 }
@@ -72,3 +83,18 @@
 .read-the-docs {
   color: #888;
 }
+
+.settings-button-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.settings-button {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
