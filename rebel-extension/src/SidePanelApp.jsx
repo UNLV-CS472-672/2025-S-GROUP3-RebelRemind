@@ -14,28 +14,32 @@ function SidePanelApp() {
   const isAuthenticated = useAuth();
 
   useEffect(() => {
+    const applyGradient = (baseColor) => {
+      const gradient = `linear-gradient(to bottom right, ${baseColor}, #f8d7da)`;
+      document.documentElement.style.setProperty("--app-background", gradient);
+      document.body.style.background = gradient;
+    };
+  
     // Initial load
     chrome.storage.sync.get("backgroundColor", (data) => {
-      const color = data.backgroundColor || "#8b0000";
-      document.documentElement.style.setProperty("--app-background", color);
-      document.body.style.backgroundColor = color;
+      const baseColor = data.backgroundColor || "#dc143c";
+      applyGradient(baseColor);
     });
   
-    // Listen for color update messages
+    // Listen for updates
     const handleColorUpdate = (msg) => {
       if (msg.type === "COLOR_UPDATED") {
-        document.documentElement.style.setProperty("--app-background", msg.color);
-        document.body.style.backgroundColor = msg.color;
+        applyGradient(msg.color);
       }
     };
   
     chrome.runtime.onMessage.addListener(handleColorUpdate);
   
-    // Cleanup
     return () => {
       chrome.runtime.onMessage.removeListener(handleColorUpdate);
     };
   }, []);
+  
   
 
   return (
