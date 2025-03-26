@@ -1,93 +1,30 @@
-Group 3 2025 Project Repo
+![image](https://github.com/user-attachments/assets/06c56dbc-b494-4b1c-9bee-c610a60eb553)
 
-A simple Hello World Chrome extension using React.
+# 🔔 Rebel Remind ⏰
 
-# Getting Started with Create React App
+**Rebel Remind** is a Google Chrome extension built to unify and simplify notifications for students at the **University of Nevada, Las Vegas (UNLV)**.
 
-Add origin (if you haven't done so already)
+### 🎯 The Problem
 
-```sh
-   git remote add origin https://github.com/UNLV-CS472-672/2025-S-GROUP3-RebelRemind.git
-```
+UNLV students receive updates from a maze of sources — **Canvas**, **Rebel News**, the **Involvement Center**, and **Campus Alerts**. Important deadlines and announcements often get buried in email overload or missed entirely.
 
-Pull the latest changes from the remote repo
+### 🚀 The Solution
 
-```sh
-   git checkout main
-   git pull origin main
-```
+Rebel Remind brings clarity to the chaos. It **centralizes** student notifications into one clean, customizable hub — right inside the Chrome browser.
 
-## Installing dependencies
+- 📚 **Canvas Integration** – Connects via API to fetch assignments, due dates, and announcements.
+- 📅 **Campus Calendar Sync** – Uses web scraping to pull in official UNLV events and opportunities.
+- 🔔 **Smart Notifications** – Choose between daily digests or weekly roundups based on your preference.
+- ⚙️ **User Personalization** – Tailor what types of alerts you want and even create your own events.
 
-```sh
-   cd rebel-extension
-```
+### ✨ TL;DR
 
-```sh
-   npm install
-```
+> Rebel Remind is your one-stop shop for staying **organized**, **on time**, and **in the loop** as a UNLV student. No more missed deadlines. No more scattered updates. Just one simple, powerful tool to keep you connected.
 
-```sh
-   cd ../backend
-```
+## Remind, Rebel, Repeat. 💪
 
-```sh
-   npm install
-```
+Current Version
 
-## Deploying the Chrome Extension
-
-### To create a build folder for deploying in Chrome Extension:
-
-Inside the /backend folder start the backend server. Leave this terminal open as your backend.
-
-```sh
-   npm run dev
-```
-
-In a separate terminal, navigate to your /rebel-extension folder
-
-```sh
-   npm run build
-```
-
-1. Navigate to chrome://extensions/
-2. Select developer mode in the top right
-3. Select **Load Unpacked** in the top left
-4. Navigate to the project and upload the **dist** folder
-
-### To recompile
-
-```sh
-   npm run build
-```
-
-1. Navigate to chrome://extensions/
-2. Hit the reload button on the RebelRemind chrome extension
-
-### An overview of the Chrome Extension infrastructure
-
-The /rebel-extension folder contains our chrome extensions.
-Here, any API calls will need to go through background.js
-
-Located at rebel-extension/public/background.js
-
-This background worker will be capable of making external calls to our server.
-
-The backend server will handle requests, and return a response. By doing it this way, we abstract the backend server from our actual chrome extension. Furthermore, by issuing all requests from the background.js file, we can make external requests while the extension is closed.
-
-If an API call was made directly from the React javascript, it would only be allowed if the pop up is open.
-
-### To test the front end with jest
-
-```sh
-   cd rebel-extension
-```
-
-```sh
-   npm install
-```
-
-```sh
-   npm test
-```
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/b4707e29-201c-4bb8-a56e-1cc03915175f" alt="Rebel Remind Logo" width="400"/>
+</p>
