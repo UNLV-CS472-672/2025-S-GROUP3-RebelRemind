@@ -1,6 +1,5 @@
 import "./SidePanelApp.css";
 import LoginButton from "./components/LoginButton";
-import Counter from "./components/Counter";
 import AccordionMenu from "./components/AccordionMenu";
 import CalendarView from "./components/CalendarView";
 import UserProfile from "./components/UserProfile";
