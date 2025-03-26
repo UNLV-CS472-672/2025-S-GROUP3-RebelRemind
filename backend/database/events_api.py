@@ -28,60 +28,88 @@ def format_week_range(date_obj):
     else:
         return f"{week_start.strftime('%b %d')} – {week_end.strftime('%d, %Y')}"
 
-def format_day(date_obj):
-    return date_obj.strftime("%Y-%m-%d")
-
 # --- Extractors ---
 
-def extract_events(filepath, source_name, weekly_grouped, daily_grouped):
+def extract_academic_calendar_events(filepath, source_name, weekly_grouped):
     with open(filepath, 'r') as f:
         data = json.load(f)
 
     for entry in data:
-        raw_date = entry.get("date") or entry.get("Date")
-        event = entry.get("name") or entry.get("Event")
+        raw_date = entry.get("Date")
+        event = entry.get("Event")
+        date_obj = parse_date(raw_date)
+        if date_obj:
+            week_key = format_week_range(date_obj)
+            weekly_grouped[week_key][source_name].append({
+                "date": date_obj.strftime("%Y-%m-%d"),
+                "event": event
+            })
+
+def extract_unlv_calendar_events(filepath, source_name, weekly_grouped):
+    with open(filepath, 'r') as f:
+        data = json.load(f)
+
+    for entry in data:
+        raw_date = entry.get("date")
+        event = entry.get("name")
         time = entry.get("time")
         location = entry.get("location")
         date_obj = parse_date(raw_date)
         if date_obj:
             week_key = format_week_range(date_obj)
-            day_key = format_day(date_obj)
-            event_data = {
+            weekly_grouped[week_key][source_name].append({
                 "date": date_obj.strftime("%Y-%m-%d"),
                 "event": event,
                 "time": time,
                 "location": location.strip() if location else ""
-            }
-            weekly_grouped[week_key][source_name].append(event_data)
-            daily_grouped[day_key][source_name].append(event_data)
+            })
 
-# --- Routes ---
+def extract_involvement_center_events(filepath, source_name, weekly_grouped):
+    with open(filepath, 'r') as f:
+        data = json.load(f)
+
+    for entry in data:
+        raw_date = entry.get("date")
+        event = entry.get("name")
+        time = entry.get("time")
+        location = entry.get("location")
+        date_obj = parse_date(raw_date)
+        if date_obj:
+            week_key = format_week_range(date_obj)
+            weekly_grouped[week_key][source_name].append({
+                "date": date_obj.strftime("%Y-%m-%d"),
+                "event": event,
+                "time": time,
+                "location": location.strip() if location else ""
+            })
+
+# --- Main Route ---
 
 @app.route('/calendar-events', methods=['GET'])
 def get_combined_events():
     weekly_grouped = defaultdict(lambda: defaultdict(list))
-    daily_grouped = defaultdict(lambda: defaultdict(list))
 
+    # Filepaths
     base_path = os.path.join("..", "webscraping")
-    event_files = [
-        ("calendar_events.json", "Academic Calendar"),
-        ("scraped_UNLVEvents.json", "UNLV Calendar"),
-        ("events.json", "Involvement Center")
-    ]
+    academic_file = os.path.join(base_path, "calendar_events.json")
+    unlv_file = os.path.join(base_path, "scraped_UNLVEvents.json")
+    involvement_file = os.path.join(base_path, "events.json")
 
     try:
-        for filename, source_name in event_files:
-            extract_events(os.path.join(base_path, filename), source_name, weekly_grouped, daily_grouped)
+        extract_academic_calendar_events(academic_file, "Academic Calendar", weekly_grouped)
+        extract_unlv_calendar_events(unlv_file, "UNLV Calendar", weekly_grouped)
+        extract_involvement_center_events(involvement_file, "Involvement Center", weekly_grouped)
     except (FileNotFoundError, json.JSONDecodeError) as e:
         return jsonify({"error": f"File error: {str(e)}"}), 500
 
-    return jsonify({"weekly": weekly_grouped, "daily": daily_grouped}), 200
+    return jsonify(weekly_grouped), 200
+
 
 @app.route('/calendar-events/by-week', methods=['GET'])
 def get_events_by_week():
-    start_date_str = request.args.get('start-date') or request.headers.get('start-date')
+    start_date_str = request.headers.get('start-date')
     if not start_date_str:
-        return jsonify({"error": "Missing 'start-date' parameter"}), 400
+        return jsonify({"error": "Missing 'start-date' header"}), 400
 
     date_obj = parse_date(start_date_str)
     if not date_obj:
@@ -89,51 +117,22 @@ def get_events_by_week():
 
     week_key = format_week_range(date_obj)
     weekly_grouped = defaultdict(lambda: defaultdict(list))
-    daily_grouped = defaultdict(lambda: defaultdict(list))
 
+    # Filepaths
     base_path = os.path.join("..", "webscraping")
-    event_files = [
-        ("calendar_events.json", "Academic Calendar"),
-        ("scraped_UNLVEvents.json", "UNLV Calendar"),
-        ("events.json", "Involvement Center")
-    ]
+    academic_file = os.path.join(base_path, "calendar_events.json")
+    unlv_file = os.path.join(base_path, "scraped_UNLVEvents.json")
+    involvement_file = os.path.join(base_path, "events.json")
 
     try:
-        for filename, source_name in event_files:
-            extract_events(os.path.join(base_path, filename), source_name, weekly_grouped, daily_grouped)
+        extract_academic_calendar_events(academic_file, "Academic Calendar", weekly_grouped)
+        extract_unlv_calendar_events(unlv_file, "UNLV Calendar", weekly_grouped)
+        extract_involvement_center_events(involvement_file, "Involvement Center", weekly_grouped)
     except (FileNotFoundError, json.JSONDecodeError) as e:
         return jsonify({"error": f"File error: {str(e)}"}), 500
 
-    return jsonify({week_key: weekly_grouped.get(week_key, {})}), 200
-
-@app.route('/calendar-events/by-day', methods=['GET'])
-def get_events_by_day():
-    date_str = request.args.get('date') or request.headers.get('date')
-    if not date_str:
-        return jsonify({"error": "Missing 'date' parameter"}), 400
-
-    date_obj = parse_date(date_str)
-    if not date_obj:
-        return jsonify({"error": "Invalid date format. Use YYYY-MM-DD or 'Monday, March 25, 2025'"}), 400
-
-    day_key = format_day(date_obj)
-    weekly_grouped = defaultdict(lambda: defaultdict(list))
-    daily_grouped = defaultdict(lambda: defaultdict(list))
-
-    base_path = os.path.join("..", "webscraping")
-    event_files = [
-        ("calendar_events.json", "Academic Calendar"),
-        ("scraped_UNLVEvents.json", "UNLV Calendar"),
-        ("events.json", "Involvement Center")
-    ]
-
-    try:
-        for filename, source_name in event_files:
-            extract_events(os.path.join(base_path, filename), source_name, weekly_grouped, daily_grouped)
-    except (FileNotFoundError, json.JSONDecodeError) as e:
-        return jsonify({"error": f"File error: {str(e)}"}), 500
-
-    return jsonify({day_key: daily_grouped.get(day_key, {})}), 200
+    events = weekly_grouped.get(week_key, {})
+    return jsonify({week_key: events}), 200
 
 # --- Run ---
 

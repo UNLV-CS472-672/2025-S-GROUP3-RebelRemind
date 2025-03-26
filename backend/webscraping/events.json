@@ -1,15 +1,81 @@
 [
     {
-        "name": "College Programs Book Club - March Meeting: THE RAINFALL MARKET",
+        "name": "UNLV IEEE Spring 2025 General Meeting #2 ",
+        "date": "Monday, March 24, 2025",
+        "time": "05:00 PM PDT",
+        "location": "AEB 140/145"
+    },
+    {
+        "name": "SORCE Storage Room Check-in 3/24/2025",
+        "date": "Monday, March 24, 2025",
+        "time": "10:00 AM PDT",
+        "location": "SORCE Storage Room"
+    },
+    {
+        "name": "Ms. Gerrie's Friendship Potluck",
+        "date": "Monday, March 24, 2025",
+        "time": "05:00 PM PDT",
+        "location": "RLL 101"
+    },
+    {
+        "name": "Business in Action & PENTEL ",
+        "date": "Monday, March 24, 2025",
+        "time": "05:00 PM PDT",
+        "location": "BEH 239"
+    },
+    {
+        "name": "SORCE Room Check-in 3/24/2025",
+        "date": "Monday, March 24, 2025",
+        "time": "10:00 AM PDT",
+        "location": "SORCE Room"
+    },
+    {
+        "name": "Celebrate Nowruz \u2013 Persian New Year",
+        "date": "Monday, March 24, 2025",
+        "time": "06:30 PM PDT",
+        "location": "SU Ballroom BC"
+    },
+    {
+        "name": "Pathways to Authentic: Emotionally Intelligent Communication Workshop",
         "date": "Tuesday, March 25, 2025",
-        "time": "03:00 PM PDT",
-        "location": "CAEO Lobby: 301 SSC-A"
+        "time": "11:30 AM PDT",
+        "location": "GUA 1126"
+    },
+    {
+        "name": "Info Session: Careers as Python Developers, Data Analysts and CNC Mill Operator",
+        "date": "Tuesday, March 25, 2025",
+        "time": "12:00 PM PDT",
+        "location": "Online"
+    },
+    {
+        "name": "Lied Library Makerspace Orientation",
+        "date": "Tuesday, March 25, 2025",
+        "time": "12:00 PM PDT",
+        "location": "Makerspace, First Floor, Lied Library"
+    },
+    {
+        "name": "Podcasting 102: Audio Mixing",
+        "date": "Tuesday, March 25, 2025",
+        "time": "12:00 PM PDT",
+        "location": "Audio Production Studio 1 (LLB 1226)"
+    },
+    {
+        "name": "Coffee and Donuts",
+        "date": "Tuesday, March 25, 2025",
+        "time": "12:00 PM PDT",
+        "location": "UNLV Student Union"
     },
     {
         "name": "Coaching x FYE: ReThink Thriving at UNLV",
         "date": "Tuesday, March 25, 2025",
         "time": "03:00 PM PDT",
         "location": "Online"
+    },
+    {
+        "name": "College Programs Book Club - March Meeting: THE RAINFALL MARKET",
+        "date": "Tuesday, March 25, 2025",
+        "time": "03:00 PM PDT",
+        "location": "CAEO Lobby: 301 SSC-A"
     },
     {
         "name": "Webapp Security (CTF Series)",
@@ -30,6 +96,12 @@
         "location": "SORCE Storage Room"
     },
     {
+        "name": "SORCE Room Check-in 3/25/2025",
+        "date": "Tuesday, March 25, 2025",
+        "time": "10:00 AM PDT",
+        "location": "SORCE Room"
+    },
+    {
         "name": "Power of Your Tribe: Lessons in Sisterhood",
         "date": "Tuesday, March 25, 2025",
         "time": "05:00 PM PDT",
@@ -48,28 +120,22 @@
         "location": "SRWC Room 1020"
     },
     {
-        "name": "SORCE Room Check-in 3/25/2025",
-        "date": "Tuesday, March 25, 2025",
-        "time": "10:00 AM PDT",
-        "location": "SORCE Room"
-    },
-    {
         "name": "CIENFEMMES PRODUCTION WORKSHOP W/ DAN JACOBS",
         "date": "Tuesday, March 25, 2025",
         "time": "05:30 PM PDT",
         "location": "Flora Dungan Humanities 143B"
     },
     {
-        "name": "Confirmation Class",
-        "date": "Tuesday, March 25, 2025",
-        "time": "07:00 PM PDT",
-        "location": "St. Thomas Aquinas Catholic Newman Center"
-    },
-    {
         "name": "Cultural Potluck Iftar",
         "date": "Tuesday, March 25, 2025",
         "time": "06:30 PM PDT",
         "location": "Student Union Ballroom C"
+    },
+    {
+        "name": "Confirmation Class",
+        "date": "Tuesday, March 25, 2025",
+        "time": "07:00 PM PDT",
+        "location": "St. Thomas Aquinas Catholic Newman Center"
     },
     {
         "name": "UNLV Spectrum Spring 2025 Meetings",

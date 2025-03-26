@@ -2,8 +2,7 @@
 #root {
   max-width: 1000px;
   min-width: 450px;
-  background-color: var(--app-background, #8b0000);
-  transition: background-color 0.3s ease; 
+  background-color: crimson;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
@@ -73,79 +72,3 @@
 .read-the-docs {
   color: #888;
 }
-
-.settings-section {
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background-color: var(--app-background, #8b0000);
-  border: 1.5px dashed #fff;
-  border-radius: 10px;
-  text-align: center;
-  max-width: 300px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.settings-title {
-  font-size: 1.2rem;
-  color: #ffe0f0;
-  font-family: 'Comic Sans MS', cursive, sans-serif;
-  margin-bottom: 8px;
-}
-
-.settings-label {
-  font-size: 0.95rem;
-  color: #ffd2f0;
-  font-weight: 600;
-  margin-bottom: 6px;
-  display: block;
-}
-
-.color-picker-input {
-  width: 45px;
-  height: 30px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.reset-button {
-  margin-top: 10px;
-  background-color: #8b0000;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s ease;
-}
-
-.reset-button:hover {
-  background-color: #b01030;
-}
-
-.color-controls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.reset-button {
-  background-color: #8b0000;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s ease;
-}
-
-.reset-button:hover {
-  background-color: #b01030;
-}
-

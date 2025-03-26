@@ -1,16 +1,15 @@
+/* This file contains styles specific to App.jsx. */
 #root {
   max-width: 1000px;
   min-width: 450px;
+  background-color: crimson;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-  background-color: var(--app-background, "#8b0000"); /* Use dynamic background color */
-  transition: background-color 0.3s ease; 
 }
 
 .accordion {
   padding: 1rem;
-  width: 450px;
 }
 
 .accordion-button {
@@ -24,7 +23,6 @@
   text-align: left;
 }
 
-/*
 .react-calendar {
   width: 350px;
   max-width: 100%;
@@ -33,7 +31,6 @@
   font-family: "Arial", "Helvetica", sans-serif;
   line-height: 1.125em;
 }
-Residual CSS from obselete library, keeping for backtracking/testing, remove later.*/
 
 .dropdown {
   padding: 0.5rem;
@@ -46,11 +43,9 @@ Residual CSS from obselete library, keeping for backtracking/testing, remove lat
   will-change: filter;
   transition: filter 300ms;
 }
-
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
-
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -88,8 +83,8 @@ Residual CSS from obselete library, keeping for backtracking/testing, remove lat
   color: white;
   font-size: 15px;
   cursor: pointer;
-  padding: 5px; /* Adds space around the text */
-  border-radius: 0; 
+  padding: 5px; /* Optional: Adds space around the text */
+  border-radius: 0; /* Optional: Adds rounded corners */
   outline: none;
 }
 
@@ -98,7 +93,7 @@ Residual CSS from obselete library, keeping for backtracking/testing, remove lat
   border-color: white; /* Change border color on hover */
 }
 
-/* Confirmation box styling */
+/* Confirmation box asking if they are sure to exit button styling */
 .confirmation-box {
   position: fixed;
   top: 50%;
@@ -131,6 +126,7 @@ Residual CSS from obselete library, keeping for backtracking/testing, remove lat
 .confirmation-box button:hover {
   background-color: lightgray;
 }
+
 
 /* Styles for the Login with Canvas button */
 .login-button-container {

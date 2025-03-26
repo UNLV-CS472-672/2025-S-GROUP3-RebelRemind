@@ -1,13 +1,12 @@
 /* Global Styles for the Entire Extension */
 
-#sidepanel-root {
+:sidepanel-root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  width: 700px;
 
   color-scheme: light dark;
-  color: var(--app-background, #8b0000);
+  color: crimson;
   background-color: #242424;
 
   font-synthesis: none;
@@ -39,7 +38,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: auto;
-  background-color: var(--app-background, #8b0000);
+  background-color: crimson;
 }
 
 h1 {
