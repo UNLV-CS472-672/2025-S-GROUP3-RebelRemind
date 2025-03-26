@@ -56,11 +56,16 @@ function CalendarMenu() {
 			setEvents([ ...canvasAssignments, ...userEvents]);
 		};
 		fetchEvents();
-	}, []);
 
-	useEffect(() => {
-		console.log("Updated Events:", events);
-	}, [events]); //
+		const handleMessage = (message) => {
+            if (message.type === "EVENT_CREATED") {
+                fetchEvents();
+            }
+        };
+
+        chrome.runtime.onMessage.addListener(handleMessage);
+        return () => chrome.runtime.onMessage.removeListener(handleMessage);
+	}, []);
 
 	return (
   	<div >
