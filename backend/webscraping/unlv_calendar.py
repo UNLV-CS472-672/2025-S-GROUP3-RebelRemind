@@ -1,14 +1,12 @@
 import requests
-from bs4 import BeautifulSoup
 import json
-
-# Flask API
-BASE = "http://127.0.0.1:5050/"
+from bs4 import BeautifulSoup
+from database import BASE
 
 # URL of the UNLV event calendar
 url = "https://www.unlv.edu/calendar"
 
-def scrape_cal():
+def default():
     # Make request inside function
     response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
     
@@ -43,13 +41,14 @@ def scrape_cal():
             }
 
             # Send event data to Flask API
-            api_response = requests.put(BASE + f"event_id/{event_id}", json=event_data)
+            api_response = requests.put(BASE + f"unlvcalendar_id/{event_id}", json=event_data)
             if api_response.status_code == 201:
                 pass
 
             events.append(event_data)  # Add event data to the events list
 
             event_id += 1  # Increment event ID
+        
         with open('scraped_UNLVEvents.json', 'w') as json_file:
             json.dump(events, json_file, indent=4)  # Write events as formatted JSON
 
@@ -57,4 +56,4 @@ def scrape_cal():
         print(f"Failed to access the page. Status code: {response.status_code}")
 
 if __name__ == "__main__":
-    scrape_cal()
+    default()

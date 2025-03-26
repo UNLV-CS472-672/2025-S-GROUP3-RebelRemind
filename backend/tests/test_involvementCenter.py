@@ -3,10 +3,8 @@ import unittest
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'webscraping')))
-from unlv_calendar import scrape_cal
-
-
-BASE = "http://127.0.0.1:5050/"  # Your Flask API base URL
+from involvement_center import default
+from database import BASE
 
 class TestFlaskAPI(unittest.TestCase):
 
@@ -19,13 +17,13 @@ class TestFlaskAPI(unittest.TestCase):
         Test adding events to the API via PUT request from the scraper.
         """
         print("Scraping events and adding to database...")
-        scrape_cal()  # This will scrape and add events to the Flask API
+        default()  # This will scrape and add events to the Flask API
 
         # Now check if events are in the API
         event_id = 1
         while True:
             # Try to retrieve the event from the API
-            response = requests.get(BASE + f"event_id/{event_id}")
+            response = requests.get(BASE + f"involvementcenter_id/{event_id}")
             
             if response.status_code == 404:  # No more events in the database
                 break
@@ -48,7 +46,7 @@ class TestFlaskAPI(unittest.TestCase):
         Test retrieving all events from the API via GET request.
         """
         # Retrieve all events from the API
-        response = requests.get(BASE + "event_list")
+        response = requests.get(BASE + "involvementcenter_list")
         
         # Ensure the status code is 200 (OK)
         self.assertEqual(response.status_code, 200, f"Failed to get events: {response.text}")
