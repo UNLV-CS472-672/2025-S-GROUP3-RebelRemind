@@ -13,15 +13,29 @@ function HomePage() {
   const navigate = useNavigate();
 
   return (
-    <div >
+    <div>
+      <img
+        src="/images/rebel-remind.png"
+        alt="Rebel Remind Logo"
+        className="rebel-remind-logo"
+      />
       <CloseButton />
-      <button
-        style={{ display: 'flex', justifyContent: 'flex-end', marginLeft: 'auto' }}
-        onClick={() => navigate("/settings")}> ⚙️ </button>
-      <AccordionMenu />    
+
+      <div className="settings-button-container">
+        <button
+          className="settings-button"
+          onClick={() => navigate("/settings")}
+        >
+          ⚙️
+        </button>
+      </div>
+
+      <AccordionMenu />
       <GetAssignmentsButton />
       <br />
-      <button onClick={() => navigate("/user-events")}> Personalize Events </button>
+      <button onClick={() => navigate("/user-events")}>
+        Personalize Events
+      </button>
       <br />
       <br />
       <SidePanelButton />
