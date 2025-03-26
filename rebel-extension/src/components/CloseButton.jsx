@@ -27,43 +27,18 @@
  * Documentation by Chatgpt
  */
 
-import React, { useState } from "react";
+import React from "react";
 
-const CloseButton = () => {
-  const [showConfirmation, setShowConfirmation] = useState(false);
-
-  // Handle click on the close button
+function App() {
   const handleClose = () => {
-    setShowConfirmation(true);
-  };
-
-  // Close the extension popup
-  const handleExit = () => {
-    window.close();
-  };
-
-  // Hide the confirmation prompt
-  const handleCancel = () => {
-    setShowConfirmation(false);
+    window.close(); // Closes the Chrome extension popup
   };
 
   return (
     <div>
-      <button className="close-button" onClick={handleClose}>
-        ✖
-      </button>
-
-      {showConfirmation && (
-        <div className="confirmation-box">
-          <p>Are you sure you want to exit?</p>
-          <div className="button-container">
-            <button onClick={handleExit}>Yes</button>
-            <button onClick={handleCancel}>No</button>
-          </div>
-        </div>
-      )}
+      <button className="close-button" onClick={handleClose}>X</button>
     </div>
   );
-};
+}
 
-export default CloseButton;
+export default App;

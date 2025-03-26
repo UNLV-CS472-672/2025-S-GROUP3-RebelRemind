@@ -39,6 +39,7 @@ function HomePage() {
       <br />
       <br />
       <SidePanelButton />
+      <button onClick={() => navigate("/pomodoro")}> Pomodoro </button>
     </div>
   );
 }
