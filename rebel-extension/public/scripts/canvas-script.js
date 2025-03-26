@@ -11,7 +11,7 @@
 /**
  * Gets a list of assignments from the Canvas API for the specified course and outputs to the console.
  */
-async function getAssignments(courseID) {
+export async function getAssignments(courseID) {
     let url = `https://unlv.instructure.com/api/v1/calendar_events?type=assignment&all_events=true&per_page=100&context_codes[]=course_${courseID}`; // URL for Canvas API call.
     const accessToken = await getCanvasPAT(); // Get Canvas Access Token from chrome.storage.
     let allAssignments = []; // Stores all assignments found in a particular course.
@@ -29,7 +29,7 @@ async function getAssignments(courseID) {
             if (!response.ok) {
                 throw new Error(`HTTP Error: ${response.status}`);
             }
-            // ai-get start (ChatGPT-4o, 0)
+            // ai-gen start (ChatGPT-4o, 0)
             const assignments = await response.json(); // Collect response of assignments
             allAssignments = allAssignments.concat(assignments); // Add response to current list
             
@@ -45,7 +45,22 @@ async function getAssignments(courseID) {
             }
             // ai-gen end
         }
-        console.log("Assignments:", allAssignments); // Send results to console for viewing.
+        // console.log("Assignments:", allAssignments); // Send results to console for viewing.
+
+        // ai-gen (ChatGPT-4o, 2)
+        const selectedKeys = ["title", "context_name"];
+        const nestedKeys = ["due_at"];
+
+        const calendarFormattedAssignments = allAssignments.map(assignment => {
+            const filteredMain = Object.fromEntries(
+                Object.entries(assignment).filter(([key]) => selectedKeys.includes(key))
+            );
+            const filteredNested = Object.fromEntries(
+                Object.entries(assignment.assignment).filter(([key]) => nestedKeys.includes(key))
+            );
+            return { ...filteredMain, ...filteredNested};
+        });
+        return calendarFormattedAssignments;
 
     } catch (error) {
         console.error("Error fetching events:", error);
@@ -55,8 +70,8 @@ async function getAssignments(courseID) {
 /**
  * Gets the Canvas Access Token from chrome.storage for use in getAssignments().
  */
-// ai-get start (ChatGPT-4o, 2)
-function getCanvasPAT() {
+// ai-gen start (ChatGPT-4o, 2)
+export function getCanvasPAT() {
     return new Promise((resolve) => {
         chrome.storage.local.get("canvasPAT", (data) => {
             if (data.canvasPAT) { // Canvas Access Token found in storage.
@@ -74,13 +89,16 @@ function getCanvasPAT() {
  */
 export async function getCourses() {
     let url = `https://unlv.instructure.com/api/v1/courses?per_page=100`;
+    console.debug("Made it");
     const accessToken = await getCanvasPAT(); // Get Canvas Access Token from chrome.storage.
+    console.debug("Using access token: ", accessToken);
     if (!accessToken) { // No Canvas Access Token found.
         console.log("Please store an access token!");
         return;
     }
     let allCourses = []; // Stores all courses student has been enrolled in.
     let activeCourses = []; // Stores only courses student is currently enrolled in.
+    let allAssignments = [];
 
     try {
         while (url) { // Loops through pages Canvas data.
@@ -99,7 +117,7 @@ export async function getCourses() {
                 throw new Error(`HTTP Error: ${response.status}`);
             }
 
-            // ai-get start (ChatGPT-4o, 0)
+            // ai-gen start (ChatGPT-4o, 0)
             const courses = await response.json(); // Collect response of courses
             allCourses = allCourses.concat(courses); // Add response to current list
 
@@ -122,9 +140,13 @@ export async function getCourses() {
             }
         }
         for (const course of activeCourses) { // Get assignments for all active courses.
-            console.log("Course Name: ", course.name);
-            await getAssignments(course.id);
+            // console.log("Course Name: ", course.name);
+            allAssignments.push( ...await getAssignments(course.id));
         }
+        console.log(allAssignments);
+        chrome.storage.local.set({ Canvas_Assignments: allAssignments }, () => {
+            console.log("Assignments Stored!");
+        });
 
     } catch (error) {
         console.error("Error fetching events:", error);

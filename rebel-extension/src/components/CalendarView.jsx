@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import "../App.css";
 import "./css/CalendarView.css";
-import calendarEvents from "./calendarEvents";
 
 //date-fns localizer for big-calendar
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
@@ -48,11 +47,26 @@ function CalendarMenu() {
 	const minLimit = setMinutes(setHours(new Date(), 7), 0);
 	const maxLimit = setMinutes(setHours(new Date(), 23), 59);
 
+	const [events, setEvents] = useState([]);
+
+	useEffect(() => {
+		const fetchEvents = async () => {
+			const canvasAssignments = await getCanvasAssignments();
+			const userEvents = await getUserEvents();
+			setEvents([ ...canvasAssignments, ...userEvents]);
+		};
+		fetchEvents();
+	}, []);
+
+	useEffect(() => {
+		console.log("Updated Events:", events);
+	}, [events]); //
+
 	return (
   	<div >
     	  <Calendar
       	  localizer={localizer}
-      	  events={calendarEvents}	
+      	  events={events}	
           defaultView= 'day'		
           views= {['day', 'week']}	
       	  startAccessor="start"
@@ -67,3 +81,42 @@ function CalendarMenu() {
 }
 
 export default CalendarMenu;
+
+const getCanvasAssignments = async () => {
+	return new Promise ((resolve) => {
+		chrome.storage.local.get("Canvas_Assignments", (data) => {
+			if (data.Canvas_Assignments) { 
+				const assignmentList = data.Canvas_Assignments;
+				const canvasAssignments = assignmentList.map(assignment => ({
+					title: assignment.title,
+					start: new Date(assignment.due_at),
+					end: new Date(assignment.due_at),
+					description: assignment.context_name
+				}));
+				resolve(canvasAssignments);
+			} else { 
+				resolve([]); 
+			}
+		});
+	})
+};
+
+const getUserEvents = async () => {
+	console.log("Here");
+	return new Promise ((resolve) => {
+		chrome.storage.local.get("userEvents", (data) => {
+			if (data.userEvents) { 
+				const userEvents = data.userEvents;
+				const userCalendarEvents = userEvents.map(event => ({
+					title: event.title,
+					start: new Date(`${event.date}T${event.startTime}:00`),
+					end: new Date(`${event.date}T${event.endTime}:00`),
+					description: event.desc
+				}))
+				resolve(userCalendarEvents);
+			} else { 
+				resolve([]); 
+			}
+		});
+	})
+};
