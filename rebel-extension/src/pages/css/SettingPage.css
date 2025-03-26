@@ -149,3 +149,12 @@
   background-color: #b01030;
 }
 
+:root {
+  --app-background: linear-gradient(135deg, #DC143C, #FF6F91);
+}
+
+/* Make the color-picker itself show the same gradient */
+.color-picker-input {
+  background-image: linear-gradient(135deg, #DC143C, #FF6F91);
+  border: none;
+}
