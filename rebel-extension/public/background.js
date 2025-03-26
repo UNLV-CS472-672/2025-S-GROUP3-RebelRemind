@@ -213,6 +213,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       chrome.runtime.sendMessage({ type: "EVENT_CREATED" }); // broadcast
       break;
 
+    case "EVENT_UPDATED":
+      chrome.runtime.sendMessage({ type: "EVENT_UPDATED" });
+      break;
+
     /**
      * Default case: Logs an unrecognized message type.
      * Helps with debugging unexpected messages.

@@ -176,6 +176,7 @@ const UserEventList = () => {
             setUserEvents(updatedEvents);
             setEditingKey(null);
             setEditedEvent({});
+            chrome.runtime.sendMessage({ type: "EVENT_UPDATED" });
         });
     };
 

@@ -58,7 +58,7 @@ function CalendarMenu() {
 		fetchEvents();
 
 		const handleMessage = (message) => {
-            if (message.type === "EVENT_CREATED") {
+            if (message.type === "EVENT_CREATED" || message.type === "EVENT_UPDATED") {
                 fetchEvents();
             }
         };
