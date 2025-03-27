@@ -43,9 +43,16 @@ def default():
             data_table.append({"name": match.text, "date": event_date})
 
     #print(data_table)
+    # get full list of all events
+    response = requests.get(BASE + "rebelcoverage_list")
 
-    id = 0
-
+    # set id to last id in list which incremented right before adding a new item
+    # duplicates will be added but that can be refined later to prevent duplicates
+    if response:
+        id = response.json()[-1]["id"]
+    else:
+        id = 0
+        
     for i in range(len(data_table)):
         id += 1
         requests.put(BASE + f"rebelcoverage_id/{id}", json={"name": data_table[i]["name"], "date": data_table[i]["date"]})
