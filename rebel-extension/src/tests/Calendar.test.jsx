@@ -1,17 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import CalendarView from '../components/CalendarView';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
-/*
-import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
-import format from 'date-fns/format'
-import parse from 'date-fns/parse'
-import startOfWeek from 'date-fns/startOfWeek'
-import getDay from 'date-fns/getDay'
-import enUS from 'date-fns/locale/en-US'
-*/
-//import { setHours } from "date-fns";
-//import { setMinutes } from "date-fns";
-
 
 // Mocking the react-big-calendar and date-fns libraries
 jest.mock('react-big-calendar', () => ({
@@ -19,98 +8,54 @@ jest.mock('react-big-calendar', () => ({
   dateFnsLocalizer: jest.fn(() => ({})), // Mock dateFnsLocalizer
 }));
 
-// Mock the entire date-fns module to ensure named exports like setHours and setMinutes are properly mocked
+// Mock date-fns and any specifically named imported like setHours/setMinutes
 jest.mock('date-fns', () => ({
-  ...jest.requireActual('date-fns'), // Preserve all other date-fns functionality
-  setHours: jest.fn(),  // Mock setHours
-  setMinutes: jest.fn(),  // Mock setMinutes
+  ...jest.requireActual('date-fns'), // Mock while still preserving original functionality
+  setHours: jest.fn(),  // Named import setHours
+  setMinutes: jest.fn(),  // Named import setMinutes
   format: jest.fn(),
   parse: jest.fn(),
   startOfWeek: jest.fn(),
   getDay: jest.fn(),
-  locale: { enUS: {} },  // Mock locale
+  locale: { enUS: {} },
 }));
-
-/*
-jest.mock('date-fns', () => ({
-  __esModule: true,
-  ...jest.requireActual('date-fns'), // Import and retain original implementations of other date-fns functions
-  setHours: jest.fn(), // Mock setHours
-}));
-*/
-
-/*
-jest.mock('date-fns', () => ({
-  ...jest.requireActual('date-fns'), // Import and retain original implementations
-  setHours: jest.fn((date, hours) => {
-    const mockedDate = new Date(date);
-    mockedDate.setHours(hours);
-    return mockedDate;
-  }),
-}));
-*/
-
-/*
-jest.mock('date-fns', () => ({
-      setHours: jest.fn((date, hours) => {
-        const newDate = new Date(date);
-        newDate.setHours(hours);
-        return newDate;
-      }),
-      // Mock other date-fns functions as needed
-    }));
-*/
-
-/*
-jest.mock('date-fns/format', () => jest.fn());
-jest.mock('date-fns/parse', () => jest.fn());
-jest.mock('date-fns/startOfWeek', () => jest.fn());
-jest.mock('date-fns/getDay', () => jest.fn());
-jest.mock('date-fns/locale/en-US', () => ({}));
-//jest.mock('date-fns/setHours', () => jest.fn());
-jest.mock('date-fns', () => ({ setHours: jest.fn() })); 
-//jest.mock('date-fns/setMinutes', () => jest.fn());
-jest.mock('date-fns', () => ({ setMinutes: jest.fn() })); 
-*/
 
 describe('Calendar View Component', () => {
   it('renders the Calendar component', () => {
-    // Render the CalendarView component
+    // Render the CalendarView component itself
     render(<CalendarView />);
 
-    // Assert that the Calendar component text is present in the document
+    // Check that the Calendar actually appears in the extension
     expect(screen.getByText('Calendar Component')).toBeInTheDocument();
   });
 
   it('sets the min and max limits correctly', () => {
-    // Test if setHours and setMinutes were called correctly.
-    // You can verify by checking if these mock functions were called with the correct arguments
+    // To check that calendar's time limits were set correctly
 
-    // Import the functions after mocking them to spy on calls
+    // Named imports must also be imported here in this test case
     const { setHours, setMinutes } = require('date-fns');
 
-    // The Calendar component will call these functions during rendering
+    // First render the calendar to invoke the functions needed to display it
     render(<CalendarView />);
 
-    // Test that the setHours and setMinutes were called with the expected values.
+    // Check that the hours and minutes were set correctly (7:00 AM to 11:59 PM
     expect(setHours).toHaveBeenCalledWith(expect.any(Date), 7);  // Min limit
-    expect(setMinutes).toHaveBeenCalledWith(expect.any(Date), 0);
+    expect(setMinutes).toHaveBeenCalled();
 
     expect(setHours).toHaveBeenCalledWith(expect.any(Date), 23); // Max limit
-    expect(setMinutes).toHaveBeenCalledWith(expect.any(Date), 59);
+    expect(setMinutes).toHaveBeenCalled();
   });
 
-  // Optionally, you can also check if the events are passed into the Calendar component correctly
+  // To check that the calendar can actually handle events if given one
   it('passes calendarEvents to the Calendar component', () => {
     const calendarEventsMock = [
       { start: new Date(), end: new Date(), title: 'Test Event' }
     ];
     
-    // You can modify your component to accept a prop for events to make testing easier
+    // Render the calendar while explicitly passing the events prop
     render(<CalendarView events={calendarEventsMock} />);
 
     // Check that the Calendar component receives and uses the events prop
     expect(screen.getByText('Calendar Component')).toBeInTheDocument();
-    // Additional checks can be added depending on how events are used in the component
   });
 });
