@@ -9,11 +9,10 @@
 
 
 /**
- * Gets a list of assignments from the Canvas API for the specified course and outputs to the console.
+ * Gets a list of assignments from the Canvas API for the specified course and outputs in a useful format.
  */
-export async function getAssignments(courseID) {
+export async function getAssignments(courseID, accessToken) {
     let url = `https://unlv.instructure.com/api/v1/calendar_events?type=assignment&all_events=true&per_page=100&context_codes[]=course_${courseID}`; // URL for Canvas API call.
-    const accessToken = await getCanvasPAT(); // Get Canvas Access Token from chrome.storage.
     let allAssignments = []; // Stores all assignments found in a particular course.
 
     try {
@@ -45,8 +44,6 @@ export async function getAssignments(courseID) {
             }
             // ai-gen end
         }
-        // console.log("Assignments:", allAssignments); // Send results to console for viewing.
-
         // ai-gen (ChatGPT-4o, 2)
         const selectedKeys = ["title", "context_name"];
         const nestedKeys = ["due_at"];
@@ -60,6 +57,7 @@ export async function getAssignments(courseID) {
             );
             return { ...filteredMain, ...filteredNested};
         });
+        // ai-gen end
         return calendarFormattedAssignments;
 
     } catch (error) {
@@ -68,7 +66,7 @@ export async function getAssignments(courseID) {
 }
 
 /**
- * Gets the Canvas Access Token from chrome.storage for use in getAssignments().
+ * Gets the Canvas Access Token from chrome.storage for use in other functions.
  */
 // ai-gen start (ChatGPT-4o, 2)
 export function getCanvasPAT() {
@@ -85,20 +83,12 @@ export function getCanvasPAT() {
 // ai-gen end
 
 /**
- * Gets a list of courses from the Canvas API and calls getAssignments() on the course.
+ * Gets a list of courses from the Canvas API to use in getAssignments().
  */
-export async function getCourses() {
+export async function getCourses(accessToken) {
     let url = `https://unlv.instructure.com/api/v1/courses?per_page=100`;
-    console.debug("Made it");
-    const accessToken = await getCanvasPAT(); // Get Canvas Access Token from chrome.storage.
-    console.debug("Using access token: ", accessToken);
-    if (!accessToken) { // No Canvas Access Token found.
-        console.log("Please store an access token!");
-        return;
-    }
     let allCourses = []; // Stores all courses student has been enrolled in.
     let activeCourses = []; // Stores only courses student is currently enrolled in.
-    let allAssignments = [];
 
     try {
         while (url) { // Loops through pages Canvas data.
@@ -136,18 +126,10 @@ export async function getCourses() {
 
         for(const course of allCourses) {
             if(!course.access_restricted_by_date) { // Finds courses that student is actively enrolled in.
-                activeCourses.push(course);
+                activeCourses.push(course.id);
             }
         }
-        for (const course of activeCourses) { // Get assignments for all active courses.
-            // console.log("Course Name: ", course.name);
-            allAssignments.push( ...await getAssignments(course.id));
-        }
-        console.log(allAssignments);
-        chrome.storage.local.set({ Canvas_Assignments: allAssignments }, () => {
-            console.log("Assignments Stored!");
-        });
-        return true;
+        return activeCourses;
 
     } catch (error) {
         console.error("Error fetching events:", error);
