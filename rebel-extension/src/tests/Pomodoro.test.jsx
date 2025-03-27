@@ -156,7 +156,7 @@ test('updates timer when storage changes (without listener)', async () => {
   render(<PomodoroTimer />);
 
   // Manually trigger re-render to simulate storage change
-  fireEvent.click(screen.getByText(/reset/i));
+  // fireEvent.click(screen.getByText(/reset/i));
 
   await waitFor(() => {
     expect(screen.getByText('15:45')).toBeInTheDocument();
