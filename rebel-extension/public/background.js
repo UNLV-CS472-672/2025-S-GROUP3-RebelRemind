@@ -12,7 +12,7 @@
  */
 
 import { authenticateUser } from "./scripts/identity-script.js";
-import { getCourses } from "./scripts/canvas-script.js";
+import { getAssignments, getCourses, getCanvasPAT } from "./scripts/canvas-script.js";
 import { openSidePanel } from "./scripts/sidepanel.js";
 
 // background.js
@@ -141,8 +141,45 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     /**
      * Retrieves the user's schedule from a background API.
      */
-    case "GET_SCHEDULE":
-      sendResponse(getCourses()); // Added call to canvas-script for making the Canvas API call.
+    case "GET_ASSIGNMENTS":
+      let allAssignments = [];
+      
+      // Await access token before continuing
+      getCanvasPAT().then((accessToken) => {
+        if (!accessToken) {
+          console.error("No access token found.");
+          sendResponse(false);
+          return;
+        }
+
+        getCourses(accessToken).then((courseList) => {
+          // Loop through the courses and fetch assignments
+          const assignmentPromises = courseList.map((course) =>
+            getAssignments(course, accessToken)
+          );
+          
+          // Wait for all assignments to be fetched
+          Promise.all(assignmentPromises)
+            .then((assignments) => {
+              // Flatten the array
+              allAssignments = assignments.flat();
+              chrome.storage.local.set({ Canvas_Assignments: allAssignments }, () => {
+                console.log("Assignments Stored!");
+              });
+              sendResponse(allAssignments); // Send the response with all assignments
+            })
+            .catch((error) => {
+              console.error("Error fetching assignments", error);
+              sendResponse(false);
+            });
+        }).catch((error) => {
+          console.error("Error with getCourses()", error);
+          sendResponse(false);
+        });
+      }).catch((error) => {
+        console.error("Error fetching access token", error);
+        sendResponse(false);
+      });
       return true;
 
     /**
@@ -206,6 +243,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
      */
     case "EVENT_CREATED":
       chrome.runtime.sendMessage({ type: "EVENT_CREATED" }); // broadcast
+      break;
+
+    case "EVENT_UPDATED":
+      chrome.runtime.sendMessage({ type: "EVENT_UPDATED" });
       break;
 
     /**

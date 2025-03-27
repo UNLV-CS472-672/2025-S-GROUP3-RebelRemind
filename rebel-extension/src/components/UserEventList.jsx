@@ -28,9 +28,9 @@ const UserEventList = () => {
      */
     useEffect(() => {
         const loadEvents = () => {
-            chrome.storage.local.get("user-def-events", (data) => {
-                if (Array.isArray(data["user-def-events"])) {
-                    setUserEvents(data["user-def-events"]);
+            chrome.storage.local.get("userEvents", (data) => {
+                if (Array.isArray(data["userEvents"])) {
+                    setUserEvents(data["userEvents"]);
                 }
             });
         };
@@ -53,7 +53,7 @@ const UserEventList = () => {
      */
     const handleDelete = (indexToDelete) => {
         const updatedEvents = userEvents.filter((_, i) => i !== indexToDelete);
-        chrome.storage.local.set({ "user-def-events": updatedEvents }, () => {
+        chrome.storage.local.set({ "userEvents": updatedEvents }, () => {
             setUserEvents(updatedEvents);
             setExpandedEventKey(null);
         });
@@ -172,10 +172,11 @@ const UserEventList = () => {
             allDay: isAllDay,
         };
 
-        chrome.storage.local.set({ "user-def-events": updatedEvents }, () => {
+        chrome.storage.local.set({ "userEvents": updatedEvents }, () => {
             setUserEvents(updatedEvents);
             setEditingKey(null);
             setEditedEvent({});
+            chrome.runtime.sendMessage({ type: "EVENT_UPDATED" });
         });
     };
 

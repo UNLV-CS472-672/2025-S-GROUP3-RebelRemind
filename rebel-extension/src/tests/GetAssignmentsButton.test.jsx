@@ -51,7 +51,7 @@ test("No assignments", async () => {
   chrome.runtime.sendMessage.mockImplementation((msg, callback) => {
     if (msg.type === "GET_PREFERENCES") {
       callback({ preferences: { canvasIntegration: true } });
-    } else if (msg.type === "GET_SCHEDULE") {
+    } else if (msg.type === "GET_ASSIGNMENTS") {
       callback(null);
     }
   });
@@ -68,7 +68,7 @@ test("Success", async () => {
   chrome.runtime.sendMessage.mockImplementation((msg, callback) => {
     if (msg.type === "GET_PREFERENCES") {
       callback({ preferences: { canvasIntegration: true } });
-    } else if (msg.type === "GET_SCHEDULE") {
+    } else if (msg.type === "GET_ASSIGNMENTS") {
       callback({ schedule: ["Assignment 1", "Assignment 2"] }); // simulate some response
     }
   });
