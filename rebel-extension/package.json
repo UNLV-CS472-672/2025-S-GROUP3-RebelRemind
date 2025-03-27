@@ -50,7 +50,8 @@
       "^.+\\.jsx?$": "babel-jest"
     },
     "moduleNameMapper": {
-      "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy",
+      "\\.(mp3)$": "<rootDir>/__mocks__/mp3Mock.js"  
     },
     "moduleFileExtensions": [
       "js",

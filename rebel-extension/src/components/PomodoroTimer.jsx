@@ -36,11 +36,11 @@ function PomodoroTimer() {
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [showEditBoxes, setShowEditBoxes] = useState(true);
-  const [isTimerDone, setIsTimerDone] = useState(false); // Track timer done state
-  const alarmRef = useRef(new Audio(FinishAlarm)); // Load the alarm sound
+  const [isTimerDone, setIsTimerDone] = useState(false);
+  const alarmRef = useRef(new Audio(FinishAlarm));
 
   useEffect(() => {
-    // Ensure the alarm is preloaded
+    console.log('Component mounted or updated');
     alarmRef.current.load();
 
     chrome.storage.local.get(["minutes", "seconds", "isRunning"], (data) => {
@@ -49,66 +49,87 @@ function PomodoroTimer() {
       if (data.isRunning !== undefined) {
         setIsRunning(data.isRunning);
         setShowEditBoxes(!data.isRunning);
+        console.log(`Restoring from storage - minutes: ${data.minutes}, seconds: ${data.seconds}, isRunning: ${data.isRunning}`);
       }
     });
 
-    chrome.storage.onChanged.addListener((changes) => {
-      if (changes.minutes) setMinutes(changes.minutes.newValue);
-      if (changes.seconds) setSeconds(changes.seconds.newValue);
+    const handleStorageChange = (changes) => {
+      if (changes.minutes) {
+        setMinutes(changes.minutes.newValue);
+        console.log(`Storage changed - minutes: ${changes.minutes.newValue}`);
+      }
+      if (changes.seconds) {
+        setSeconds(changes.seconds.newValue);
+        console.log(`Storage changed - seconds: ${changes.seconds.newValue}`);
+      }
       if (changes.isRunning) {
         setIsRunning(changes.isRunning.newValue);
         setShowEditBoxes(!changes.isRunning.newValue);
+        console.log(`Storage changed - isRunning: ${changes.isRunning.newValue}`);
       }
-    });
+    };
+
+    chrome.storage.onChanged.addListener(handleStorageChange);
 
     return () => {
-      chrome.storage.onChanged.removeListener(() => {});
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+      console.log('Component unmounted');
     };
   }, []);
 
-  // Play alarm when timer reaches 0:00
   useEffect(() => {
+    console.log('Timer updated:', minutes, seconds, 'isRunning:', isRunning);
     if (minutes === 0 && seconds === 0 && isRunning) {
+      console.log('Timer reached 0:00, triggering alarm...');
       alarmRef.current.play().catch((error) => {
         console.error("Audio playback failed:", error);
       });
       setIsRunning(false);
-      setIsTimerDone(true); // Set timer done
+      setIsTimerDone(true);
       setShowEditBoxes(true);
       chrome.storage.local.set({ isRunning: false });
 
-      // Trigger notification when time's up
       chrome.runtime.sendMessage({ action: "timeUpNotification" });
     }
   }, [minutes, seconds, isRunning]);
 
   const handleStart = () => {
+    console.log('Starting timer with:', minutes, 'minutes and', seconds, 'seconds');
     chrome.storage.local.set({ minutes, seconds, isRunning: true }, () => {
       chrome.runtime.sendMessage({ action: "start" });
     });
     setIsRunning(true);
-    setIsTimerDone(false); // Reset the "Timer Done" flag
+    setIsTimerDone(false);
     setShowEditBoxes(false);
   };
 
   const handlePause = () => {
+    console.log('Pausing timer...');
     chrome.runtime.sendMessage({ action: "pause" });
     setIsRunning(false);
     setShowEditBoxes(true);
   };
 
   const handleReset = (customMinutes = 25) => {
+    console.log('Resetting timer to', customMinutes, 'minutes');
     chrome.runtime.sendMessage({ action: "reset", minutes: customMinutes });
     chrome.storage.local.set({ isRunning: false }, () => {});
     setIsRunning(false);
     setMinutes(customMinutes);
     setSeconds(0);
     setShowEditBoxes(true);
-    setIsTimerDone(false); // Reset when resetting timer
+    setIsTimerDone(false);
   };
 
-  const handleShortBreak = () => handleReset(5);
-  const handleLongBreak = () => handleReset(15);
+  const handleShortBreak = () => {
+    console.log('Starting short break...');
+    handleReset(5);
+  };
+
+  const handleLongBreak = () => {
+    console.log('Starting long break...');
+    handleReset(15);
+  };
 
   return (
     <div className="pomodoro-container">
@@ -125,7 +146,11 @@ function PomodoroTimer() {
           <input
             type="number"
             value={minutes}
-            onChange={(e) => setMinutes(Math.max(0, parseInt(e.target.value) || 0))}
+            onChange={(e) => {
+              const newMinutes = Math.max(0, parseInt(e.target.value) || 0);
+              console.log('Minutes changed to', newMinutes);
+              setMinutes(newMinutes);
+            }}
             disabled={isRunning}
             min="0"
           />
@@ -133,7 +158,11 @@ function PomodoroTimer() {
           <input
             type="number"
             value={seconds}
-            onChange={(e) => setSeconds(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
+            onChange={(e) => {
+              const newSeconds = Math.max(0, Math.min(59, parseInt(e.target.value) || 0));
+              console.log('Seconds changed to', newSeconds);
+              setSeconds(newSeconds);
+            }}
             disabled={isRunning}
             min="0"
             max="59"
