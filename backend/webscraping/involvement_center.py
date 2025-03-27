@@ -2,6 +2,7 @@ import requests
 import json
 from datetime import datetime
 from pytz import timezone
+from database import BASE
 
 url = "https://involvementcenter.unlv.edu/api/discovery/event/search?"
 query = f"endsAfter={datetime.today()}&orderByField=endsOn&orderByDirection=ascending&status=Approved&take=9999"
@@ -15,9 +16,15 @@ def default():
     events = json_data['value']
 
     results = []
+    id = 0
+    
     for event in events:
-        results.append(map_event(event))
-
+        id += 1
+        event = map_event(event)
+        # PUT events into database
+        response = requests.put(BASE + f"involvementcenter_id/{id}", event)
+        results.append(event)
+    
     with open('events.json', 'w', encoding='utf-8') as f:
         json.dump(results, f, indent=4)
 

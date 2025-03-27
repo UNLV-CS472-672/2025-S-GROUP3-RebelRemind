@@ -34,14 +34,14 @@ def default():
             "name": event['Event'],
             "date": event['Date']
         }
-        response = requests.put(BASE + f"event_id/{calendar_id}", json=put_data) # Use json= for the request body
+        response = requests.put(BASE + f"academiccalendar_id/{calendar_id}", json=put_data) # Use json= for the request body
 
         if response.status_code != 201:
             print(f"Error adding event {calendar_id}: {response.status_code} - {response.text}")
             return
 
     # GET calendar list
-    response = requests.get(BASE + "event_list")
+    response = requests.get(BASE + "academiccalendar_list")
     if response.status_code != 200:
         print(f"Error getting calendar list: {response.status_code} - {response.text}")
         return
