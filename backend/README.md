@@ -24,20 +24,22 @@
 
 ## Running Scripts
 
-- Run corresponding webscraping script
-```sh
-   academic_calendar
-   involvement_center
-   rebel_coverage
-   unlv_calendar
-```
-
 - Create database and launch Flask API server
 ```sh
    serve_data
 ```
 
-- Test database
+- Run all webscraping scripts
 ```sh
-   test_data
+   ./webscrape.sh
+```
+
+- Output events stored in database
+```sh
+   test_database
+```
+
+- Run pytest to test files
+```sh
+   python3 -m pytest --cov=webscraping --cov=database --cov=tests --cov=app
 ```
