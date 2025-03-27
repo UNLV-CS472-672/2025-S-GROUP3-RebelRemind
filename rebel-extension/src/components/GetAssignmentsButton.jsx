@@ -32,8 +32,8 @@ const GetAssignmentsButton = () => {
           }
       });
     }).then((canvasIntegrationPreference) => {
-      if(canvasIntegrationPreference) { // Go ahead with GET_SCHEDULE since Canvas integration is enabled.
-          chrome.runtime.sendMessage({ type: "GET_SCHEDULE" }, (response) => {
+      if(canvasIntegrationPreference) { // Go ahead with GET_ASSIGNMENTS since Canvas integration is enabled.
+          chrome.runtime.sendMessage({ type: "GET_ASSIGNMENTS" }, (response) => {
               if (response) {
                 alert("Your schedule has been fetched!");
               }

@@ -57,11 +57,11 @@ const UserEventInput = () => {
         };
 
         // Fetch and update stored events
-        chrome.storage.local.get("user-def-events", (data) => {
-            const existing = Array.isArray(data["user-def-events"]) ? data["user-def-events"] : [];
+        chrome.storage.local.get("userEvents", (data) => {
+            const existing = Array.isArray(data["userEvents"]) ? data["userEvents"] : [];
             const updatedEvents = [...existing, newEvent];
 
-            chrome.storage.local.set({ "user-def-events": updatedEvents }, () => {
+            chrome.storage.local.set({ "userEvents": updatedEvents }, () => {
                 alert("Your event has been securely saved.");
                 resetForm();
 
