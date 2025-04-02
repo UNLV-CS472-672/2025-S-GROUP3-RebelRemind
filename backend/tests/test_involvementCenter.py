@@ -37,6 +37,7 @@ class TestFlaskAPI(unittest.TestCase):
             self.assertIn("date", event_data)
             self.assertIn("time", event_data)
             self.assertIn("location", event_data)
+            self.assertIn("organization", event_data)
 
             print(f"✅ Event {event_id} successfully added and retrieved!")
             event_id += 1  # Increment event ID for next loop
@@ -64,6 +65,7 @@ class TestFlaskAPI(unittest.TestCase):
             self.assertIn("date", event)
             self.assertIn("time", event)
             self.assertIn("location", event)
+            self.assertIn("organization", event)
 
         print("✅ All events retrieved successfully!")
 
