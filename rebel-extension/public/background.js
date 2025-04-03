@@ -32,14 +32,15 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 // Start the timer
+// Start the timer
 function startTimer() {
   if (isRunning) return;
 
-  chrome.storage.local.get(["minutes", "seconds"], (data) => { // GET USER INPUT FOR MINUTES AND SECONDS
+  chrome.storage.local.get(["minutes", "seconds"], (data) => {
     minutes = data.minutes ?? 25;
     seconds = data.seconds ?? 0;
   });
-  
+
   isRunning = true;
 
   timerInterval = setInterval(() => {
@@ -48,22 +49,12 @@ function startTimer() {
       isRunning = false;
       chrome.storage.local.set({ isRunning: false });
 
-    //   chrome.notifications.create("", {
-    //     type: "basic",
-    //     iconUrl: "images/icon.png", // Ensure this matches the actual path
-    //     title: "Pomodoro Timer",
-    //     message: "Time's up! Take a break!",
-    // });
-
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      if (message.action === "timeUpNotification") {
-        chrome.notifications.create("timerDone", {
-          type: "basic",
-          title: "Pomodoro Timer",
-          message: "Timer is up! Time to take a break!", // Text-only notification
-        });
-      }
-    });
+      // ✅ Show timer-up notification directly (not in a nested listener)
+      chrome.notifications.create("timerDone", {
+        type: "basic",
+        title: "Pomodoro Timer",
+        message: "Timer is up! Time to take a break!"
+      });
 
       return;
     }
@@ -97,13 +88,66 @@ function resetTimer(customMinutes = 25) {
 
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "start") startTimer();
-  if (request.action === "pause") pauseTimer();
-  if (request.action === "reset") resetTimer(request.minutes || 25); // FIX: Now resets to correct time
-  if (request.action === "getStatus") {
+  if (!request || typeof request !== "object") {
+    console.warn("Invalid message received:", request);
+    return;
+  }
+
+  const action = request.action;
+
+  if (action === "start") startTimer();
+  else if (action === "pause") pauseTimer();
+  else if (action === "reset") resetTimer(request.minutes || 25);
+  else if (action === "getStatus") {
     sendResponse({ minutes, seconds, isRunning });
+  } else if (action === "timeUpNotification") {
+    // Redundant now, but preserved if future use case arises
+    chrome.notifications.create("timerDone", {
+      type: "basic",
+      title: "Pomodoro Timer",
+      message: "Timer is up! Time to take a break!"
+    });
+  } else {
+    console.warn("Received unknown message action:", action);
   }
 });
+
+
+
+// // Floating timer Pomodoro feature
+// let floatingWindowId = null;
+
+// function openFloatingTimerWindow() {
+//   if (floatingWindowId !== null) return;
+
+//   chrome.system.display.getInfo((displays) => {
+//     const screen = displays[0].workArea;
+//     const width = 260;
+//     const height = 150;
+
+//     const left = screen.left + screen.width - width - 20; // 20px margin from right
+//     const top = screen.top + screen.height - height - 40; // 40px margin from bottom
+
+//     chrome.windows.create({
+//       url: chrome.runtime.getURL("floating-timer.html"),
+//       type: "popup",
+//       width,
+//       height,
+//       left,
+//       top,
+//       focused: false
+//     }, (win) => {
+//       floatingWindowId = win.id;
+
+//       chrome.windows.onRemoved.addListener((closedWindowId) => {
+//         if (closedWindowId === floatingWindowId) {
+//           floatingWindowId = null;
+//         }
+//       });
+//     });
+//   });
+// }
+
 
 
 /**
@@ -137,6 +181,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
  * @param {Function} sendResponse - The callback function to send a response back to the sender.
  */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (!message?.type) return; // ⛔ skip if it's a Pomodoro-style message
   switch (message.type) {
     /**
      * Retrieves the user's schedule from a background API.
@@ -256,5 +301,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     default:
       console.warn("Received unknown message type:", message.type);
       break;
+  }
+});
+
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name === "popup") {
+    port.onDisconnect.addListener(() => {
+      chrome.storage.local.get("isRunning", ({ isRunning }) => {
+        if (isRunning) {
+          // ✅ Timer is still running — you can trigger widget logic here
+          console.log("[Background] Popup closed while timer running — widget logic could go here.");
+        }
+      });
+    });
   }
 });

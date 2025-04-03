@@ -44,14 +44,25 @@ function PomodoroTimer() {
     alarmRef.current.load();
 
     chrome.storage.local.get(["minutes", "seconds", "isRunning"], (data) => {
-      if (data.minutes !== undefined) setMinutes(data.minutes);
-      if (data.seconds !== undefined) setSeconds(data.seconds);
-      if (data.isRunning !== undefined) {
-        setIsRunning(data.isRunning);
-        setShowEditBoxes(!data.isRunning);
-        console.log(`Restoring from storage - minutes: ${data.minutes}, seconds: ${data.seconds}, isRunning: ${data.isRunning}`);
+      const isTimerDone = data.minutes === 0 && data.seconds === 0 && !data.isRunning;
+    
+      if (isTimerDone) {
+        chrome.storage.local.set({ minutes: 25, seconds: 0 }); // Auto-reset
+        setMinutes(25);
+        setSeconds(0);
+        setIsRunning(false);
+        setShowEditBoxes(true);
+        console.log("Auto-resetting timer to 25:00 after completion");
+      } else {
+        if (data.minutes !== undefined) setMinutes(data.minutes);
+        if (data.seconds !== undefined) setSeconds(data.seconds);
+        if (data.isRunning !== undefined) {
+          setIsRunning(data.isRunning);
+          setShowEditBoxes(!data.isRunning);
+        }
       }
     });
+    
 
     const handleStorageChange = (changes) => {
       if (changes.minutes) {
@@ -89,9 +100,18 @@ function PomodoroTimer() {
       setShowEditBoxes(true);
       chrome.storage.local.set({ isRunning: false });
 
-      chrome.runtime.sendMessage({ action: "timeUpNotification" });
+      //chrome.runtime.sendMessage({ action: "timeUpNotification" });
     }
   }, [minutes, seconds, isRunning]);
+
+  useEffect(() => {
+    const port = chrome.runtime.connect({ name: "popup" });
+  
+    return () => {
+      port.disconnect(); // optional, but clean
+    };
+  }, []);
+  
 
   const handleStart = () => {
     console.log('Starting timer with:', minutes, 'minutes and', seconds, 'seconds');

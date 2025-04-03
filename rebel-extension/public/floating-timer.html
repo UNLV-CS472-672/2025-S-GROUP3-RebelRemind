@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Pomodoro Timer</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      user-select: none;
+    }
+
+    #draggable {
+      cursor: move;
+      padding: 1rem;
+      border-radius: 10px;
+      background-color: #fff3f3;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #timer {
+      font-size: 2.5rem;
+      font-weight: bold;
+    }
+
+    #toggle-btn {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: none;
+      background-color: #d9534f;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #toggle-btn:hover {
+      background-color: #c9302c;
+    }
+  </style>
+</head>
+<body>
+  <div id="draggable">
+    <div id="timer">Loading...</div>
+    <button id="toggle-btn">Minimize Window</button>
+  </div>
+  <script src="scripts/floating-timer.js"></script>
+</body>
+</html>
