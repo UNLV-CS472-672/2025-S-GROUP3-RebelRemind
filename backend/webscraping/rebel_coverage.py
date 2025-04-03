@@ -1,66 +1,52 @@
-#!/usr/bin/env python3
-
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
 import requests
 import json
-from database import BASE
+from bs4 import BeautifulSoup
+
+#from database import BASE
+BASE = "http://127.0.0.1:5050/"
+url = 'https://unlvrebels.com/coverage'
 
 def default():
-    #service = Service(executable_path='./chromedriver-linux64/chromedriver')
-    service = Service(ChromeDriverManager().install())
+    response = requests.get(url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, "html.parser")
+        # Get the main table
+        table = soup.find_all('table')[0]
+        # Get the rows
+        data = table.find_all('tr')[1:]
 
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless=new")
-    driver = webdriver.Chrome(service=service, options=options)
-    url = 'https://unlvrebels.com/coverage'
+        # Print list of dates with their events
+        weekdays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']
+        data_table = []
 
-    # Open the webpage
-    driver.get(url)
+        event_date = ''
 
-    # Wait for page to load before proceeding
-    driver.implicitly_wait(0)
+        for item in data:
+            time = item
+            item = item.find('th').text
+            dist = item.find('\n', 1)
+            trunc_item = item[dist:].replace('\n','')
+            item = item.replace('\n','', 0)
+            item = item.replace('\n',' ')
+            if any(day in item.upper() for day in weekdays):
+                event_date = trunc_item
+            else:
+                if time.find('td'):
+                    time = time.find('td').text
+                else:
+                    time = 0
+                data_table.append({"name": item, "date": event_date, "time": time})
 
-    table = driver.find_element(By.TAG_NAME, 'table')
+        # print(data_table)
 
-    matches = table.find_elements(By.TAG_NAME, 'tr')
+        for i in range(len(data_table)):
+            requests.put(BASE + f"rebelcoverage_add", json={"name": data_table[i]["name"], "date": data_table[i]["date"], "time": data_table[i]["time"]})
+        
+        with open('scraped_RebelCoverage.json', 'w') as json_file:
+            json.dump(data_table, json_file, indent=4)
 
-    # Print list of dates with their events
-    weekdays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']
-    data_table = []
-    matches = matches[1:]
-
-    event_date = ''
-
-    for match in matches:
-        if any(day in match.text for day in weekdays):
-            #data_table.append([match.text])
-            event_date = match.text
-        else:
-            #data_table[-1].append(match.text)
-            data_table.append({"name": match.text, "date": event_date})
-
-    #print(data_table)
-    # get full list of all events
-    response = requests.get(BASE + "rebelcoverage_list")
-
-    # set id to last id in list which incremented right before adding a new item
-    # duplicates will be added but that can be refined later to prevent duplicates
-    if response:
-        id = response.json()[-1]["id"]
     else:
-        id = 0
-        
-    for i in range(len(data_table)):
-        id += 1
-        requests.put(BASE + f"rebelcoverage_id/{id}", json={"name": data_table[i]["name"], "date": data_table[i]["date"]})
-        
-    with open('scraped_RebelCoverage.json', 'w') as json_file:
-        json.dump(data_table, json_file, indent=4)
-
-    driver.quit()
+        print(f"Failed to access the page. Status code: {response.status_code}")
 
 if __name__ == '__main__':
     default()
