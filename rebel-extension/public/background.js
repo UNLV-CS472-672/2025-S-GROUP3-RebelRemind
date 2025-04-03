@@ -449,11 +449,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 // }
 
 
-
-
-
-
-// Pomodoro feature only:
 // Pomodoro Timer Logic
 let timerInterval;
 let isRunning = false;
@@ -486,12 +481,19 @@ function startTimer() {
 
         chrome.notifications.create("timerDone", {
           type: "basic",
-          iconUrl: "images/pomodor-icon.png", // ✅ Make sure this file exists
+          iconUrl: chrome.runtime.getURL("images/pomodor-icon.png"),
           title: "Pomodoro Timer",
-          message: "Timer is up! Time to take a break!"
+          message: "Timer is up! Time to take a break!",
+          priority: 2, // 🔺 force it to show
+          requireInteraction: true // ⏳ stays visible until dismissed
+        }, () => {
+          if (chrome.runtime.lastError) {
+            console.error("❌ Notification error:", chrome.runtime.lastError.message);
+          } else {
+            console.log("✅ Pomodoro notification shown: timerDone");
+          }
         });
         
-
         removeWidgetFromAllTabs();
         return;
       }
@@ -543,7 +545,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else if (action === "timeUpNotification") {
     chrome.notifications.create("timerDone", {
       type: "basic",
-      iconUrl: "images/default_icon.png", // You need to add this image to your extension folder!
+      iconUrl: "images/pomodor-icon.png",
       title: "Pomodoro Timer",
       message: "Timer is up! Time to take a break!"
     });
@@ -598,7 +600,6 @@ function removeWidgetFromAllTabs() {
 }
 
 
-
 function injectWidgetIntoAllTabs() {
   chrome.tabs.query({}, (tabs) => {
     for (const tab of tabs) {
@@ -622,3 +623,19 @@ function injectWidgetIntoAllTabs() {
     }
   });
 }
+
+chrome.runtime.onStartup.addListener(() => {
+  chrome.notifications.create("testNotify", {
+    type: "basic",
+    iconUrl: chrome.runtime.getURL("images/pomodor-icon.png"), // make sure this one exists
+    title: "Rebel Remind Test",
+    message: "This is a test notification."
+  }, () => {
+    if (chrome.runtime.lastError) {
+      console.error("❌ Notification error:", chrome.runtime.lastError.message);
+    } else {
+      console.log("✅ Notification test sent.");
+    }
+  });
+});
+
