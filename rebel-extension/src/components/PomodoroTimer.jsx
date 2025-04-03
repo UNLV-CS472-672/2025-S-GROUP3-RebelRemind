@@ -104,13 +104,13 @@ function PomodoroTimer() {
     }
   }, [minutes, seconds, isRunning]);
 
-  useEffect(() => {
-    const port = chrome.runtime.connect({ name: "popup" });
+  // useEffect(() => {
+  //   const port = chrome.runtime.connect({ name: "popup" });
   
-    return () => {
-      port.disconnect(); // optional, but clean
-    };
-  }, []);
+  //   return () => {
+  //     port.disconnect(); // optional, but clean
+  //   };
+  // }, []);
   
 
   const handleStart = () => {
