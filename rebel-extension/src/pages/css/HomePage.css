@@ -18,7 +18,6 @@
 }
 
 
-
 .accordion {
   padding: 1rem;
 }
@@ -86,8 +85,8 @@
 
 .settings-button-container {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 1px;
+  right: 10px;
   z-index: 1000;
 }
 
@@ -98,3 +97,51 @@
   cursor: pointer;
 }
 
+.change-view-container {
+  position: fixed;
+  bottom: 10px;
+  left: 20px;
+  z-index: 1000;
+}
+
+.change-view-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Dropdown appears directly below the button */
+.change-view-dropdown {
+  position: fixed;
+  left: 20px;        /* align with Change View button */
+  bottom: 70px;      /* show above the button */
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  width: 200px;
+  z-index: 9999;
+}
+
+
+.change-view-dropdown button {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 10px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: black;
+  border-radius: 6px;
+}
+
+.change-view-dropdown button:hover {
+  background-color: #f0f0f0;
+}
