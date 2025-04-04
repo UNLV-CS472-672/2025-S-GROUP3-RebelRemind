@@ -1,12 +1,25 @@
-/* This file contains styles specific to App.jsx. */
+/* SettingPage.css */
+
 #root {
   max-width: 1000px;
   min-width: 450px;
+  /* Use the same background var, plus a fallback: */
   background-color: var(--app-background, #8b0000);
-  transition: background-color 0.3s ease; 
+  /* Also change the text color to match: */
+  color: var(--app-text-color, #ffffff);
+  transition: background-color 0.3s ease, color 0.3s ease;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+}
+
+/* 
+   Keep your existing gradient definition for --app-background,
+   but also define --app-text-color so we can switch it from JS.
+*/
+:root {
+  --app-background: linear-gradient(135deg, #DC143C, #FF6F91);
+  --app-text-color: #ffffff; /* newly added */
 }
 
 .accordion {
@@ -134,6 +147,7 @@
   margin-top: 0.5rem;
 }
 
+/* This line appears twice, but it's identical. Keeping it as is. */
 .reset-button {
   background-color: #8b0000;
   color: white;
@@ -149,12 +163,25 @@
   background-color: #b01030;
 }
 
-:root {
-  --app-background: linear-gradient(135deg, #DC143C, #FF6F91);
-}
-
-/* Make the color-picker itself show the same gradient */
+/* Keep your default gradient on the color-picker itself: */
 .color-picker-input {
   background-image: linear-gradient(135deg, #DC143C, #FF6F91);
   border: none;
+}
+
+
+button {
+  outline: none;
+  border: none;
+  background-color: #8b0000;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #b01030;
 }
