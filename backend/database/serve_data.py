@@ -5,7 +5,7 @@ from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api, Resource, reqparse, abort, fields, marshal_with
 from http import HTTPStatus
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import func, and_
 
 app = Flask(__name__)
@@ -475,6 +475,27 @@ class AcademicCalendar_Daily(Resource):
 			abort(HTTPStatus.NOT_FOUND, message="Table is empty")
 		return result
 
+class AcademicCalendar_Weekly(Resource):
+    @marshal_with(event_fields)
+    def get(self, date):
+        start_date = datetime.strptime(date, "%Y-%m-%d").date()
+        end_date = start_date + timedelta(days=7)
+        result = db.session.query(AcademicCalendar).filter(
+            AcademicCalendar.date >= start_date,
+            AcademicCalendar.date < end_date
+        ).order_by(AcademicCalendar.date.asc()).all()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+        return result
+
+class AcademicCalendar_Monthly(Resource):
+    @marshal_with(event_fields)
+    def get(self, month):
+        result = db.session.query(AcademicCalendar).filter(func.strftime("%Y-%m", AcademicCalendar.date) == month).order_by(AcademicCalendar.date.asc()).all()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+        return result
+
 # List all items in Involvement Center table
 class InvolvementCenter_Daily(Resource):
 	@marshal_with(event_fields)
@@ -483,6 +504,27 @@ class InvolvementCenter_Daily(Resource):
 		if not result:
 			abort(HTTPStatus.NOT_FOUND, message="Table is empty")
 		return result
+
+class InvolvementCenter_Weekly(Resource):
+    @marshal_with(event_fields)
+    def get(self, date):
+        start_date = datetime.strptime(date, "%Y-%m-%d").date()
+        end_date = start_date + timedelta(days=7)
+        result = db.session.query(InvolvementCenter).filter(
+            InvolvementCenter.date >= start_date,
+            InvolvementCenter.date < end_date
+        ).order_by(InvolvementCenter.date.asc()).all()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+        return result
+
+class InvolvementCenter_Monthly(Resource):
+    @marshal_with(event_fields)
+    def get(self, month):
+        result = db.session.query(InvolvementCenter).filter(func.strftime("%Y-%m", InvolvementCenter.date) == month).order_by(InvolvementCenter.date.asc()).all()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+        return result
 
 # List all items in Rebel Coverage table
 class RebelCoverage_Daily(Resource):
@@ -493,6 +535,27 @@ class RebelCoverage_Daily(Resource):
 			abort(HTTPStatus.NOT_FOUND, message="Table is empty")
 		return result
 
+class RebelCoverage_Weekly(Resource):
+    @marshal_with(event_fields)
+    def get(self, date):
+        start_date = datetime.strptime(date, "%Y-%m-%d").date()
+        end_date = start_date + timedelta(days=7)
+        result = db.session.query(RebelCoverage).filter(
+            RebelCoverage.date >= start_date,
+            RebelCoverage.date < end_date
+        ).order_by(RebelCoverage.date.asc()).all()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+        return result
+
+class RebelCoverage_Monthly(Resource):
+    @marshal_with(event_fields)
+    def get(self, month):
+        result = db.session.query(RebelCoverage).filter(func.strftime("%Y-%m", RebelCoverage.date) == month).order_by(RebelCoverage.date.asc()).all()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+        return result
+
 # List all items in UNLV Calendar table
 class UNLVCalendar_Daily(Resource):
 	@marshal_with(event_fields)
@@ -501,6 +564,27 @@ class UNLVCalendar_Daily(Resource):
 		if not result:
 			abort(HTTPStatus.NOT_FOUND, message="Table is empty")
 		return result
+
+class UNLVCalendar_Weekly(Resource):
+    @marshal_with(event_fields)
+    def get(self, date):
+        start_date = datetime.strptime(date, "%Y-%m-%d").date()
+        end_date = start_date + timedelta(days=7)
+        result = db.session.query(UNLVCalendar).filter(
+            UNLVCalendar.date >= start_date,
+            UNLVCalendar.date < end_date
+        ).order_by(UNLVCalendar.date.asc()).all()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+        return result
+
+class UNLVCalendar_Monthly(Resource):
+    @marshal_with(event_fields)
+    def get(self, month):
+        result = db.session.query(UNLVCalendar).filter(func.strftime("%Y-%m", UNLVCalendar.date) == month).order_by(UNLVCalendar.date.asc()).all()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+        return result
 
 # API resources for PUT commands
 api.add_resource(User_Add, "/user_add")
@@ -540,6 +624,18 @@ api.add_resource(AcademicCalendar_Daily, "/academiccalendar_daily/<string:date>"
 api.add_resource(InvolvementCenter_Daily, "/involvementcenter_daily/<string:date>")
 api.add_resource(RebelCoverage_Daily, "/rebelcoverage_daily/<string:date>")
 api.add_resource(UNLVCalendar_Daily, "/unlvcalendar_daily/<string:date>")
+
+# API resources for WEEKLY GET commands
+api.add_resource(AcademicCalendar_Weekly, "/academiccalendar_weekly/<string:date>")
+api.add_resource(InvolvementCenter_Weekly, "/involvementcenter_weekly/<string:date>")
+api.add_resource(RebelCoverage_Weekly, "/rebelcoverage_weekly/<string:date>")
+api.add_resource(UNLVCalendar_Weekly, "/unlvcalendar_weekly/<string:date>")
+
+# API resources for MONTHLY GET commands
+api.add_resource(AcademicCalendar_Monthly, "/academiccalendar_monthly/<string:month>")
+api.add_resource(InvolvementCenter_Monthly, "/involvementcenter_monthly/<string:month>")
+api.add_resource(RebelCoverage_Monthly, "/rebelcoverage_monthly/<string:month>")
+api.add_resource(UNLVCalendar_Monthly, "/unlvcalendar_monthly/<string:month>")
 
 # default function to run API
 def default():
