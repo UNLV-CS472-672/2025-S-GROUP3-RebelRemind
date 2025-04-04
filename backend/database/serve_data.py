@@ -5,7 +5,7 @@ from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api, Resource, reqparse, abort, fields, marshal_with
 from http import HTTPStatus
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import func, and_
 
 app = Flask(__name__)
@@ -26,8 +26,6 @@ def DupCheck(table, date, name, time = ''):
 	# Involvement Center
 	if table == InvolvementCenter:
 		# Format date from string into date object
-		fmt='%A, %B %d, %Y'
-		#date_object = datetime.strptime(date, fmt)
 		date_object = datetime.fromisoformat(date)
 		# Check if event exists already
 		result = db.session.query(table).filter(and_(table.date == func.date(date_object), table.name == name, table.time == time)).all()
@@ -64,55 +62,83 @@ class User(db.Model):
 	nshe = db.Column(db.String(15), nullable=False, unique=True)
 
 	def __repr__(self):
-		return f"User(id = {self.id}, first_name = {self.first_name}, last_name = {self.last_name}, nshe = {self.nshe})"
+		return ("User("
+					f"id = {self.id}," +
+					f"first_name = {self.first_name}," +
+					f"last_name = {self.last_name}," +
+					f"nshe = {self.nshe})")
 
 # Create Academic Calendar table for database
 class AcademicCalendar(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(500), nullable=False)
-	#date = db.Column(db.String(100), db.ForeignKey('daily.date'), nullable=False)
 	date = db.Column(db.Date, nullable=False)
 	time = db.Column(db.String(100))
 	location = db.Column(db.String(100))
+	organization = db.Column(db.String(100))
 
 	def __repr__(self):
-		return f"AcademicCalendar(id = {self.id}, name = {self.name}, date = {self.date}, time = {self.time}, location = {self.location})"
+		return ("AcademicCalendar(" +
+					f"id = {self.id},"
+					f"name = {self.name}," +
+					f"date = {self.date}," +
+					f"time = {self.time}," +
+					f"location = {self.location}," +
+					f"organization = {self.organization})")
 
 # Create Involvement Center table for database
 class InvolvementCenter(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(500), nullable=False)
-	#date = db.Column(db.String(100), db.ForeignKey('daily.date'), nullable=False)
 	date = db.Column(db.Date, nullable=False)
 	time = db.Column(db.String(100))
 	location = db.Column(db.String(100))
+	organization = db.Column(db.String(100))
 
 	def __repr__(self):
-		return f"InvolvementCenter(id = {self.id}, name = {self.name}, date = {self.date}, time = {self.time}, location = {self.location})"
+		return ("InvolvementCenter(" +
+					f"id = {self.id},"
+					f"name = {self.name}," +
+					f"date = {self.date}," +
+					f"time = {self.time}," +
+					f"location = {self.location}," +
+					f"organization = {self.organization})")
 
 # Create Rebel Coverage table for database
 class RebelCoverage(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(500), nullable=False)
-	#date = db.Column(db.String(100), db.ForeignKey('daily.date'), nullable=False)
 	date = db.Column(db.Date, nullable=False)
 	time = db.Column(db.String(100))
 	location = db.Column(db.String(100))
+	organization = db.Column(db.String(100))
 
 	def __repr__(self):
-		return f"RebelCoverage(id = {self.id}, name = {self.name}, date = {self.date}, time = {self.time}, location = {self.location})"
+		return ("RebelCoverage(" +
+					f"id = {self.id},"
+					f"name = {self.name}," +
+					f"date = {self.date}," +
+					f"time = {self.time}," +
+					f"location = {self.location}," +
+					f"organization = {self.organization})")
 
 # Create UNLV Calendar table for database
 class UNLVCalendar(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(500), nullable=False)
-	#date = db.Column(db.String(100), db.ForeignKey('daily.date'), nullable=False)
 	date = db.Column(db.Date, nullable=False)
 	time = db.Column(db.String(100))
 	location = db.Column(db.String(100))
+	organization = db.Column(db.String(100))
 
 	def __repr__(self):
-		return f"UNLVCalendar(id = {self.id}, name = {self.name}, date = {self.date}, time = {self.time}, location = {self.location})"
+		return ("UNLVCalendar(" +
+					f"id = {self.id},"
+					f"name = {self.name}," +
+					f"date = {self.date}," +
+					f"time = {self.time}," +
+					f"location = {self.location}," +
+					f"organization = {self.organization})")
 
 # Parser for User table
 user_put_args = reqparse.RequestParser()
@@ -126,6 +152,7 @@ event_put_args.add_argument("name", type=str, help="Event name is required", req
 event_put_args.add_argument("date", type=str, help="Event date is required", required=True)
 event_put_args.add_argument("time", type=str, help="Event time can be null", required=False)
 event_put_args.add_argument("location", type=str, help="Event location can be null", required=False)
+event_put_args.add_argument("organization", type=str, help="Event organization can be null", required=False)
 
 # Resource fields for User model
 user_fields = {
@@ -141,7 +168,8 @@ event_fields = {
 	'name': fields.String,
 	'date': fields.String,
 	'time': fields.String,
-	'location': fields.String
+	'location': fields.String,
+	'organization': fields.String
 }
 
 # Commands for User model
@@ -212,7 +240,8 @@ class AcademicCalendar_Add(Resource):
 			name=args['name'],
 			date=date_object,
 			time=args.get('time'),
-			location=args.get('location')
+			location=args.get('location'),
+			organization=args.get('organization')
 		)
 		db.session.add(event)
 		db.session.commit()
@@ -262,7 +291,8 @@ class InvolvementCenter_Add(Resource):
 			name=args['name'],
 			date=date_object,
 			time=args['time'],
-			location=args.get('location')
+			location=args.get('location'),
+			organization=args.get('organization')
 		)
 		db.session.add(event)
 		db.session.commit()
@@ -312,7 +342,8 @@ class RebelCoverage_Add(Resource):
 			name=args['name'],
 			date=date_object,
 			time=args.get('time'),
-			location=args.get('location')
+			location=args.get('location'),
+			organization=args.get('organization')
 		)
 		db.session.add(event)
 		db.session.commit()
@@ -362,7 +393,8 @@ class UNLVCalendar_Add(Resource):
 			name=args['name'],
 			date=date_object,
 			time=args.get('time'),
-			location=args.get('location')
+			location=args.get('location'),
+			organization=args.get('organization')
 		)
 		db.session.add(event)
 		db.session.commit()
@@ -443,6 +475,27 @@ class AcademicCalendar_Daily(Resource):
 			abort(HTTPStatus.NOT_FOUND, message="Table is empty")
 		return result
 
+class AcademicCalendar_Weekly(Resource):
+    @marshal_with(event_fields)
+    def get(self, date):
+        start_date = datetime.strptime(date, "%Y-%m-%d").date()
+        end_date = start_date + timedelta(days=7)
+        result = db.session.query(AcademicCalendar).filter(
+            AcademicCalendar.date >= start_date,
+            AcademicCalendar.date < end_date
+        ).order_by(AcademicCalendar.date.asc()).all()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+        return result
+
+class AcademicCalendar_Monthly(Resource):
+    @marshal_with(event_fields)
+    def get(self, month):
+        result = db.session.query(AcademicCalendar).filter(func.strftime("%Y-%m", AcademicCalendar.date) == month).order_by(AcademicCalendar.date.asc()).all()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+        return result
+
 # List all items in Involvement Center table
 class InvolvementCenter_Daily(Resource):
 	@marshal_with(event_fields)
@@ -451,6 +504,27 @@ class InvolvementCenter_Daily(Resource):
 		if not result:
 			abort(HTTPStatus.NOT_FOUND, message="Table is empty")
 		return result
+
+class InvolvementCenter_Weekly(Resource):
+    @marshal_with(event_fields)
+    def get(self, date):
+        start_date = datetime.strptime(date, "%Y-%m-%d").date()
+        end_date = start_date + timedelta(days=7)
+        result = db.session.query(InvolvementCenter).filter(
+            InvolvementCenter.date >= start_date,
+            InvolvementCenter.date < end_date
+        ).order_by(InvolvementCenter.date.asc()).all()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+        return result
+
+class InvolvementCenter_Monthly(Resource):
+    @marshal_with(event_fields)
+    def get(self, month):
+        result = db.session.query(InvolvementCenter).filter(func.strftime("%Y-%m", InvolvementCenter.date) == month).order_by(InvolvementCenter.date.asc()).all()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+        return result
 
 # List all items in Rebel Coverage table
 class RebelCoverage_Daily(Resource):
@@ -461,6 +535,27 @@ class RebelCoverage_Daily(Resource):
 			abort(HTTPStatus.NOT_FOUND, message="Table is empty")
 		return result
 
+class RebelCoverage_Weekly(Resource):
+    @marshal_with(event_fields)
+    def get(self, date):
+        start_date = datetime.strptime(date, "%Y-%m-%d").date()
+        end_date = start_date + timedelta(days=7)
+        result = db.session.query(RebelCoverage).filter(
+            RebelCoverage.date >= start_date,
+            RebelCoverage.date < end_date
+        ).order_by(RebelCoverage.date.asc()).all()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+        return result
+
+class RebelCoverage_Monthly(Resource):
+    @marshal_with(event_fields)
+    def get(self, month):
+        result = db.session.query(RebelCoverage).filter(func.strftime("%Y-%m", RebelCoverage.date) == month).order_by(RebelCoverage.date.asc()).all()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+        return result
+
 # List all items in UNLV Calendar table
 class UNLVCalendar_Daily(Resource):
 	@marshal_with(event_fields)
@@ -469,6 +564,27 @@ class UNLVCalendar_Daily(Resource):
 		if not result:
 			abort(HTTPStatus.NOT_FOUND, message="Table is empty")
 		return result
+
+class UNLVCalendar_Weekly(Resource):
+    @marshal_with(event_fields)
+    def get(self, date):
+        start_date = datetime.strptime(date, "%Y-%m-%d").date()
+        end_date = start_date + timedelta(days=7)
+        result = db.session.query(UNLVCalendar).filter(
+            UNLVCalendar.date >= start_date,
+            UNLVCalendar.date < end_date
+        ).order_by(UNLVCalendar.date.asc()).all()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+        return result
+
+class UNLVCalendar_Monthly(Resource):
+    @marshal_with(event_fields)
+    def get(self, month):
+        result = db.session.query(UNLVCalendar).filter(func.strftime("%Y-%m", UNLVCalendar.date) == month).order_by(UNLVCalendar.date.asc()).all()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+        return result
 
 # API resources for PUT commands
 api.add_resource(User_Add, "/user_add")
@@ -508,6 +624,18 @@ api.add_resource(AcademicCalendar_Daily, "/academiccalendar_daily/<string:date>"
 api.add_resource(InvolvementCenter_Daily, "/involvementcenter_daily/<string:date>")
 api.add_resource(RebelCoverage_Daily, "/rebelcoverage_daily/<string:date>")
 api.add_resource(UNLVCalendar_Daily, "/unlvcalendar_daily/<string:date>")
+
+# API resources for WEEKLY GET commands
+api.add_resource(AcademicCalendar_Weekly, "/academiccalendar_weekly/<string:date>")
+api.add_resource(InvolvementCenter_Weekly, "/involvementcenter_weekly/<string:date>")
+api.add_resource(RebelCoverage_Weekly, "/rebelcoverage_weekly/<string:date>")
+api.add_resource(UNLVCalendar_Weekly, "/unlvcalendar_weekly/<string:date>")
+
+# API resources for MONTHLY GET commands
+api.add_resource(AcademicCalendar_Monthly, "/academiccalendar_monthly/<string:month>")
+api.add_resource(InvolvementCenter_Monthly, "/involvementcenter_monthly/<string:month>")
+api.add_resource(RebelCoverage_Monthly, "/rebelcoverage_monthly/<string:month>")
+api.add_resource(UNLVCalendar_Monthly, "/unlvcalendar_monthly/<string:month>")
 
 # default function to run API
 def default():
