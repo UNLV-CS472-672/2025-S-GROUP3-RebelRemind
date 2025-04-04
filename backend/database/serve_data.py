@@ -179,7 +179,7 @@ class User_Info(Resource):
 	def get(self, nshe):
 		result = User.query.filter_by(nshe=nshe).first()
 		if not result:
-			abort(HTTPStatus.NOT_FOUND, message=f"Could not find date '{nshe}'")
+			abort(HTTPStatus.NOT_FOUND, message=f"Could not find nshe '{nshe}'")
 		return result
 
 class User_Add(Resource):
