@@ -1,7 +1,8 @@
 import requests
 import json
 from bs4 import BeautifulSoup
-from database import BASE
+#from database import BASE
+BASE = "http://127.0.0.1:5050/"
 
 # URL of the UNLV event calendar
 url = "https://www.unlv.edu/calendar"
@@ -14,7 +15,6 @@ def default():
         soup = BeautifulSoup(response.text, "html.parser")
         
         events = []  # Initialize an empty list to hold events
-        event_id = 1  # Initialize event ID counter
 
         # Loop through each event on the page
         for event in soup.find_all("div", class_="col-sm-10"):
@@ -41,15 +41,14 @@ def default():
             }
 
             # Send event data to Flask API
-            api_response = requests.put(BASE + f"unlvcalendar_id/{event_id}", json=event_data)
-            if api_response.status_code == 201:
-                pass
+            #api_response = requests.put(BASE + f"unlvcalendar_id/{event_id}", json=event_data)
+            api_response = requests.put(BASE + f"unlvcalendar_add", json=event_data)
+            # if api_response.status_code == 201:
+            #     pass
 
             events.append(event_data)  # Add event data to the events list
-
-            event_id += 1  # Increment event ID
         
-        with open('scraped_UNLVEvents.json', 'w') as json_file:
+        with open('scraped_UNLVCalendar.json', 'w') as json_file:
             json.dump(events, json_file, indent=4)  # Write events as formatted JSON
 
     else:
