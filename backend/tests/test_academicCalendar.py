@@ -1,8 +1,7 @@
 import requests
 import json
 import os
-
-BASE = "http://127.0.0.1:5050/"
+from database import BASE
 
 def default():
     """

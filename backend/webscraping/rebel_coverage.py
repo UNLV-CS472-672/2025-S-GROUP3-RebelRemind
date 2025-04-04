@@ -1,9 +1,8 @@
 import requests
 import json
 from bs4 import BeautifulSoup
+from database import BASE
 
-#from database import BASE
-BASE = "http://127.0.0.1:5050/"
 url = 'https://unlvrebels.com/coverage'
 
 def default():

@@ -2,8 +2,7 @@ import requests
 import json
 from datetime import datetime
 from pytz import timezone
-#from database import BASE
-BASE = "http://127.0.0.1:5050/"
+from database import BASE
 
 url = "https://involvementcenter.unlv.edu/api/discovery/event/search?"
 query = f"endsAfter={datetime.today()}&orderByField=endsOn&orderByDirection=ascending&status=Approved&take=9999"
@@ -37,7 +36,8 @@ def map_event(event_json):
         'name': event_json['name'],
         'date': e_date,
         'time': e_time,
-        'location': event_json['location']
+        'location': event_json['location'],
+        'organization': event_json['organizationName']
     }
 
 if __name__ == '__main__':
