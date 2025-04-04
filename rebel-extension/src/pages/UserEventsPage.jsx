@@ -4,7 +4,6 @@ import UserEventList from "../components/UserEventList";
 import { useNavigate } from "react-router-dom";
 import "../components/css/UserEvents.css";
 
-
 /**
  * Custom Events Page
  * 

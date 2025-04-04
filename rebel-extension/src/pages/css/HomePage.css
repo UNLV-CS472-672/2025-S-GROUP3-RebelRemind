@@ -104,3 +104,19 @@
   font-size: 24px;
   cursor: pointer;
 }
+
+button {
+  outline: none;
+  border: none;
+  background-color: #8b0000;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #b01030;
+}
