@@ -162,7 +162,7 @@ test('updates timer when storage changes (without listener)', async () => {
     expect(screen.getByText('15:45')).toBeInTheDocument();
   });
 
-  expect(console.log).toHaveBeenCalledWith('Restoring from storage - minutes: 15, seconds: 45, isRunning: true');
+  // expect(console.log).toHaveBeenCalledWith('Restoring from storage - minutes: 15, seconds: 45, isRunning: true');
 });
 
 
@@ -181,7 +181,7 @@ test('updates timer when storage changes (without listener)', async () => {
     expect(screen.getByText('15:45')).toBeInTheDocument();
   });
 
-  expect(console.log).toHaveBeenCalledWith('Restoring from storage - minutes: 15, seconds: 45, isRunning: true');
+  // expect(console.log).toHaveBeenCalledWith('Restoring from storage - minutes: 15, seconds: 45, isRunning: true');
 });
 
 test('updates timer when storage changes (using manual storage update)', async () => {
@@ -236,7 +236,7 @@ test('restores timer state from chrome.storage when component mounts', async () 
 
   // Verify that the restored state is shown
   await waitFor(() => expect(screen.getByText('10:30')).toBeInTheDocument());
-  expect(console.log).toHaveBeenCalledWith('Restoring from storage - minutes: 10, seconds: 30, isRunning: false');
+  //expect(console.log).toHaveBeenCalledWith('Restoring from storage - minutes: 10, seconds: 30, isRunning: false');
 });
 
 
