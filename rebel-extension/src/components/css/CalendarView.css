@@ -23,13 +23,27 @@ button.rbc-input::-moz-focus-inner {
   padding: 0;
 }
 
+.modal-header{
+  background-color: crimson;
+}
+
+.modal-content{
+  background-color: #808080;
+  color: white;
+}
+
+.btn-secondary{
+  background-color:#000000;
+}
+
 .rbc-calendar {
   background-color: #808080;
   border-radius: 8px;
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
   height: 100%;
-  width: 600px;	/* I CHANGED TO FIX THE OFFSET ISSUE ~Jeremy */
+  min-width: 350px;	/* I CHANGED TO FIX THE OFFSET ISSUE ~Jeremy */
+  width: auto;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;

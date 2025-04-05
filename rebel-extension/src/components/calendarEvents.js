@@ -1,27 +1,38 @@
 export default [
   {
-    'title': '3 Day Event very long title',
-    'start': new Date(2025, 2, 24),
-    'end': new Date(2025, 2, 27)
+    'title': 'UNLV Food Festival',
+    'start': new Date(2025, 3, 1),
+    'end': new Date(2025, 3, 3),
+    'location': 'UNLV - Pida Plaza',
+    'description': 'Pida Plaza Potluck Palooza',
+    'id': 1
   },
   {
-    'title': 'One day event',
-    'start': new Date(2025, 2, 26),
-    'end': new Date(2025, 2, 26)
+    'title': 'FAFSA Due Date',
+    'start': new Date(2025, 3, 2),
+    'end': new Date(2025, 3, 2),
+    'id': 1
   },
   {
-    'title': 'Today Event',
-    'start': new Date(2025, 2, 24),
-    'end': new Date(2025, 2, 24)
+    'title': 'CS302 - OH',
+    'start': new Date(2025, 3, 3),
+    'end': new Date(2025, 3, 3),
+    'location': 'TBE-B 308',
+    'description': 'Office Hours with Jimi',
+    'id': 1
   },
   {
-    'title': 'Later Event',
-    'start': new Date(2025, 2, 24, 15, 0, 0),
-    'end': new Date(2025, 2, 24, 17, 0, 0)
+    'title': 'Art Show',
+    'start': new Date(2025, 3, 4, 15, 0, 0),
+    'end': new Date(2025, 3, 4, 17, 0, 0),
+    'location': "Greenspun Hall",
+    'id': 1
   },
   {
-    'title': 'Also Later Event',
-    'start': new Date(2025, 2, 24, 15, 0, 0),
-    'end': new Date(2025, 2, 24, 17, 0, 0)
-  }
+    'title': 'Phase 4',
+    'start': new Date(2025, 3, 5, 17, 0, 0),
+    'end': new Date(2025, 3, 5, 17, 0, 0),
+    'course': 'CS460',
+    'id': 0
+  },
 ];
