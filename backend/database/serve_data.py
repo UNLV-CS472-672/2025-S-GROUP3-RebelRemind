@@ -140,6 +140,16 @@ class UNLVCalendar(db.Model):
 					f"location = {self.location}," +
 					f"organization = {self.organization})")
 
+# Create Organization table for database
+class Organization(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(500), nullable=False, unique=True)
+
+    def __repr__(self):
+        return ("Organization(" +
+                    f"id = {self.id},"
+                    f"name = {self.name})")
+                    
 # Parser for User table
 user_put_args = reqparse.RequestParser()
 user_put_args.add_argument("first_name", type=str, help="First name is required", required=True)
@@ -153,6 +163,10 @@ event_put_args.add_argument("date", type=str, help="Event date is required", req
 event_put_args.add_argument("time", type=str, help="Event time can be null", required=False)
 event_put_args.add_argument("location", type=str, help="Event location can be null", required=False)
 event_put_args.add_argument("organization", type=str, help="Event organization can be null", required=False)
+
+# Parser for Organization table
+organization_put_args = reqparse.RequestParser()
+organization_put_args.add_argument("name", type=str, help="Organization name is required", required=True)
 
 # Resource fields for User model
 user_fields = {
@@ -170,6 +184,12 @@ event_fields = {
 	'time': fields.String,
 	'location': fields.String,
 	'organization': fields.String
+}
+
+# Resource fields for Organization model
+organization_fields = {
+    'id': fields.Integer,
+    'name': fields.String,
 }
 
 # Commands for User model
@@ -420,6 +440,32 @@ class UNLVCalendar_Delete_All(Resource):
 			abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
 		return result
 
+# Commands for Organization table
+class Organization_Add(Resource):
+    # PUT item into Organization table
+    @marshal_with(organization_fields)
+    def put(self):
+        args = organization_put_args.parse_args()
+        result = Organization.query.filter_by(name=args['name']).first()
+        if result:
+            abort(HTTPStatus.CONFLICT, message=f"Organization with name {args['name']} already exists.")
+        organization = Organization(
+            name=args['name']
+        )
+        db.session.add(organization)
+        db.session.commit()
+        return organization, HTTPStatus.CREATED
+
+class Organization_Delete_All(Resource):
+    @marshal_with(organization_fields)
+    def delete(self):
+        result = Organization.query.delete()
+        db.session.commit()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Organization table is already empty or deletion failed.")
+        # Returning a success message as marshal_with might not work well with delete count
+        return jsonify(message=f"Deleted {result} organizations.")
+
 # List all items in User model table
 class User_List(Resource):
 	@marshal_with(user_fields)
@@ -465,6 +511,15 @@ class UNLVCalendar_List(Resource):
 			abort(HTTPStatus.NOT_FOUND, message="Table is empty")
 		return result
 
+# List all items in Organization table
+class Organization_List(Resource):
+    @marshal_with(organization_fields)
+    def get(self):
+        result = Organization.query.order_by(Organization.name.asc()).all()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Organization table is empty")
+        return result
+        
 # DAILY LISTS
 # List daily items in Academic Calendar table
 class AcademicCalendar_Daily(Resource):
@@ -592,6 +647,7 @@ api.add_resource(AcademicCalendar_Add, "/academiccalendar_add")
 api.add_resource(InvolvementCenter_Add, "/involvementcenter_add")
 api.add_resource(RebelCoverage_Add, "/rebelcoverage_add")
 api.add_resource(UNLVCalendar_Add, "/unlvcalendar_add")
+api.add_resource(Organization_Add, "/organization_add")
 
 # API resource for DELETE commands
 api.add_resource(User_Delete, "/user_delete/<string:nshe>")
@@ -604,6 +660,7 @@ api.add_resource(RebelCoverage_Delete_All, "/rebelcoverage_delete_all")
 api.add_resource(RebelCoverage_Delete_Past, "/rebelcoverage_delete_past")
 api.add_resource(UNLVCalendar_Delete_All, "/unlvcalendar_delete_all")
 api.add_resource(UNLVCalendar_Delete_Past, "/unlvcalendar_delete_past")
+api.add_resource(Organization_Delete_All, "/organization_delete_all")
 
 # API resources for GET commands
 api.add_resource(User_Info, "/user_id/<string:nshe>")
@@ -618,6 +675,7 @@ api.add_resource(AcademicCalendar_List, "/academiccalendar_list")
 api.add_resource(InvolvementCenter_List, "/involvementcenter_list")
 api.add_resource(RebelCoverage_List, "/rebelcoverage_list")
 api.add_resource(UNLVCalendar_List, "/unlvcalendar_list")
+api.add_resource(Organization_List, "/organization_list")
 
 # API resources for DAILY GET commands
 api.add_resource(AcademicCalendar_Daily, "/academiccalendar_daily/<string:date>")
