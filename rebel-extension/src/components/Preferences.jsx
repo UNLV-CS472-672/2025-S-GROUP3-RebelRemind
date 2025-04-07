@@ -365,8 +365,8 @@ const Preferences = () => {
 
             {/* Unsaved Changes Notification */}
             {unsaved && (
-                <div style={{ marginTop: '0.5rem', color: 'crimson', fontSize: '0.9rem' }}>
-                    You have unsaved changes
+                <div style={{ marginTop: '1rem', color: 'crimson', fontSize: '0.9rem' }}>
+                    You have unsaved changes!
                 </div>
             )}
         </div>
