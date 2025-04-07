@@ -38,6 +38,41 @@ export default function SettingsPage() {
     const isAuthenticated = useAuth(); // Determines if user is logged in
     const navigate = useNavigate(); // For navigation to home
 
+    // Set all preferences to false initially
+    const [preferences, setPreferences] = useState({
+        academicCalendar: false,
+        UNLVCalendar: false,
+        involvementCenter: false,
+        canvasIntegration: false,
+        rebelCoverage: false,
+        userEvents: false,
+    });
+
+    // Get all preferences from storage on page load
+    useEffect(() => {
+        chrome.storage.sync.get(['preferences'], (result) => {
+            console.log("Loaded preferences:", result.preferences);
+            if (result.preferences) {
+                setPreferences(result.preferences);
+            }
+        });
+    }, []);
+
+    // Listen for updates on the preferences from storage
+    useEffect(() => {
+        function handleStorageChange(changes, area) {
+            if (area === 'sync' && changes.preferences) {
+                const newPrefs = changes.preferences.newValue;
+                setPreferences((prev) => ({ ...prev, ...newPrefs }));
+            }
+        }
+        chrome.storage.onChanged.addListener(handleStorageChange);
+        return () => {
+            chrome.storage.onChanged.removeListener(handleStorageChange);
+        };
+    }, []);
+    
+
     /**
      * Toggle section visibility.
      * If the same section is clicked again, it collapses.
@@ -87,14 +122,18 @@ export default function SettingsPage() {
                 </div>
             ),
         },
-        {
+        preferences.canvasIntegration && {
             key: 'canvas',
             icon: <FaBook />,
             label: 'Canvas Integration',
             content: (
                 <div>
                     <p>Your Canvas Integration PAT.</p>
-                    <CanvasTokenManager />
+                    {isAuthenticated ? (
+                        <CanvasTokenManager />
+                    ) : (
+                        <p>Please log in to your account to link your Canvas account.</p>
+                    )}
                 </div>
             )
         },
@@ -157,7 +196,7 @@ export default function SettingsPage() {
                 </div>
             )
         },
-    ];
+    ].filter(Boolean); // removes any `false` entries like when canvasIntegration is off
 
     return (
         <>
