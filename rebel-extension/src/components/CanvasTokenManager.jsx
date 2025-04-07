@@ -48,7 +48,6 @@ const CanvasTokenManager = () => {
 
     return (
         <div className="p-6 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
-            <h3 className="text-xl font-semibold mb-4">Canvas Integration</h3>
 
             {/* Input Field for Canvas Token */}
             <div className="relative">
