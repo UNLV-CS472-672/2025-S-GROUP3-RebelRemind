@@ -19,7 +19,7 @@
  * Authored by: Sebastian Yepez
  */
 
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { act, render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import SettingsPage from "../pages/SettingsPage";
 import * as useAuthHook from "../../public/hooks/useAuth";
@@ -38,19 +38,37 @@ jest.mock("../../public/hooks/useAuth", () => ({
 }));
 
 // 🧪 Setup mock chrome APIs before all tests
+let storageChangeListener;
+
 beforeAll(() => {
   global.chrome = {
     storage: {
       sync: {
-        get: jest.fn((_, cb) => cb({ backgroundColor: "#8b0000" })),
-        set: jest.fn()
-      }
+        get: jest.fn((_, cb) =>
+          cb({
+            backgroundColor: "#8b0000",
+            preferences: {
+              academicCalendar: false,
+              canvasIntegration: false,
+              UNLVCalendar: false,
+            },
+          })
+        ),
+        set: jest.fn(),
+      },
+      onChanged: {
+        addListener: jest.fn((listener) => {
+          storageChangeListener = listener;
+        }),
+        removeListener: jest.fn(),
+      },
     },
     runtime: {
-      sendMessage: jest.fn()
-    }
+      sendMessage: jest.fn(),
+    },
   };
 });
+
 
 describe("SettingsPage", () => {
   beforeEach(() => {
@@ -93,6 +111,30 @@ describe("SettingsPage", () => {
     });
 
   });
+  it("updates preferences when storage changes", async () => {
+    renderWithRouter(<SettingsPage />);
+
+    // Simulate storage change event from Preferences component
+    act(() => {
+      storageChangeListener(
+        {
+          preferences: {
+            newValue: {
+              academicCalendar: true,
+              canvasIntegration: true,
+              UNLVCalendar: false,
+            },
+          },
+        },
+        "sync"
+      );
+    });
+
+    // Expand Canvas section to confirm it shows up
+    fireEvent.click(screen.getByText("Canvas Integration"));
+    expect(await screen.findByText(/your canvas integration pat/i)).toBeInTheDocument();
+  });
+
 
   it("resets color to default when reset button is clicked", async () => {
     renderWithRouter(<SettingsPage />);
