@@ -62,7 +62,7 @@ describe("SettingsPage", () => {
 
   it("renders the color picker and reset button", async () => {
     renderWithRouter(<SettingsPage />);
-    
+
     // Expand Appearance section first
     fireEvent.click(screen.getByText("Appearance"));
 
@@ -79,12 +79,19 @@ describe("SettingsPage", () => {
     });
 
     await waitFor(() => {
-      expect(global.chrome.storage.sync.set).toHaveBeenCalledWith({ backgroundColor: "#123456" });
-      expect(global.chrome.runtime.sendMessage).toHaveBeenCalledWith({
-        type: "COLOR_UPDATED",
-        color: "#123456"
-      });
+      expect(global.chrome.storage.sync.set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          backgroundColor: "#123456"
+        })
+      );
+      expect(global.chrome.runtime.sendMessage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "COLOR_UPDATED",
+          color: "#123456"
+        })
+      );
     });
+
   });
 
   it("resets color to default when reset button is clicked", async () => {
@@ -94,11 +101,46 @@ describe("SettingsPage", () => {
     fireEvent.click(await screen.findByRole("button", { name: /back to original/i }));
 
     await waitFor(() => {
-      expect(global.chrome.storage.sync.set).toHaveBeenCalledWith({ backgroundColor: "#dc143c" });
-      expect(global.chrome.runtime.sendMessage).toHaveBeenCalledWith({
-        type: "COLOR_UPDATED",
-        color: "#dc143c"
-      });
+      expect(global.chrome.storage.sync.set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          backgroundColor: "#dc143c",
+          selectedThemeKey: "",
+          textColor: "#ffffff",
+        })
+      );
+      expect(global.chrome.runtime.sendMessage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "COLOR_UPDATED",
+          color: "#dc143c",
+          textColor: "#ffffff",
+        })
+      );
+    });
+  });
+
+  it("updates theme when theme is selected", async () => {
+    renderWithRouter(<SettingsPage />);
+    fireEvent.click(screen.getByText("Appearance"));
+    fireEvent.change(await screen.findByRole("combobox"), {
+      target: { value: "blackRed" },
+    });
+
+
+    await waitFor(() => {
+      expect(global.chrome.storage.sync.set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          backgroundColor: "#000000",
+          textColor: "#ff1c1c",
+          selectedThemeKey: "blackRed",
+        })
+      );
+      expect(global.chrome.runtime.sendMessage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "COLOR_UPDATED",
+          color: "#000000",
+          textColor: "#ff1c1c",
+        })
+      );
     });
   });
 

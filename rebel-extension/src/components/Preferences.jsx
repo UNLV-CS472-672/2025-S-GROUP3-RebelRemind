@@ -203,7 +203,7 @@ const Preferences = () => {
     return (
         <div style={{padding: '0.2rem'}}>
             {/* Preferences Grid */}
-            <div style={{ marginTop: '1rem' }}>
+            <div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1rem' }}>
                     {/* Left column preferences */}
                     <div style={{ display: 'flex', flexDirection: 'column', rowGap: '1rem' }}>
@@ -281,7 +281,7 @@ const Preferences = () => {
                             </div>
                             <div style={{ marginTop: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                                 {involvedClubs.map((club) => (
-                                    <div key={club} style={{ display: 'flex', alignItems: 'center', background: '#8b0000', borderRadius: '9999px', padding: '0.3rem', fontSize: '0.9rem' }}>
+                                    <div key={club} style={{ color: 'white', display: 'flex', alignItems: 'center', background: '#8b0000', borderRadius: '9999px', padding: '0.3rem', fontSize: '0.9rem' }}>
                                         <span style={{ padding: '0.3rem' }}>{club}</span>
                                         <button onClick={() => handleRemoveClub(club)} style={{ background: 'none', border: 'none', fontWeight: 'bold', cursor: 'pointer' }} aria-label={`Remove ${club}`}>
                                             ×

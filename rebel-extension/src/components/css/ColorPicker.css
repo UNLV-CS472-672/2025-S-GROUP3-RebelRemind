@@ -1,6 +1,6 @@
 .settings-section {
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
+    /* margin-top: 1.5rem;
+    margin-bottom: 1.5rem; */
     /* padding: 1rem; */
     background-color: var(--app-background, #8b0000);
     border: 1.5px dashed #fff;
@@ -24,14 +24,6 @@
     font-weight: 600;
     margin-bottom: 6px;
     display: block;
-}
-
-.color-picker-input {
-    width: 45px;
-    height: 30px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
 }
 
 .reset-button {
@@ -58,6 +50,23 @@
     margin-top: 0.5rem;
 }
 
+:root {
+    --app-background: linear-gradient(135deg, #DC143C, #FF6F91);
+}
+
+/* Make the color-picker itself show the same gradient */
+
+.color-picker-input {
+    width: 45px;
+    height: 30px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background-image: linear-gradient(135deg, #DC143C, #FF6F91);
+}
+
+
+/* This line appears twice, but it's identical. Keeping it as is. */
 .reset-button {
     background-color: #8b0000;
     color: white;
@@ -73,12 +82,18 @@
     background-color: #b01030;
 }
 
-:root {
-    --app-background: linear-gradient(135deg, #DC143C, #FF6F91);
+button {
+    outline: none;
+    border: none;
+    background-color: #8b0000;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
 }
 
-/* Make the color-picker itself show the same gradient */
-.color-picker-input {
-    background-image: linear-gradient(135deg, #DC143C, #FF6F91);
-    border: none;
+button:hover {
+    background-color: #b01030;
 }

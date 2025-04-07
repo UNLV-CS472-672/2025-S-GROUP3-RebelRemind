@@ -26,20 +26,6 @@
     font-family: system-ui, sans-serif;
 }
 
-.settings-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px;
-    border-bottom: 1px solid #eee;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.settings-item:hover {
-    background-color: #f9f9f9;
-}
-
 .icon {
     width: 24px;
     margin-right: 12px;
@@ -69,16 +55,18 @@
 .settings-item:hover,
 .settings-item.open {
     background-color: #f9f9f9;
+    color: black;
 }
 
 .settings-content {
     background-color: #f9f9f9;
     /* match open background */
-    padding: 10px 16px;
+    padding: 16px 10px 20px 16px;
     font-size: 14px;
     animation: fadeIn 0.2s ease-in;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
+    color: black;
 }
 
 
