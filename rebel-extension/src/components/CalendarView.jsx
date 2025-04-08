@@ -26,6 +26,7 @@ import { setMinutes } from "date-fns";
  * - react-big-calendar.css for styling. (Modified to fit the extension's color scheme and size)
  *
  * Authored by: Jeremy Besitula
+ * Assignment and User Created Event support by: Gunnar Dalton
  *
  * Put into component DailyCalendar.jsx by Jeremy Besitula
  * @returns {JSX.Element} The react-big-calendar component UI.
@@ -49,7 +50,13 @@ function CalendarMenu() {
 
 	const [events, setEvents] = useState([]);
 
+	/**
+     * Effect Hook: Load the stored Canvas assignments and user created events when the component mounts.
+     */
 	useEffect(() => {
+		/**
+ 		* Calls the correct functions to get Canvas assignments and user created events and places them together in one array.
+ 		*/
 		const fetchEvents = async () => {
 			const canvasAssignments = await getCanvasAssignments();
 			const userEvents = await getUserEvents();
@@ -57,6 +64,9 @@ function CalendarMenu() {
 		};
 		fetchEvents();
 
+		/**
+ 		* Listens for messages indicating that a user created event has been created or updated.
+ 		*/
 		const handleMessage = (message) => {
             if (message.type === "EVENT_CREATED" || message.type === "EVENT_UPDATED") {
                 fetchEvents();
@@ -88,6 +98,9 @@ function CalendarMenu() {
 
 export default CalendarMenu;
 
+/**
+ * Gets the list of Canvas assignments from storage and formats it in the correct way to be handled by the calendar.
+ */
 const getCanvasAssignments = async () => {
 	return new Promise ((resolve) => {
 		chrome.storage.local.get("Canvas_Assignments", (data) => {
@@ -107,8 +120,10 @@ const getCanvasAssignments = async () => {
 	})
 };
 
+/**
+ * Gets the list of user created events from storage and formats it in the correct way to be handled by the calendar.
+ */
 const getUserEvents = async () => {
-	console.log("Here");
 	return new Promise ((resolve) => {
 		chrome.storage.local.get("userEvents", (data) => {
 			if (data.userEvents) { 

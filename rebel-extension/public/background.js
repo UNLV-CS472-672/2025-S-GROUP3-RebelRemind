@@ -105,6 +105,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+/**
+* Listens for and handles any Chrome alarms.
+*/
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name == "getAssignments") { // alarm is triggered, update storage with new assignments
+    fetchCanvasAssignments();
+  }
+});
 
 /**
  * This section is meant to handle all functions that need to be ran when the user logs into Chrome
@@ -138,48 +146,30 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
  */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   switch (message.type) {
+    
     /**
-     * Retrieves the user's schedule from a background API.
-     */
-    case "GET_ASSIGNMENTS":
-      let allAssignments = [];
-      
-      // Await access token before continuing
-      getCanvasPAT().then((accessToken) => {
-        if (!accessToken) {
-          console.error("No access token found.");
-          sendResponse(false);
-          return;
-        }
-
-        getCourses(accessToken).then((courseList) => {
-          // Loop through the courses and fetch assignments
-          const assignmentPromises = courseList.map((course) =>
-            getAssignments(course, accessToken)
-          );
-          
-          // Wait for all assignments to be fetched
-          Promise.all(assignmentPromises)
-            .then((assignments) => {
-              // Flatten the array
-              allAssignments = assignments.flat();
-              chrome.storage.local.set({ Canvas_Assignments: allAssignments }, () => {
-                console.log("Assignments Stored!");
-              });
-              sendResponse(allAssignments); // Send the response with all assignments
-            })
-            .catch((error) => {
-              console.error("Error fetching assignments", error);
-              sendResponse(false);
-            });
-        }).catch((error) => {
-          console.error("Error with getCourses()", error);
-          sendResponse(false);
-        });
-      }).catch((error) => {
-        console.error("Error fetching access token", error);
-        sendResponse(false);
+    * Starts the alarm that will refresh Canvas assignments in storage.
+    */
+    case "START_CANVAS_ALARM":
+      chrome.alarms.create("getAssignments", { periodInMinutes: 30 }); // refresh assignment list from Canvas every 30 minutes
+      console.log("Canvas Alarm Started");
+      break;
+    
+    /**
+    * Clears the alarm that refreshes Canvas assignments in storage.
+    */
+    case "CLEAR_CANVAS_ALARM":
+      chrome.alarms.clear("getAssignments", () => { // delete alarm that refreshes assignments
+        console.log("getAssignments Alarm Cleared");
       });
+      break;
+    
+    /**
+    * Updates the Canvas assignments list that is in storage.
+    */
+    case "UPDATE_ASSIGNMENTS":
+      fetchCanvasAssignments(); // update storage with new assignments
+      sendResponse(true);
       return true;
 
     /**
@@ -240,11 +230,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     /**
      * Reloads "Your Custom Events" list in UserEventsPage by broadcasting message from UserEventInput.jsx
+     * Reloads the calendar in side panel to reflect created event.
      */
     case "EVENT_CREATED":
       chrome.runtime.sendMessage({ type: "EVENT_CREATED" }); // broadcast
       break;
 
+    /**
+    * Reloads the calendar in side panel to reflect updated event.
+    */
     case "EVENT_UPDATED":
       chrome.runtime.sendMessage({ type: "EVENT_UPDATED" });
       break;
@@ -258,3 +252,47 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break;
   }
 });
+
+/**
+* Fetches all assignments from Canvas and places them into storage.
+*/
+async function fetchCanvasAssignments() {
+  console.log("Fetching Assignments");
+  let allAssignments = [];
+  
+  // Await access token before continuing
+  getCanvasPAT().then((accessToken) => {
+    if (!accessToken) {
+      console.error("No access token found.");
+      return false;
+    }
+
+    getCourses(accessToken).then((courseList) => {
+      // Loop through the courses and fetch assignments
+      const assignmentPromises = courseList.map((course) =>
+        getAssignments(course, accessToken)
+      );
+      
+      // Wait for all assignments to be fetched
+      Promise.all(assignmentPromises)
+        .then((assignments) => {
+          // Flatten the array
+          allAssignments = assignments.flat();
+          chrome.storage.local.set({ Canvas_Assignments: allAssignments }, () => {
+            console.log("Assignments Stored!");
+          });
+          return true;
+        })
+        .catch((error) => {
+          console.error("Error fetching assignments", error);
+          return false;
+        });
+    }).catch((error) => {
+      console.error("Error with getCourses()", error);
+      return false;
+    });
+  }).catch((error) => {
+    console.error("Error fetching access token", error);
+    return false;
+  });
+}

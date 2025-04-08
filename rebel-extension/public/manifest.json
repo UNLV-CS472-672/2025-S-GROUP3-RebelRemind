@@ -24,7 +24,7 @@
     "service_worker": "background.js",
     "type": "module"
   },
-  "permissions": ["storage", "activeTab", "scripting", "identity", "sidePanel"],
+  "permissions": ["storage", "activeTab", "scripting", "identity", "sidePanel", "alarms"],
   "host_permissions": [
     "http://localhost:3001/*",
     "https://unlv.instructure.com/*"
