@@ -47,6 +47,7 @@ function SettingPage() {
             value={themeKey}
             className="reset-button"
           >
+            <option value="custom">Custom</option>
             <option value="scarletGray">Scarlet &amp; Gray</option>
             <option value="blackRed">Black &amp; Red</option>
           </select>
