@@ -202,3 +202,6 @@
     border-radius: 4px;
 }
 
+.mx-auto.bg-white h3.text-xl.font-semibold {
+    color: black !important;
+  }
