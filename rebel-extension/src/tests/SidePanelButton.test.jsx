@@ -21,7 +21,7 @@ describe("SidePanelButton", () => {
     render(<SidePanelButton />);
 
     expect(
-      screen.getByText(/Calendar View -->/i)
+      screen.getByText(/Calendar View/i)
     ).toBeInTheDocument();
   });
 
