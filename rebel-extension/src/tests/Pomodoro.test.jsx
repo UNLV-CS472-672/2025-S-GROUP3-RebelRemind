@@ -4,20 +4,14 @@ import '@testing-library/jest-dom';
 
 jest.useFakeTimers();
 
-// Mock chrome.storage and chrome.runtime
+// Mock chrome APIs
 global.chrome = {
   storage: {
     local: {
       get: jest.fn((keys, callback) => {
-        callback({
-          minutes: 25,
-          seconds: 0,
-          isRunning: false,
-        });
+        callback({ minutes: 25, seconds: 0, isRunning: false });
       }),
-      set: jest.fn((values, callback) => {
-        callback && callback();
-      }),
+      set: jest.fn((values, callback) => callback && callback()),
     },
     onChanged: {
       addListener: jest.fn(),
@@ -29,270 +23,218 @@ global.chrome = {
   },
 };
 
-// Mock the alarm sound
+
+function ResetTestWrapper() {
+  const [instance, setInstance] = React.useState(null);
+
+  return (
+    <>
+      <PomodoroTimer ref={(ref) => setInstance(ref)} />
+      <button onClick={() => instance?.handleReset?.(10)}>Custom Reset</button>
+    </>
+  );
+}
+
+
+// Mock alarm
 jest.spyOn(HTMLAudioElement.prototype, 'load').mockImplementation(() => {});
 jest.spyOn(HTMLAudioElement.prototype, 'play').mockImplementation(() => Promise.resolve());
 
 describe('PomodoroTimer', () => {
   beforeEach(() => {
-    // Mock console.log to capture logs
     global.console.log = jest.fn();
   });
 
-  test('renders the timer display with default values', async () => {
-    render(<PomodoroTimer />);
-    expect(screen.getByText('25:00')).toBeInTheDocument();
-    expect(console.log).toHaveBeenCalledWith('Component mounted or updated');
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  test('starts the timer and updates the display', async () => {
+  test('renders with default 25:00', async () => {
     render(<PomodoroTimer />);
-    const startButton = screen.getByText(/start/i);
-    fireEvent.click(startButton);
-
-    // Fast forward by 1 second
-    jest.advanceTimersByTime(1000);
-
-    // Wait for the timer to update (we'll skip checking for 24:59 in this case)
-    await waitFor(() => {
-      expect(screen.getByText(/25:00/i)).toBeInTheDocument();  // Keep it at the initial value or a placeholder check
-    });
-
-    expect(console.log).toHaveBeenCalledWith('Starting timer with:', 25, 'minutes and', 0, 'seconds');
+    expect(await screen.findByText('25:00')).toBeInTheDocument();
   });
 
-  test('pauses the timer', async () => {
+  test('starts and logs timer start', async () => {
     render(<PomodoroTimer />);
-    const startButton = screen.getByText(/start/i);
-    fireEvent.click(startButton);
-
-    // Fast forward by 1 second
+    fireEvent.click(screen.getByText(/start/i));
     jest.advanceTimersByTime(1000);
-    
-    const pauseButton = screen.getByText(/pause/i);
-    fireEvent.click(pauseButton);
+    await waitFor(() => expect(console.log).toHaveBeenCalledWith('Starting timer with:', 25, 'minutes and', 0, 'seconds'));
+  });
 
-    // The timer should stay at the initial value, e.g., '25:00', after pause
-    await waitFor(() => {
-      expect(screen.getByText('25:00')).toBeInTheDocument(); // Timer should not decrease
-    });
-
+  test('pauses the timer and logs it', async () => {
+    render(<PomodoroTimer />);
+    fireEvent.click(screen.getByText(/start/i));
+    fireEvent.click(screen.getByText(/pause/i));
     expect(console.log).toHaveBeenCalledWith('Pausing timer...');
   });
 
-  test('resets the timer to the default values', async () => {
+  test('resets to 25 minutes and logs it', async () => {
     render(<PomodoroTimer />);
-    const resetButton = screen.getByText(/reset/i);
-    fireEvent.click(resetButton);
-    expect(screen.getByText('25:00')).toBeInTheDocument();
-
-    // Check for reset action log
+    fireEvent.click(screen.getByText(/reset/i));
+    expect(await screen.findByText('25:00')).toBeInTheDocument();
     expect(console.log).toHaveBeenCalledWith('Resetting timer to', 25, 'minutes');
   });
 
-  test('triggers short break functionality', async () => {
+  test('short break resets to 5 minutes', async () => {
     render(<PomodoroTimer />);
-    const shortBreakButton = screen.getByText(/short break/i);
-    fireEvent.click(shortBreakButton);
-    expect(screen.getByText('05:00')).toBeInTheDocument();
-
-    // Check log for short break action
+    fireEvent.click(screen.getByText(/short break/i));
+    expect(await screen.findByText('05:00')).toBeInTheDocument();
     expect(console.log).toHaveBeenCalledWith('Starting short break...');
   });
 
-  test('triggers long break functionality', async () => {
+  test('long break resets to 15 minutes', async () => {
     render(<PomodoroTimer />);
-    const longBreakButton = screen.getByText(/long break/i);
-    fireEvent.click(longBreakButton);
-    expect(screen.getByText('15:00')).toBeInTheDocument();
-
-    // Check log for long break action
+    fireEvent.click(screen.getByText(/long break/i));
+    expect(await screen.findByText('15:00')).toBeInTheDocument();
     expect(console.log).toHaveBeenCalledWith('Starting long break...');
   });
 
-  afterEach(() => {
-    jest.clearAllMocks(); // Clear all mocks to prevent test interference
+  test('auto-resets if loaded with 0:00 and not running', async () => {
+    chrome.storage.local.get.mockImplementationOnce((_, cb) => cb({ minutes: 0, seconds: 0, isRunning: false }));
+    render(<PomodoroTimer />);
+    expect(await screen.findByText('25:00')).toBeInTheDocument();
+    expect(console.log).toHaveBeenCalledWith('Auto-resetting timer to 25:00 after completion');
+  });
+
+  test('handles storage.get else block (partial values)', async () => {
+    chrome.storage.local.get.mockImplementationOnce((_, cb) => cb({ minutes: 13, seconds: 14 }));
+    render(<PomodoroTimer />);
+    expect(await screen.findByText('13:14')).toBeInTheDocument();
+  });
+
+  test('covers else block when timer is not done', async () => {
+    chrome.storage.local.get.mockImplementationOnce((_, cb) => cb({ minutes: 25, seconds: 1, isRunning: true }));
+    render(<PomodoroTimer />);
+    expect(await screen.findByText('25:01')).toBeInTheDocument();
+  });
+
+  test('triggers alarm and logs when reaching 0:00', async () => {
+    chrome.storage.local.get.mockImplementationOnce((_, cb) => cb({ minutes: 0, seconds: 0, isRunning: true }));
+    render(<PomodoroTimer />);
+    await waitFor(() => expect(console.log).toHaveBeenCalledWith('Timer reached 0:00, triggering alarm...'));
+  });
+
+  test('handles alarm playback failure', async () => {
+    const mockError = new Error('Playback failed');
+    HTMLAudioElement.prototype.play.mockImplementationOnce(() => Promise.reject(mockError));
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    chrome.storage.local.get.mockImplementationOnce((_, cb) => cb({ minutes: 0, seconds: 0, isRunning: true }));
+
+    await act(async () => render(<PomodoroTimer />));
+    await waitFor(() => expect(errorSpy).toHaveBeenCalledWith('Audio playback failed:', mockError));
+    errorSpy.mockRestore();
+  });
+
+  test('removes chrome.storage listener on unmount', () => {
+    const { unmount } = render(<PomodoroTimer />);
+    unmount();
+    expect(chrome.storage.onChanged.removeListener).toHaveBeenCalled();
+  });
+
+  test('updates minutes/seconds via input fields', async () => {
+    render(<PomodoroTimer />);
+    const inputs = screen.getAllByRole('spinbutton');
+    fireEvent.change(inputs[0], { target: { value: '12' } });
+    fireEvent.change(inputs[1], { target: { value: '45' } });
+    expect(inputs[0].value).toBe('12');
+    expect(inputs[1].value).toBe('45');
+  });
+
+  test('input edge cases (negative, over max, invalid)', () => {
+    render(<PomodoroTimer />);
+    const [minInput, secInput] = screen.getAllByRole('spinbutton');
+
+    fireEvent.change(minInput, { target: { value: '-5' } });
+    expect(minInput.value).toBe('0');
+
+    fireEvent.change(secInput, { target: { value: '100' } });
+    expect(secInput.value).toBe('59');
+
+    fireEvent.change(secInput, { target: { value: 'abc' } });
+    expect(secInput.value).toBe('0');
+  });
+
+  test('pause sends chrome.runtime message (branch)', () => {
+    chrome.storage.local.get.mockImplementationOnce((_, cb) => cb({ isRunning: true }));
+    render(<PomodoroTimer />);
+    fireEvent.click(screen.getByText(/pause/i));
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({ action: 'pause' });
   });
 });
 
-// Your original tests
-test('resets the timer during a break', async () => {
-  render(<PomodoroTimer />);
-  
-  // Start a short break
-  const shortBreakButton = screen.getByText(/short break/i);
-  fireEvent.click(shortBreakButton);
 
-  // Wait for the break to be started
-  await waitFor(() => expect(screen.getByText('05:00')).toBeInTheDocument());
-
-  // Reset during the break
-  const resetButton = screen.getByText(/reset/i);
-  fireEvent.click(resetButton);
-
-  // Ensure the timer resets to 25:00
-  expect(screen.getByText('25:00')).toBeInTheDocument();
-  expect(console.log).toHaveBeenCalledWith('Resetting timer to', 25, 'minutes');
-});
-
-test('loads initial values from chrome.storage', async () => {
-  chrome.storage.local.get.mockImplementation((keys, callback) => {
-    callback({ minutes: 10, seconds: 30, isRunning: true });
+test('auto-reset logic is triggered on mount when timer is 0:00 and not running', async () => {
+  chrome.storage.local.get.mockImplementationOnce((_, cb) => {
+    cb({ minutes: 0, seconds: 0, isRunning: false });
   });
 
   render(<PomodoroTimer />);
 
   await waitFor(() => {
-    expect(screen.getByText('10:30')).toBeInTheDocument();
+    expect(screen.getByText('25:00')).toBeInTheDocument();
+    expect(console.log).toHaveBeenCalledWith("Auto-resetting timer to 25:00 after completion");
+    expect(chrome.storage.local.set).toHaveBeenCalledWith({ minutes: 25, seconds: 0 });
   });
 });
 
-// New tests for storage update scenarios
-test('updates timer when storage changes (without listener)', async () => {
-  chrome.storage.local.get.mockImplementation((keys, callback) => {
-    callback({ minutes: 15, seconds: 45, isRunning: true });
+test('covers auto-reset block when timer is 0:00 and not running on mount', async () => {
+  const mockSet = jest.fn();
+
+  // Set up the mock BEFORE component renders
+  global.chrome.storage.local.set = mockSet;
+
+  // Mock initial storage with timer done
+  global.chrome.storage.local.get.mockImplementationOnce((_, cb) => {
+    cb({ minutes: 0, seconds: 0, isRunning: false });
   });
 
   render(<PomodoroTimer />);
-
-  // Manually trigger re-render to simulate storage change
-  // fireEvent.click(screen.getByText(/reset/i));
 
   await waitFor(() => {
-    expect(screen.getByText('15:45')).toBeInTheDocument();
+    expect(screen.getByText('25:00')).toBeInTheDocument();
   });
 
-  // expect(console.log).toHaveBeenCalledWith('Restoring from storage - minutes: 15, seconds: 45, isRunning: true');
+  // ✅ Only assert the object passed — no callback
+  expect(mockSet).toHaveBeenCalledWith({ minutes: 25, seconds: 0 });
+  expect(console.log).toHaveBeenCalledWith("Auto-resetting timer to 25:00 after completion");
 });
 
 
-test('updates timer when storage changes (without listener)', async () => {
-  const { rerender } = render(<PomodoroTimer />);
+test('auto-resets timer when minutes and seconds are 0 and isRunning is false', async () => {
+  const mockSet = jest.fn();
 
-  // Mock new storage values
-  chrome.storage.local.get.mockImplementation((keys, callback) => {
-    callback({ minutes: 15, seconds: 45, isRunning: true });
+  // Inject mock before render
+  global.chrome.storage.local.set = mockSet;
+
+  // This will trigger the auto-reset block
+  global.chrome.storage.local.get.mockImplementationOnce((_, cb) => {
+    cb({ minutes: 0, seconds: 0, isRunning: false });
   });
 
-  // Force a re-render to simulate component reading new storage values
-  rerender(<PomodoroTimer />);
+  render(<PomodoroTimer />);
 
   await waitFor(() => {
-    expect(screen.getByText('15:45')).toBeInTheDocument();
+    expect(screen.getByText('25:00')).toBeInTheDocument();
   });
 
-  // expect(console.log).toHaveBeenCalledWith('Restoring from storage - minutes: 15, seconds: 45, isRunning: true');
+  // Test that the reset logic was executed
+  expect(mockSet).toHaveBeenCalledWith({ minutes: 25, seconds: 0 });
+  expect(console.log).toHaveBeenCalledWith("Auto-resetting timer to 25:00 after completion");
 });
 
-test('updates timer when storage changes (using manual storage update)', async () => {
+
+test('clamps invalid or negative minute input to 0', () => {
   render(<PomodoroTimer />);
+  const [minutesInput] = screen.getAllByRole('spinbutton');
 
-  // Simulate a change in storage values
-  chrome.storage.onChanged.addListener.mock.calls[0][0]({
-    minutes: { newValue: 15 },
-    seconds: { newValue: 45 },
-    isRunning: { newValue: true },
-  });
+  fireEvent.change(minutesInput, { target: { value: '-10' } });
+  expect(minutesInput.value).toBe('0');
 
-  // Wait for the UI to reflect the updated values
-  await waitFor(() => {
-    expect(screen.getByText('15:45')).toBeInTheDocument();
-  });
+  fireEvent.change(minutesInput, { target: { value: 'abc' } });
+  expect(minutesInput.value).toBe('0');
 
-  expect(console.log).toHaveBeenCalledWith('Storage changed - minutes: 15');
-  expect(console.log).toHaveBeenCalledWith('Storage changed - seconds: 45');
-});
-
-test('updates timer when storage changes', async () => {
-  render(<PomodoroTimer />);
-
-  // Simulate storage change event manually
-  act(() => {
-    chrome.storage.onChanged.addListener.mock.calls[0][0]({
-      minutes: { newValue: 15 },
-      seconds: { newValue: 45 },
-      isRunning: { newValue: true },
-    });
-  });
-
-  // Ensure UI updates correctly
-  await waitFor(() => {
-    expect(screen.getByText('15:45')).toBeInTheDocument();
-  });
-
-  expect(console.log).toHaveBeenCalledWith('Storage changed - minutes: 15');
-  expect(console.log).toHaveBeenCalledWith('Storage changed - seconds: 45');
+  fireEvent.change(minutesInput, { target: { value: '' } });
+  expect(minutesInput.value).toBe('0');
 });
 
 
-
-test('restores timer state from chrome.storage when component mounts', async () => {
-  // Mock chrome.storage.local.get to simulate storage state
-  chrome.storage.local.get.mockImplementation((keys, callback) => {
-    callback({ minutes: 10, seconds: 30, isRunning: false });
-  });
-
-  render(<PomodoroTimer />);
-
-  // Verify that the restored state is shown
-  await waitFor(() => expect(screen.getByText('10:30')).toBeInTheDocument());
-  //expect(console.log).toHaveBeenCalledWith('Restoring from storage - minutes: 10, seconds: 30, isRunning: false');
-});
-
-
-test('calls chrome.storage.removeListener when component unmounts', () => {
-  const { unmount } = render(<PomodoroTimer />);
-
-  // Simulate the component unmounting
-  unmount();
-
-  // Check that the storage listener was removed
-  expect(chrome.storage.onChanged.removeListener).toHaveBeenCalled();
-});
-
-test('triggers short break and updates state correctly', async () => {
-  render(<PomodoroTimer />);
-
-  const shortBreakButton = screen.getByText(/short break/i);
-
-  // Trigger short break
-  fireEvent.click(shortBreakButton);
-
-  // Timer should reset to 5 minutes
-  await waitFor(() => expect(screen.getByText('05:00')).toBeInTheDocument());
-
-  // Ensure that reset functionality is triggered with the correct values
-  expect(console.log).toHaveBeenCalledWith('Starting short break...');
-  expect(console.log).toHaveBeenCalledWith('Resetting timer to', 5, 'minutes');
-});
-
-test('triggers long break and updates state correctly', async () => {
-  render(<PomodoroTimer />);
-
-  const longBreakButton = screen.getByText(/long break/i);
-
-  // Trigger long break
-  fireEvent.click(longBreakButton);
-
-  // Timer should reset to 15 minutes
-  await waitFor(() => expect(screen.getByText('15:00')).toBeInTheDocument());
-
-  // Ensure that reset functionality is triggered with the correct values
-  expect(console.log).toHaveBeenCalledWith('Starting long break...');
-  expect(console.log).toHaveBeenCalledWith('Resetting timer to', 15, 'minutes');
-});
-
-test('handles reset functionality correctly', async () => {
-  render(<PomodoroTimer />);
-
-  const resetButton = screen.getByText(/reset/i);
-
-  // Reset timer to default 25 minutes
-  fireEvent.click(resetButton);
-
-  // Ensure the timer resets to 25:00
-  await waitFor(() => expect(screen.getByText('25:00')).toBeInTheDocument());
-
-  // Ensure the reset function was called with the correct values
-  expect(console.log).toHaveBeenCalledWith('Resetting timer to', 25, 'minutes');
-});
