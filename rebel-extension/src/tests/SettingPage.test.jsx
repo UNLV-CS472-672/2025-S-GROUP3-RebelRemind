@@ -72,7 +72,7 @@ describe("SettingPage", () => {
       expect(global.chrome.storage.sync.set).toHaveBeenCalledWith(
         expect.objectContaining({
           backgroundColor: "#123456",
-          selectedThemeKey: "",
+          selectedThemeKey: "custom",
           textColor: "#ffffff",
         })
       );
@@ -96,7 +96,7 @@ describe("SettingPage", () => {
       expect(global.chrome.storage.sync.set).toHaveBeenCalledWith(
         expect.objectContaining({
           backgroundColor: "#dc143c",
-          selectedThemeKey: "",
+          selectedThemeKey: "custom",
           textColor: "#ffffff",
         })
       );
