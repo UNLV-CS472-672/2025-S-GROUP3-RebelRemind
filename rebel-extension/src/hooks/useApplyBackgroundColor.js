@@ -17,7 +17,7 @@ const THEMES = {
 const useApplyBackgroundColor = () => {
   const [selectedColor, setSelectedColor] = useState(DEFAULT_COLOR);
   const [textColor, setTextColor] = useState(DEFAULT_TEXT);
-  const [themeKey, setThemeKey] = useState("");
+  const [themeKey, setThemeKey] = useState("custom");
 
   const applyColor = (bg, text) => {
     const gradient = `linear-gradient(to bottom right, ${bg}, #f8d7da)`;
@@ -33,7 +33,7 @@ const useApplyBackgroundColor = () => {
       (data) => {
         const baseColor = data.backgroundColor || DEFAULT_COLOR;
         const txtColor = data.textColor || DEFAULT_TEXT;
-        const theme = data.selectedThemeKey || "";
+        const theme = data.selectedThemeKey || "custom";
         setSelectedColor(baseColor);
         setTextColor(txtColor);
         setThemeKey(theme);
@@ -45,29 +45,34 @@ const useApplyBackgroundColor = () => {
   const handleColorChange = (event) => {
     const newColor = event.target.value;
     setSelectedColor(newColor);
-    setThemeKey(""); // clear theme
+    setTextColor(DEFAULT_TEXT);
+    setThemeKey("custom");
+
     chrome.storage.sync.set({
       backgroundColor: newColor,
-      textColor,
-      selectedThemeKey: "",
+      textColor: DEFAULT_TEXT,
+      selectedThemeKey: "custom",
     });
-    applyColor(newColor, textColor);
+
+    applyColor(newColor, DEFAULT_TEXT);
     chrome.runtime.sendMessage({
       type: "COLOR_UPDATED",
       color: newColor,
-      textColor,
+      textColor: DEFAULT_TEXT,
     });
   };
 
   const handleResetColor = () => {
     setSelectedColor(DEFAULT_COLOR);
     setTextColor(DEFAULT_TEXT);
-    setThemeKey("");
+    setThemeKey("custom");
+
     chrome.storage.sync.set({
       backgroundColor: DEFAULT_COLOR,
       textColor: DEFAULT_TEXT,
-      selectedThemeKey: "",
+      selectedThemeKey: "custom",
     });
+
     applyColor(DEFAULT_COLOR, DEFAULT_TEXT);
     chrome.runtime.sendMessage({
       type: "COLOR_UPDATED",

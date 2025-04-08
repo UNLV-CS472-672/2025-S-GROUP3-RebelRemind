@@ -1,75 +1,74 @@
-/* ===== Page Container ===== */
-.user-events-page {
-    background: var(--app-background);
-    color: var(--app-text-color);
-    min-height: 100vh;
-    padding: 1rem;
-    text-align: center;
-  }
-  
-  /* ===== Event Input ===== */
-  .text-inputs {
+/* CSS for UserEventInput.jsx and UserEventList.jsx */
+
+/* UserEventInput */
+
+.text-inputs {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
     margin-left: 30px;
-  }
-  
-  .event-title,
-  .event-desc-input {
+}
+
+/* Shared styling */
+.event-title,
+.event-desc-input {
     width: 92%;
     padding: 0.5rem;
-  }
-  
-  .event-title {
+}
+
+.event-title {
     width: 60%;
-  }
-  
-  .event-desc-input {
+}
+
+/* Specific to textarea */
+.event-desc-input {
     field-sizing: content;
     min-block-size: 10vh;
     max-block-size: 30vh;
     overflow-y: auto;
     overflow-x: hidden;
-  }
-  
-  .event-row {
+}
+
+.event-row {
     display: flex;
     flex-direction: row;
     gap: 1rem;
     justify-content: center;
+    /* center the row inside parent */
     width: 80%;
     margin: 0 auto;
-  }
-  
-  .event-col-left,
-  .event-col-right {
+    /* center horizontally */
+}
+
+.event-col-left,
+.event-col-right {
     display: flex;
     flex-direction: column;
     width: 50%;
-  }
-  
-  .event-col-right {
+}
+
+.event-col-right {
     align-items: flex-end;
-  }
-  
-  .time-row {
+}
+
+.time-row {
     display: flex;
     flex-direction: row;
     align-items: center;
     margin-bottom: 0.5rem;
-  }
-  
-  .time-label {
+}
+
+.time-label {
     width: 50px;
+    /* fixed width so both labels align */
     margin-right: 0.2rem;
-    color: #ddd;
+    color: #777;
     font-size: 0.95rem;
     text-align: right;
-  }
-  
-  .event-input {
+}
+
+.event-input {
     flex: 1;
     padding: 0.5rem;
     font-size: 1rem;
@@ -77,54 +76,47 @@
     border-radius: 4px;
     background-color: #111;
     color: #fff;
-  }
-  
-  .mx-auto {
-    background: var(--app-background);
-    color: var(--app-text-color);
-    border-radius: 8px;
-    padding: 10px;
-  }
-  
-  /* ===== Event List ===== */
-  .event-list {
+}
+
+/* UserEventList */
+
+.event-list {
     list-style: none;
     padding: 0;
     margin: 0;
-  }
-  
-  .event-dropdown-item {
-    border-bottom: 1px solid #555;
+}
+
+.event-dropdown-item {
+    border-bottom: 1px solid #ddd;
     margin-bottom: 0.5rem;
     border-radius: 6px;
     overflow: hidden;
     transition: all 0.3s ease;
-  }
-  
-  .event-dropdown-header {
+}
+
+.event-dropdown-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--app-background);
-    color: var(--app-text-color);
+    background-color: #f9fafb;
     padding: 10px 12px;
     cursor: pointer;
     font-weight: 500;
-  }
-  
-  .event-dropdown-header:hover {
-    background: rgba(0, 0, 0, 0.1);
-  }
-  
-  .event-dropdown-details {
-    background: var(--app-background);
-    color: var(--app-text-color);
+}
+
+.event-dropdown-header:hover {
+    background-color: #f1f5f9;
+}
+
+.event-dropdown-details {
+    background-color: #fff;
     padding: 10px 14px;
     font-size: 0.95rem;
-    border-top: 1px solid #555;
-  }
-  
-  .delete-btn {
+    color: #333;
+    border-top: 1px solid #eee;
+}
+
+.delete-btn {
     background-color: #e53e3e;
     color: white;
     border: none;
@@ -132,79 +124,84 @@
     padding: 4px 10px;
     cursor: pointer;
     font-size: 0.85rem;
-  }
-  
-  .delete-btn:hover {
+}
+
+.delete-btn:hover {
     background-color: #c53030;
-  }
-  
-  .dropdown-title {
+}
+
+.dropdown-title {
     display: flex;
     align-items: center;
     gap: 8px;
-  }
-  
-  .dropdown-icon {
+}
+
+.dropdown-icon {
     font-size: 0.9rem;
-    color: #fff;
+    color: #555;
     transition: transform 0.2s ease;
-  }
-  
-  /* ===== Tab Navigation ===== */
-  .tab-nav {
+}
+
+.tab-nav {
     display: flex;
     justify-content: center;
-    border-bottom: 2px solid #555;
+    border-bottom: 2px solid #f1f1f1;
     margin-bottom: 1rem;
     gap: 1.5rem;
     padding-left: 4px;
-  }
-  
-  .tab-item {
+}
+
+.tab-item {
     padding: 0.5rem 0;
     cursor: pointer;
     font-weight: 500;
-    color: #ddd;
+    color: #6b7280;
+    /* Tailwind gray-500 */
     border-bottom: 2px solid transparent;
     transition: color 0.2s ease, border-color 0.2s ease;
-  }
-  
-  .tab-item:hover {
-    color: #fff;
-  }
-  
-  .tab-item.active {
-    color: #ff4d4d;
-    border-bottom: 2px solid #ff4d4d;
-  }
-  
-  .event-subheader {
+}
+
+.tab-item:hover {
+    color: #374151;
+    /* gray-700 */
+}
+
+.tab-item.active {
+    color: #b91c1c;
+    /* red-700 */
+    border-bottom: 2px solid #b91c1c;
+}
+
+.event-subheader {
     font-weight: 600;
     font-size: 1.1rem;
     margin: 1rem 0 0.5rem;
-    color: #eee;
+    color: #374151;
     text-align: left;
-  }
-  
-  /* ===== Edit Row ===== */
-  .edit-row {
+    /* Tailwind gray-700 */
+}
+
+.edit-row {
     display: flex;
     align-items: center;
     margin-bottom: 0.5rem;
-  }
-  
-  .edit-label {
+}
+
+.edit-label {
     width: 100px;
     text-align: right;
     margin-right: 10px;
     font-weight: bold;
-  }
-  
-  .edit-input,
-  .edit-textarea {
+}
+
+.edit-input,
+.edit-textarea {
     flex: 1;
     padding: 4px 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+.mx-auto.bg-white h3.text-xl.font-semibold {
+    color: black !important;
   }
-  
