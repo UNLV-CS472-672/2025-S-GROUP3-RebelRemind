@@ -71,7 +71,7 @@ export default function SettingsPage() {
             chrome.storage.onChanged.removeListener(handleStorageChange);
         };
     }, []);
-    
+
 
     /**
      * Toggle section visibility.
@@ -205,30 +205,33 @@ export default function SettingsPage() {
                 <button className="back-button" onClick={() => navigate("/")}>⬅️</button>
             </div>
 
-            {/* Page Title */}
-            <div className="title-container">
-                <h4>Settings</h4>
-            </div>
+            <div className="settings-page-wrapper">
 
-            {/* Settings Accordion UI */}
-            <div className="settings-container">
-                {settingsItems.map(({ key, icon, label, content }) => (
-                    <div key={key} className="settings-group">
-                        <div
-                            className={`settings-item ${openSection === key ? 'open' : ''}`}
-                            onClick={() => toggleSection(key)}
-                        >
-                            <span className="icon">{icon}</span>
-                            <span className="label">{label}</span>
-                            <span className="arrow">{openSection === key ? '˅' : '›'}</span>
-                        </div>
-                        {openSection === key && (
-                            <div className="settings-content">
-                                {content}
+                {/* Page Title */}
+                <div className="title-container">
+                    <h4>Settings</h4>
+                </div>
+
+                {/* Settings Accordion UI */}
+                <div className="settings-container">
+                    {settingsItems.map(({ key, icon, label, content }) => (
+                        <div key={key} className="settings-group">
+                            <div
+                                className={`settings-item ${openSection === key ? 'open' : ''}`}
+                                onClick={() => toggleSection(key)}
+                            >
+                                <span className="icon">{icon}</span>
+                                <span className="label">{label}</span>
+                                <span className={`arrow ${openSection === key ? 'rotated' : ''}`}>›</span>
                             </div>
-                        )}
-                    </div>
-                ))}
+                            {openSection === key && (
+                                <div className="settings-content">
+                                    {content}
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
             </div>
         </>
     );

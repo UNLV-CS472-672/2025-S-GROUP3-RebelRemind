@@ -1,0 +1,75 @@
+This a list of all the endpoint requests to put/get data from the database.
+
+All GET responses are in JSON format.
+The GET responses are the main endpoints that the REBEL REMIND front end will use.
+
+# API resources for PUT commands (THESE ARE HANDLED BY THE WEB SCRAPERS EXCEPT FOR "/user_add")
+ex: requests.put("http://franklopez.tech:5050/user_add", json={"first_name": "John", "last_name": "Doe", "nshe": "2000111222"})
+
+api.add_resource(User_Add, "/user_add")
+api.add_resource(AcademicCalendar_Add, "/academiccalendar_add")
+api.add_resource(InvolvementCenter_Add, "/involvementcenter_add")
+api.add_resource(RebelCoverage_Add, "/rebelcoverage_add")
+api.add_resource(UNLVCalendar_Add, "/unlvcalendar_add")
+api.add_resource(Organization_Add, "/organization_add")
+
+
+# API resources for list commands
+ex: requests.get("http://franklopez.tech:5050/academiccalendar_list")
+
+api.add_resource(User_List, "/user_list")
+api.add_resource(AcademicCalendar_List, "/academiccalendar_list")
+api.add_resource(InvolvementCenter_List, "/involvementcenter_list")
+api.add_resource(RebelCoverage_List, "/rebelcoverage_list")
+api.add_resource(UNLVCalendar_List, "/unlvcalendar_list")
+api.add_resource(Organization_List, "/organization_list")
+
+
+# API resources for DAILY GET commands
+ex: requests.get("http://franklopez.tech:5050/academiccalendar_daily/2025-04-23")
+
+api.add_resource(AcademicCalendar_Daily, "/academiccalendar_daily/<string:date>")
+api.add_resource(InvolvementCenter_Daily, "/involvementcenter_daily/<string:date>")
+api.add_resource(RebelCoverage_Daily, "/rebelcoverage_daily/<string:date>")
+api.add_resource(UNLVCalendar_Daily, "/unlvcalendar_daily/<string:date>")
+
+
+# API resources for WEEKLY GET commands
+ex: requests.get("http://franklopez.tech:5050/academiccalendar_daily/2025-04-23")
+
+api.add_resource(AcademicCalendar_Weekly, "/academiccalendar_weekly/<string:date>")
+api.add_resource(InvolvementCenter_Weekly, "/involvementcenter_weekly/<string:date>")
+api.add_resource(RebelCoverage_Weekly, "/rebelcoverage_weekly/<string:date>")
+api.add_resource(UNLVCalendar_Weekly, "/unlvcalendar_weekly/<string:date>")
+
+
+# API resources for MONTHLY GET commands
+ex: requests.get("http://franklopez.tech:5050/academiccalendar_monthly/2025-04")
+
+api.add_resource(AcademicCalendar_Monthly, "/academiccalendar_monthly/<string:month>")
+api.add_resource(InvolvementCenter_Monthly, "/involvementcenter_monthly/<string:month>")
+api.add_resource(RebelCoverage_Monthly, "/rebelcoverage_monthly/<string:month>")
+api.add_resource(UNLVCalendar_Monthly, "/unlvcalendar_monthly/<string:month>")
+
+
+THESE REQUESTS CAN PROBABLY BE DELETED AND DO NOT REALLY NEED TO BE USED WITH REBEL REMIND
+# API resources for GET commands
+api.add_resource(User_Info, "/user_id/<string:nshe>")
+api.add_resource(AcademicCalendar_Info, "/academiccalendar_id/<int:event_id>")
+api.add_resource(InvolvementCenter_Info, "/involvementcenter_id/<int:event_id>")
+api.add_resource(RebelCoverage_Info, "/rebelcoverage_id/<int:event_id>")
+api.add_resource(UNLVCalendar_Info, "/unlvcalendar_id/<int:event_id>")
+
+THESE REQUESTS MAY ONLY WORK LOCALLY WHICH IS FINE BECAUSE THESE SHOULD NOT BE CALLED BY REBEL REMIND
+# API resource for DELETE commands
+api.add_resource(User_Delete, "/user_delete/<string:nshe>")
+api.add_resource(User_Delete_All, "/user_delete_all")
+api.add_resource(AcademicCalendar_Delete_All, "/academiccalendar_delete_all")
+api.add_resource(AcademicCalendar_Delete_Past, "/academiccalendar_delete_past")
+api.add_resource(InvolvementCenter_Delete_All, "/involvementcenter_delete_all")
+api.add_resource(InvolvementCenter_Delete_Past, "/involvementcenter_delete_past")
+api.add_resource(RebelCoverage_Delete_All, "/rebelcoverage_delete_all")
+api.add_resource(RebelCoverage_Delete_Past, "/rebelcoverage_delete_past")
+api.add_resource(UNLVCalendar_Delete_All, "/unlvcalendar_delete_all")
+api.add_resource(UNLVCalendar_Delete_Past, "/unlvcalendar_delete_past")
+api.add_resource(Organization_Delete_All, "/organization_delete_all")

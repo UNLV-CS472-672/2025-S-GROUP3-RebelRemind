@@ -274,16 +274,19 @@ const Preferences = () => {
                             />
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                                 {filteredClubs.map((club) => (
-                                    <button key={club} onClick={() => handleAddClub(club)} style={{ padding: '0.3rem 0.6rem', borderRadius: '9999px', background: '#555' }}>
+                                    <button key={club} onClick={() => handleAddClub(club)} style={{ padding: '0.3rem 0.6rem', 
+                                                                                            borderRadius: '9999px', background: '#555' }}>
                                         {club}
                                     </button>
                                 ))}
                             </div>
                             <div style={{ marginTop: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                                 {involvedClubs.map((club) => (
-                                    <div key={club} style={{ color: 'white', display: 'flex', alignItems: 'center', background: '#8b0000', borderRadius: '9999px', padding: '0.3rem', fontSize: '0.9rem' }}>
+                                    <div key={club} style={{ color: 'white', display: 'flex', alignItems: 'center', 
+                                                             background: '#8b0000', borderRadius: '9999px', padding: '0.3rem', fontSize: '0.9rem' }}>
                                         <span style={{ padding: '0.3rem' }}>{club}</span>
-                                        <button onClick={() => handleRemoveClub(club)} style={{ background: 'none', border: 'none', fontWeight: 'bold', cursor: 'pointer' }} aria-label={`Remove ${club}`}>
+                                        <button onClick={() => handleRemoveClub(club)} style={{ background: 'none', border: 'none', 
+                                                    fontWeight: 'bold', cursor: 'pointer' }} aria-label={`Remove ${club}`}>
                                             ×
                                         </button>
                                     </div>

@@ -3,20 +3,34 @@
 }
 
 .back-button-container {
-    position: fixed;
-    top: 20px;
-    left: 20px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
     z-index: 10;
-    background-color: none;
-  }
+}
 
 .back-button {
-    background-color: none;
+    background: none;
+    transition: transform 0.2s ease-in-out;
+}
+
+.back-button:hover {
+    background: none;
+    transform: scale(1.15);
+    /* slightly larger */
+}
+
+.settings-page-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
 }
 
 .title-container {
-    display: flex;
-    justify-content: center;
+    margin-bottom: 1rem;
+    text-align: center;
 }
 
 .settings-container {
@@ -24,7 +38,10 @@
     flex-direction: column;
     padding: 16px;
     font-family: system-ui, sans-serif;
+    max-width: 600px;
+    width: 100%;
 }
+
 
 .icon {
     width: 24px;
@@ -40,7 +57,15 @@
 .arrow {
     font-size: 18px;
     color: #ccc;
+    display: inline-block;
+    transition: transform 0.2s ease;
 }
+
+.arrow.rotated {
+    transform: rotate(90deg);
+    /* rotate right arrow to point down */
+}
+
 
 .settings-item {
     display: flex;
