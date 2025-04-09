@@ -26,8 +26,6 @@ def DupCheck(table, date, name, time = ''):
 	# Involvement Center
 	if table == InvolvementCenter:
 		# Format date from string into date object
-		fmt='%A, %B %d, %Y'
-		#date_object = datetime.strptime(date, fmt)
 		date_object = datetime.fromisoformat(date)
 		# Check if event exists already
 		result = db.session.query(table).filter(and_(table.date == func.date(date_object), table.name == name, table.time == time)).all()
@@ -64,55 +62,83 @@ class User(db.Model):
 	nshe = db.Column(db.String(15), nullable=False, unique=True)
 
 	def __repr__(self):
-		return f"User(id = {self.id}, first_name = {self.first_name}, last_name = {self.last_name}, nshe = {self.nshe})"
+		return ("User("
+					f"id = {self.id}," +
+					f"first_name = {self.first_name}," +
+					f"last_name = {self.last_name}," +
+					f"nshe = {self.nshe})")
 
 # Create Academic Calendar table for database
 class AcademicCalendar(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(500), nullable=False)
-	#date = db.Column(db.String(100), db.ForeignKey('daily.date'), nullable=False)
 	date = db.Column(db.Date, nullable=False)
 	time = db.Column(db.String(100))
 	location = db.Column(db.String(100))
+	organization = db.Column(db.String(100))
 
 	def __repr__(self):
-		return f"AcademicCalendar(id = {self.id}, name = {self.name}, date = {self.date}, time = {self.time}, location = {self.location})"
+		return ("AcademicCalendar(" +
+					f"id = {self.id},"
+					f"name = {self.name}," +
+					f"date = {self.date}," +
+					f"time = {self.time}," +
+					f"location = {self.location}," +
+					f"organization = {self.organization})")
 
 # Create Involvement Center table for database
 class InvolvementCenter(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(500), nullable=False)
-	#date = db.Column(db.String(100), db.ForeignKey('daily.date'), nullable=False)
 	date = db.Column(db.Date, nullable=False)
 	time = db.Column(db.String(100))
 	location = db.Column(db.String(100))
+	organization = db.Column(db.String(100))
 
 	def __repr__(self):
-		return f"InvolvementCenter(id = {self.id}, name = {self.name}, date = {self.date}, time = {self.time}, location = {self.location})"
+		return ("InvolvementCenter(" +
+					f"id = {self.id},"
+					f"name = {self.name}," +
+					f"date = {self.date}," +
+					f"time = {self.time}," +
+					f"location = {self.location}," +
+					f"organization = {self.organization})")
 
 # Create Rebel Coverage table for database
 class RebelCoverage(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(500), nullable=False)
-	#date = db.Column(db.String(100), db.ForeignKey('daily.date'), nullable=False)
 	date = db.Column(db.Date, nullable=False)
 	time = db.Column(db.String(100))
 	location = db.Column(db.String(100))
+	organization = db.Column(db.String(100))
 
 	def __repr__(self):
-		return f"RebelCoverage(id = {self.id}, name = {self.name}, date = {self.date}, time = {self.time}, location = {self.location})"
+		return ("RebelCoverage(" +
+					f"id = {self.id},"
+					f"name = {self.name}," +
+					f"date = {self.date}," +
+					f"time = {self.time}," +
+					f"location = {self.location}," +
+					f"organization = {self.organization})")
 
 # Create UNLV Calendar table for database
 class UNLVCalendar(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(500), nullable=False)
-	#date = db.Column(db.String(100), db.ForeignKey('daily.date'), nullable=False)
 	date = db.Column(db.Date, nullable=False)
 	time = db.Column(db.String(100))
 	location = db.Column(db.String(100))
+	organization = db.Column(db.String(100))
 
 	def __repr__(self):
-		return f"UNLVCalendar(id = {self.id}, name = {self.name}, date = {self.date}, time = {self.time}, location = {self.location})"
+		return ("UNLVCalendar(" +
+					f"id = {self.id},"
+					f"name = {self.name}," +
+					f"date = {self.date}," +
+					f"time = {self.time}," +
+					f"location = {self.location}," +
+					f"organization = {self.organization})")
 
 # Parser for User table
 user_put_args = reqparse.RequestParser()
@@ -126,6 +152,7 @@ event_put_args.add_argument("name", type=str, help="Event name is required", req
 event_put_args.add_argument("date", type=str, help="Event date is required", required=True)
 event_put_args.add_argument("time", type=str, help="Event time can be null", required=False)
 event_put_args.add_argument("location", type=str, help="Event location can be null", required=False)
+event_put_args.add_argument("organization", type=str, help="Event organization can be null", required=False)
 
 # Resource fields for User model
 user_fields = {
@@ -141,7 +168,8 @@ event_fields = {
 	'name': fields.String,
 	'date': fields.String,
 	'time': fields.String,
-	'location': fields.String
+	'location': fields.String,
+	'organization': fields.String
 }
 
 # Commands for User model
@@ -151,7 +179,7 @@ class User_Info(Resource):
 	def get(self, nshe):
 		result = User.query.filter_by(nshe=nshe).first()
 		if not result:
-			abort(HTTPStatus.NOT_FOUND, message=f"Could not find date '{nshe}'")
+			abort(HTTPStatus.NOT_FOUND, message=f"Could not find nshe '{nshe}'")
 		return result
 
 class User_Add(Resource):
@@ -212,7 +240,8 @@ class AcademicCalendar_Add(Resource):
 			name=args['name'],
 			date=date_object,
 			time=args.get('time'),
-			location=args.get('location')
+			location=args.get('location'),
+			organization=args.get('organization')
 		)
 		db.session.add(event)
 		db.session.commit()
@@ -262,7 +291,8 @@ class InvolvementCenter_Add(Resource):
 			name=args['name'],
 			date=date_object,
 			time=args['time'],
-			location=args.get('location')
+			location=args.get('location'),
+			organization=args.get('organization')
 		)
 		db.session.add(event)
 		db.session.commit()
@@ -312,7 +342,8 @@ class RebelCoverage_Add(Resource):
 			name=args['name'],
 			date=date_object,
 			time=args.get('time'),
-			location=args.get('location')
+			location=args.get('location'),
+			organization=args.get('organization')
 		)
 		db.session.add(event)
 		db.session.commit()
@@ -362,7 +393,8 @@ class UNLVCalendar_Add(Resource):
 			name=args['name'],
 			date=date_object,
 			time=args.get('time'),
-			location=args.get('location')
+			location=args.get('location'),
+			organization=args.get('organization')
 		)
 		db.session.add(event)
 		db.session.commit()

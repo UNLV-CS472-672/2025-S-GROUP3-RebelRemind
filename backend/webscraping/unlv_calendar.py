@@ -1,8 +1,7 @@
 import requests
 import json
 from bs4 import BeautifulSoup
-#from database import BASE
-BASE = "http://127.0.0.1:5050/"
+from database import BASE
 
 # URL of the UNLV event calendar
 url = "https://www.unlv.edu/calendar"
