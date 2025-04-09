@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import { HashRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
@@ -7,33 +7,37 @@ import PomodoroPage from "./pages/Pomodoro";
 import useApplyBackgroundColor from "./hooks/useApplyBackgroundColor";
 import UserEventsPage from "./pages/UserEventsPage";
 
-function AppContent() {
-  const navigate = useNavigate();
+
+function App() {
+  useApplyBackgroundColor();
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
     chrome.storage.local.get(["isRunning"], (result) => {
       if (result.isRunning) {
-        navigate("/pomodoro");
+        setShouldRedirect(true);
       }
+      setChecked(true);
     });
   }, []);
 
-  return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/settings" element={<SettingPage />} />
-      <Route path="/pomodoro" element={<PomodoroPage />} />
-      <Route path="/user-events" element={<UserEventsPage />} />
-    </Routes>
-  );
-}
-
-function App() {
-  useApplyBackgroundColor();
+  if (!checked) {
+    // Wait until chrome.storage check finishes
+    return null;
+  }
 
   return (
     <Router>
-      <AppContent />
+      <Routes>
+        <Route
+          path="/"
+          element={shouldRedirect ? <Navigate to="/pomodoro" /> : <HomePage />}
+        />
+        <Route path="/settings" element={<SettingPage />} />
+        <Route path="/pomodoro" element={<PomodoroPage />} />
+        <Route path="/user-events" element={<UserEventsPage />} />
+      </Routes>
     </Router>
   );
 }
