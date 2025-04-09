@@ -1,20 +1,29 @@
-/* This file contains styles specific to App.jsx. */
+/* HomePage.css */
+
+:root {
+  /* Default background and text (override these from JS) */
+  --app-background: #8b0000;
+  --app-text-color: #ffffff;
+}
+
 #root {
   max-width: 1000px;
   min-width: 450px;
-  background-color: var(--app-background, "#8b0000");
+  background-color: var(--app-background);
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  color: var(--app-text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .rebel-remind-logo {
-  width: 100%;            
-  max-width: 500px;       
-  display: block;         
-  margin-bottom: 10px;         
-  padding: 0;             
-  object-fit: contain;    
+  width: 100%;
+  max-width: 500px;
+  display: block;
+  margin-bottom: 10px;
+  padding: 0;
+  object-fit: contain;
 }
 
 
@@ -144,4 +153,20 @@
 
 .change-view-dropdown button:hover {
   background-color: #f0f0f0;
+}
+
+button {
+  outline: none;
+  border: none;
+  background-color: #8b0000;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #b01030;
 }

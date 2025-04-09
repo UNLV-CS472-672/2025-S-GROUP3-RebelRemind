@@ -13,7 +13,7 @@ jest.mock("react-router-dom", () => ({
 // mock useAuth
 jest.mock("../../public/hooks/useAuth", () => ({
   __esModule: true,
-  default: jest.fn()
+  default: jest.fn(),
 }));
 
 // mock chrome APIs
@@ -21,11 +21,23 @@ beforeAll(() => {
   global.chrome = {
     storage: {
       sync: {
-        get: jest.fn((key, cb) => cb({ backgroundColor: "#8b0000" })),
-        set: jest.fn()
-      }
+        get: jest.fn((keys, cb) =>
+          cb({
+            backgroundColor: "#8b0000",
+            textColor: "#ffffff",
+            selectedThemeKey: "",
+          })
+        ),
+        set: jest.fn(),
+      },
     },
-    runtime: { sendMessage: jest.fn() }
+    runtime: {
+      sendMessage: jest.fn(),
+      onMessage: {
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+      },
+    },
   };
 });
 
@@ -33,33 +45,92 @@ describe("SettingPage", () => {
   beforeEach(() => {
     useAuthHook.default.mockReturnValue(false);
     mockNavigate.mockClear();
+    global.chrome.storage.sync.set.mockClear();
+    global.chrome.runtime.sendMessage.mockClear();
   });
 
-  const renderWithRouter = (ui) => render(<MemoryRouter>{ui}</MemoryRouter>);
+  const renderWithRouter = (ui) =>
+    render(<MemoryRouter>{ui}</MemoryRouter>);
 
   it("renders the color picker and reset button", () => {
     renderWithRouter(<SettingPage />);
-    expect(screen.getByLabelText(/choose your background color/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /back to original/i })).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/choose your background color/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /back to original/i })
+    ).toBeInTheDocument();
   });
 
   it("updates color when color input changes", async () => {
     renderWithRouter(<SettingPage />);
-    fireEvent.change(screen.getByLabelText(/choose your background color/i), { target: { value: "#123456" } });
+    fireEvent.change(screen.getByLabelText(/choose your background color/i), {
+      target: { value: "#123456" },
+    });
 
     await waitFor(() => {
-      expect(global.chrome.storage.sync.set).toHaveBeenCalledWith({ backgroundColor: "#123456" });
-      expect(global.chrome.runtime.sendMessage).toHaveBeenCalledWith({ type: "COLOR_UPDATED", color: "#123456" });
+      expect(global.chrome.storage.sync.set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          backgroundColor: "#123456",
+          selectedThemeKey: "custom",
+          textColor: "#ffffff",
+        })
+      );
+      expect(global.chrome.runtime.sendMessage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "COLOR_UPDATED",
+          color: "#123456",
+          textColor: "#ffffff",
+        })
+      );
     });
   });
 
   it("resets color to default when reset button is clicked", async () => {
     renderWithRouter(<SettingPage />);
-    fireEvent.click(screen.getByRole("button", { name: /back to original/i }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /back to original/i })
+    );
 
     await waitFor(() => {
-      expect(global.chrome.storage.sync.set).toHaveBeenCalledWith({ backgroundColor: "#dc143c" });
-      expect(global.chrome.runtime.sendMessage).toHaveBeenCalledWith({ type: "COLOR_UPDATED", color: "#dc143c"});
+      expect(global.chrome.storage.sync.set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          backgroundColor: "#dc143c",
+          selectedThemeKey: "custom",
+          textColor: "#ffffff",
+        })
+      );
+      expect(global.chrome.runtime.sendMessage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "COLOR_UPDATED",
+          color: "#dc143c",
+          textColor: "#ffffff",
+        })
+      );
+    });
+  });
+
+  it("updates theme when theme is selected", async () => {
+    renderWithRouter(<SettingPage />);
+    fireEvent.change(screen.getByRole("combobox"), {
+      target: { value: "blackRed" },
+    });
+
+    await waitFor(() => {
+      expect(global.chrome.storage.sync.set).toHaveBeenCalledWith(
+        expect.objectContaining({
+          backgroundColor: "#000000",
+          textColor: "#ff1c1c",
+          selectedThemeKey: "blackRed",
+        })
+      );
+      expect(global.chrome.runtime.sendMessage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "COLOR_UPDATED",
+          color: "#000000",
+          textColor: "#ff1c1c",
+        })
+      );
     });
   });
 

@@ -8,7 +8,14 @@ import useApplyBackgroundColor from "../hooks/useApplyBackgroundColor";
 function SettingPage() {
   const isAuthenticated = useAuth();
   const navigate = useNavigate();
-  const { selectedColor, handleColorChange, handleResetColor } = useApplyBackgroundColor();
+
+  const {
+    selectedColor,
+    handleColorChange,
+    handleResetColor,
+    handleThemeSelection,
+    themeKey,
+  } = useApplyBackgroundColor();
 
   return (
     <>
@@ -31,6 +38,19 @@ function SettingPage() {
           <button onClick={handleResetColor} className="reset-button">
             🔄 Back to Original
           </button>
+        </div>
+
+        <div className="theme-selector" style={{ marginTop: "1rem" }}>
+          <label className="settings-label">Pick a preset theme:</label>
+          <select
+            onChange={(e) => handleThemeSelection(e.target.value)}
+            value={themeKey}
+            className="reset-button"
+          >
+            <option value="custom">Custom</option>
+            <option value="scarletGray">Scarlet &amp; Gray</option>
+            <option value="blackRed">Black &amp; Red</option>
+          </select>
         </div>
       </div>
 
