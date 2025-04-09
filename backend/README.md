@@ -41,5 +41,5 @@
 
 - Run pytest to test files
 ```sh
-   python3 -m pytest --cov=webscraping --cov=database --cov=tests --cov=app
+   python3 -m pytest --cov=webscraping --cov=database --cov=app
 ```

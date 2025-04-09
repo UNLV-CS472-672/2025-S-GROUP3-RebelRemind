@@ -31,7 +31,6 @@ function HomePage() {
       </div>
 
       <AccordionMenu />
-      <GetAssignmentsButton />
       <br />
       <button onClick={() => navigate("/user-events")}>
         Personalize Events
@@ -46,3 +45,4 @@ function HomePage() {
 }
 
 export default HomePage;
+
