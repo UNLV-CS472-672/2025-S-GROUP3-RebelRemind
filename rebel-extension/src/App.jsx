@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./App.css";
 import { HashRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
-import SettingPage from "./pages/SettingPage";
+import SettingsPage from "./pages/SettingsPage";
 import PomodoroPage from "./pages/Pomodoro";
 import useApplyBackgroundColor from "./hooks/useApplyBackgroundColor";
 import UserEventsPage from "./pages/UserEventsPage";
@@ -34,7 +34,7 @@ function App() {
           path="/"
           element={shouldRedirect ? <Navigate to="/pomodoro" /> : <HomePage />}
         />
-        <Route path="/settings" element={<SettingPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
         <Route path="/pomodoro" element={<PomodoroPage />} />
         <Route path="/user-events" element={<UserEventsPage />} />
       </Routes>
