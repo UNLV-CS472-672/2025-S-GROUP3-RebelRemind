@@ -1,5 +1,8 @@
 import useApplyBackgroundColor from "../hooks/useApplyBackgroundColor";
 import './css/ColorPicker.css'
+import ThemeCard from "./ThemeCard"; 
+import { THEMES } from "../hooks/useApplyBackgroundColor"; 
+
 
 // MOVED GEE'S COLOR PICKER TO THIS COMPONENT. PLEASE UPDATE ACCORDINGLY
 
@@ -32,18 +35,21 @@ function ColorPicker() {
           </button>
         </div>
 
-        <div className="theme-selector" style={{ marginTop: "1rem" }}>
-          <label className="settings-label">Pick a preset theme:</label>
-          <select
-            onChange={(e) => handleThemeSelection(e.target.value)}
-            value={themeKey}
-            className="reset-button"
-          >
-            <option value="custom">Custom</option>
-            <option value="scarletGray">Scarlet &amp; Gray</option>
-            <option value="blackRed">Black &amp; Red</option>
-          </select>
+        <div className="theme-card-container">
+          {Object.entries(THEMES).map(([key, { background, text }]) => (
+            <ThemeCard
+              key={key}
+              themeKey={key}
+              background={background}
+              text={text}
+              isActive={themeKey === key}
+              onClick={() => handleThemeSelection(key)}
+            />
+          ))}
         </div>
+
+
+       
       </div>
   );
 }

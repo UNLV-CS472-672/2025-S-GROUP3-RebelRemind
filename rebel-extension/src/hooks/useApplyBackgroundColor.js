@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 const DEFAULT_COLOR = "#dc143c";
 const DEFAULT_TEXT = "#ffffff";
 
-const THEMES = {
+export const THEMES = {
   scarletGray: {
     background: "#BB0000",
     text: "#d3d3d3",
@@ -13,6 +13,7 @@ const THEMES = {
     text: "#ff1c1c",
   },
 };
+
 
 const useApplyBackgroundColor = () => {
   const [selectedColor, setSelectedColor] = useState(DEFAULT_COLOR);
