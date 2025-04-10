@@ -93,7 +93,6 @@
 }
 
 .settings-button-container {
-  position: fixed;
   bottom: 1px;
   right: 10px;
   z-index: 1000;
@@ -107,8 +106,7 @@
 }
 
 .change-view-container {
-  position: fixed;
-  bottom: 10px;
+  /*bottom: 10px;*/
   left: 20px;
   z-index: 1000;
 }
