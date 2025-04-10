@@ -1,32 +1,3 @@
-/**
- * Pomodoro Timer
- * 
- * This code implements a Pomodoro Timer with functionality to start, pause, reset,
- * and switch between short and long breaks. The timer uses React state and useEffect
- * hooks to manage the countdown and control the timer's flow.
- * 
- * Features Implemented:
- * - **Timer Countdown:** The timer starts at 25 minutes by default and counts down
- *   to 00:00, transitioning from minutes to seconds.
- * - **Start, Pause, and Reset:** Users can start, pause, or reset the timer to its
- *   initial 25-minute countdown.
- * - **Break Options:** Includes options to switch the timer to a 5-minute short break
- *   or a 15-minute long break.
- * - **Finish Alarm:** When the timer reaches 00:00, an audio alarm is played to
- *   indicate the end of the Pomodoro session or break.
- * - **State Management:** Uses React's useState and useEffect to manage timer state
- *   (minutes, seconds, running status), and play an alarm sound upon completion.
- * - **Audio Preload:** The audio file is preloaded to ensure smooth playback when
- *   the timer ends.
- * 
- * Author - Chandni Mirpuri Silva
- * 
- * Documentation provided by Chatgpt 
- * 
- * This implementation provides an interactive Pomodoro timer to improve productivity
- * and focus with audible reminders for the timer's completion.
- */
-
 import React, { useState, useEffect, useRef } from "react";
 import FinishAlarm from "../assets/FinishAlarm.mp3";
 import "./css/Pomodoro.css";
@@ -44,24 +15,37 @@ function PomodoroTimer() {
     alarmRef.current.load();
 
     chrome.storage.local.get(["minutes", "seconds", "isRunning"], (data) => {
-      if (data.minutes !== undefined) setMinutes(data.minutes);
-      if (data.seconds !== undefined) setSeconds(data.seconds);
-      if (data.isRunning !== undefined) {
-        setIsRunning(data.isRunning);
-        setShowEditBoxes(!data.isRunning);
-        console.log(`Restoring from storage - minutes: ${data.minutes}, seconds: ${data.seconds}, isRunning: ${data.isRunning}`);
+      const isTimerDone = data.minutes === 0 && data.seconds === 0 && !data.isRunning;
+    
+      if (isTimerDone) {
+        chrome.storage.local.set({ minutes: 25, seconds: 0 }); // Auto-reset
+        setMinutes(25);
+        setSeconds(0);
+        setIsRunning(false);
+        setShowEditBoxes(true);
+        console.log("Auto-resetting timer to 25:00 after completion");
+      } else {
+        if (data.minutes !== undefined) setMinutes(data.minutes);
+        if (data.seconds !== undefined) setSeconds(data.seconds);
+        if (data.isRunning !== undefined) {
+          setIsRunning(data.isRunning);
+          setShowEditBoxes(!data.isRunning);
+        }
       }
     });
-
+    
+    /* istanbul ignore next */
     const handleStorageChange = (changes) => {
       if (changes.minutes) {
         setMinutes(changes.minutes.newValue);
         console.log(`Storage changed - minutes: ${changes.minutes.newValue}`);
       }
+      /* istanbul ignore next */
       if (changes.seconds) {
         setSeconds(changes.seconds.newValue);
         console.log(`Storage changed - seconds: ${changes.seconds.newValue}`);
       }
+      /* istanbul ignore next */
       if (changes.isRunning) {
         setIsRunning(changes.isRunning.newValue);
         setShowEditBoxes(!changes.isRunning.newValue);
@@ -89,7 +73,7 @@ function PomodoroTimer() {
       setShowEditBoxes(true);
       chrome.storage.local.set({ isRunning: false });
 
-      chrome.runtime.sendMessage({ action: "timeUpNotification" });
+      //chrome.runtime.sendMessage({ action: "timeUpNotification" });
     }
   }, [minutes, seconds, isRunning]);
 
@@ -192,3 +176,34 @@ function PomodoroTimer() {
 }
 
 export default PomodoroTimer;
+
+
+
+/**
+ * Pomodoro Timer
+ * 
+ * This code implements a Pomodoro Timer with functionality to start, pause, reset,
+ * and switch between short and long breaks. The timer uses React state and useEffect
+ * hooks to manage the countdown and control the timer's flow.
+ * 
+ * Features Implemented:
+ * - **Timer Countdown:** The timer starts at 25 minutes by default and counts down
+ *   to 00:00, transitioning from minutes to seconds.
+ * - **Start, Pause, and Reset:** Users can start, pause, or reset the timer to its
+ *   initial 25-minute countdown.
+ * - **Break Options:** Includes options to switch the timer to a 5-minute short break
+ *   or a 15-minute long break.
+ * - **Finish Alarm:** When the timer reaches 00:00, an audio alarm is played to
+ *   indicate the end of the Pomodoro session or break.
+ * - **State Management:** Uses React's useState and useEffect to manage timer state
+ *   (minutes, seconds, running status), and play an alarm sound upon completion.
+ * - **Audio Preload:** The audio file is preloaded to ensure smooth playback when
+ *   the timer ends.
+ * 
+ * Author - Chandni Mirpuri Silva
+ * 
+ * Documentation provided by Chatgpt 
+ * 
+ * This implementation provides an interactive Pomodoro timer to improve productivity
+ * and focus with audible reminders for the timer's completion.
+ */

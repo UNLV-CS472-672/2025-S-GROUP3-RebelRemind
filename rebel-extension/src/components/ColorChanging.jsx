@@ -1,14 +1,9 @@
-import "./css/SettingPage.css";
-import LoginButton from "../components/LoginButton";
-import UserProfile from "../components/UserProfile";
-import useAuth from "../../public/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
 import useApplyBackgroundColor from "../hooks/useApplyBackgroundColor";
+import './css/ColorPicker.css'
 
-function SettingPage() {
-  const isAuthenticated = useAuth();
-  const navigate = useNavigate();
+// MOVED GEE'S COLOR PICKER TO THIS COMPONENT. PLEASE UPDATE ACCORDINGLY
 
+function ColorPicker() {
   const {
     selectedColor,
     handleColorChange,
@@ -18,9 +13,6 @@ function SettingPage() {
   } = useApplyBackgroundColor();
 
   return (
-    <>
-      <button onClick={() => navigate("/")}>⬅️ Back</button>
-
       <div className="settings-section">
         <h2 className="settings-title">🎨 Customize Your Background</h2>
         <label htmlFor="colorPicker" className="settings-label">
@@ -53,10 +45,7 @@ function SettingPage() {
           </select>
         </div>
       </div>
-
-      {isAuthenticated ? <UserProfile /> : <LoginButton />}
-    </>
   );
 }
 
-export default SettingPage;
+export default ColorPicker;

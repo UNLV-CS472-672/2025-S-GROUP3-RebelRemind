@@ -1,8 +1,8 @@
 import requests
 import json
 from bs4 import BeautifulSoup
-#from database import BASE
-BASE = "http://127.0.0.1:5050/"
+from database import BASE
+
 url = "https://catalog.unlv.edu/content.php?catoid=47&navoid=14311"
 
 def default():
@@ -42,8 +42,6 @@ def default():
         filename="scraped_AcademicCalendar.json"
         with open(filename, "w", encoding="utf-8") as f:
             json.dump(calendar_data, f, indent=4) # indent for readability
-
-        print(f"Calendar data written to {filename}")
 
         # PUT calendar events into the database
         calendar_id = 0

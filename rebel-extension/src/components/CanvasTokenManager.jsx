@@ -56,9 +56,7 @@ const CanvasTokenManager = () => {
     };
 
     return (
-        <div className="p-6 max-w-md mx-auto bg-white rounded-lg shadow-md text-center">
-            <h3 className="text-xl font-semibold mb-4">Canvas Integration</h3>
-
+        <div className="p-6 max-w-md rounded-lg shadow-md text-center"> {/* Removed mx-auto so that the background color wouldn't show through */}
             {/* Input Field for Canvas Token */}
             <div className="relative">
                 <input
@@ -72,7 +70,7 @@ const CanvasTokenManager = () => {
                 {/* Toggle Visibility Button */}
                 <button
                     onClick={() => setShowToken(!showToken)}
-                    className="absolute right-2 top-2 text-gray-600 hover:text-gray-800"
+                    className="absolute right-2 top-2"
                 >
                     {showToken ? "🙈 Hide" : "👁 Show"}
                 </button>
@@ -81,7 +79,7 @@ const CanvasTokenManager = () => {
             {/* Save Button */}
             <button
                 onClick={saveCanvasToken}
-                className="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+                className="mt-2 w-full rounded"
             >
                 Save Token
             </button>

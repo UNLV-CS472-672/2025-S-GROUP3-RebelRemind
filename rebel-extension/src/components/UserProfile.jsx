@@ -1,15 +1,10 @@
 import { useEffect, useState } from "react";
-import CanvasTokenManager from "./CanvasTokenManager";
-import Preferences from "./Preferences";
-
 /**
  * UserProfile Component
  *
- * Displays authenticated user's profile data and allows users to manage preferences.
- * - Retrieves user data and preferences from `chrome.storage.sync` on mount.
+ * Displays authenticated user's profile data and logout button.
+ * - Retrieves user data from `chrome.storage.sync` on mount.
  * - Provides logout functionality that clears authentication and storage.
- * - Integrates `Preferences` for managing user settings.
- * - Includes `CanvasTokenManager` for handling Canvas API tokens.
  *
  * Authored by: Sebastian Yepez
  * 
@@ -18,93 +13,54 @@ import Preferences from "./Preferences";
  * @component
  * @returns {JSX.Element} The User Profile UI.
  */
+
 const UserProfile = () => {
-    const [user, setUser] = useState(null); // Stores the authenticated user
-    const [preferences, setPreferences] = useState({
-        darkMode: false,
-        notifications: false,
-        canvasIntegration: false,
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    chrome.storage.sync.get(["user"], (data) => {
+      if (data.user) {
+        setUser(data.user);
+      }
+    });
+  }, []);
+
+  const handleLogout = () => {
+    chrome.identity.getAuthToken({ interactive: false }, function (token) {
+      if (token) {
+        fetch(`https://accounts.google.com/o/oauth2/revoke?token=${token}`)
+          .then(() => console.log("OAuth token revoked"))
+          .catch((err) => console.error("Failed to revoke token", err));
+
+        chrome.identity.removeCachedAuthToken({ token }, () => {
+          console.log("Cached auth token removed");
+        });
+      }
     });
 
-    /**
-     * Effect Hook: Loads user data and preferences when the component mounts.
-     * Retrieves stored authentication data and user preferences from `chrome.storage.sync`.
-     */
-    useEffect(() => {
-        chrome.storage.sync.get(["user", "preferences"], (data) => {
-            if (data.user) {
-                setUser(data.user);
-            }
-            if (data.preferences) {
-                setPreferences(data.preferences);
-            }
-        });
-    }, []);
+    chrome.storage.sync.clear(() => console.log("Sync storage cleared."));
+    chrome.storage.local.clear(() => console.log("Local storage cleared."));
 
-    /**
-     * Logs the user out by revoking the OAuth token (if applicable),
-     * clearing stored authentication data, and resetting preferences.
-     */
-    const handleLogout = () => {
-        // Attempt to revoke OAuth token (if authentication uses Google)
-        chrome.identity.getAuthToken({ interactive: false }, function (token) {
-            if (token) {
-                fetch(`https://accounts.google.com/o/oauth2/revoke?token=${token}`)
-                    .then(() => console.log("OAuth token revoked"))
-                    .catch((err) => console.error("Failed to revoke token", err));
+    setUser(null);
+    alert("You have been logged out.");
+  };
 
-                chrome.identity.removeCachedAuthToken({ token }, () => {
-                    console.log("Cached auth token removed");
-                });
-            }
-        });
+  return (
+    <div className="text-center">
+      <h2>Your Profile</h2>
+      {user ? (
+        <>
+          <img src={user.picture} alt="Profile Picture" width="60" style={{ borderRadius: '20%' }}/>
+          <h5 className="mt-2">{user.name}</h5>
+          <p>{user.email}</p>
 
-        // Clear all stored user data and preferences
-        chrome.storage.sync.clear(() => console.log("Sync storage cleared."));
-        chrome.storage.local.clear(() => console.log("Local storage cleared."));
-
-        // Reset UI state
-        setUser(null);
-        setPreferences({
-            darkMode: false,
-            notifications: false,
-            canvasIntegration: false,
-        });
-
-        alert("You have been logged out.");
-    };
-
-    return (
-        <div className="p-4 text-center">
-            <h2>Your Profile</h2>
-
-            {user ? (
-                <>
-                    {/* Preferences Component */}
-                    <Preferences
-                        user={user}
-                        preferences={preferences}
-                        setPreferences={setPreferences}
-                        handleLogout={handleLogout} // Pass handleLogout function
-                    />
-
-                    <br />
-
-                    {/* Canvas Token Manager Component */}
-                    <CanvasTokenManager />
-
-                    <br />
-
-                    {/* Logout Button */}
-                    <button onClick={handleLogout} className="mt-4 bg-red-500 text-white p-2 rounded">
-                        Logout
-                    </button>
-                </>
-            ) : (
-                <p>No user logged in.</p>
-            )}
-        </div>
-    );
+          <button onClick={handleLogout} className="mb-2 rounded"> Logout </button>
+        </>
+      ) : (
+        <p>No user logged in.</p>
+      )}
+    </div>
+  );
 };
 
 export default UserProfile;

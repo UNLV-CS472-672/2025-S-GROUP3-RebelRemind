@@ -15,96 +15,6 @@ import { authenticateUser } from "./scripts/identity-script.js";
 import { getAssignments, getCourses, getCanvasPAT } from "./scripts/canvas-script.js";
 import { openSidePanel } from "./scripts/sidepanel.js";
 
-// background.js
-/**
- * Listens for the Chrome extension installation event.
- * This event triggers once when the extension is installed or updated.
- * Used to initialize default settings or guide users on first install.
- */
-let timerInterval;
-let isRunning = false;
-let minutes = 25;
-let seconds = 0;
-
-// Initialize default timer state
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.local.set({ minutes: 25, seconds: 0, isRunning: false });
-});
-
-// Start the timer
-function startTimer() {
-  if (isRunning) return;
-
-  chrome.storage.local.get(["minutes", "seconds"], (data) => { // GET USER INPUT FOR MINUTES AND SECONDS
-    minutes = data.minutes ?? 25;
-    seconds = data.seconds ?? 0;
-  });
-  
-  isRunning = true;
-
-  timerInterval = setInterval(() => {
-    if (minutes === 0 && seconds === 0) {
-      clearInterval(timerInterval);
-      isRunning = false;
-      chrome.storage.local.set({ isRunning: false });
-
-    //   chrome.notifications.create("", {
-    //     type: "basic",
-    //     iconUrl: "images/icon.png", // Ensure this matches the actual path
-    //     title: "Pomodoro Timer",
-    //     message: "Time's up! Take a break!",
-    // });
-
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      if (message.action === "timeUpNotification") {
-        chrome.notifications.create("timerDone", {
-          type: "basic",
-          title: "Pomodoro Timer",
-          message: "Timer is up! Time to take a break!", // Text-only notification
-        });
-      }
-    });
-
-      return;
-    }
-
-    if (seconds === 0) {
-      minutes--;
-      seconds = 59;
-    } else {
-      seconds--;
-    }
-
-    chrome.storage.local.set({ minutes, seconds });
-  }, 1000);
-}
-
-// Pause the timer
-function pauseTimer() {
-  clearInterval(timerInterval);
-  isRunning = false;
-  chrome.storage.local.set({ isRunning: false });
-}
-
-// Reset the timer with a custom time
-function resetTimer(customMinutes = 25) {
-  clearInterval(timerInterval);
-  isRunning = false;
-  minutes = customMinutes;
-  seconds = 0;
-  chrome.storage.local.set({ minutes, seconds, isRunning: false });
-}
-
-// Listen for messages from the popup
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "start") startTimer();
-  if (request.action === "pause") pauseTimer();
-  if (request.action === "reset") resetTimer(request.minutes || 25); // FIX: Now resets to correct time
-  if (request.action === "getStatus") {
-    sendResponse({ minutes, seconds, isRunning });
-  }
-});
-
 /**
 * Listens for and handles any Chrome alarms.
 */
@@ -145,6 +55,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
  * @param {Function} sendResponse - The callback function to send a response back to the sender.
  */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (!message?.type) return; // ⛔ skip if it's a Pomodoro-style message
   switch (message.type) {
     
     /**
@@ -296,3 +207,184 @@ async function fetchCanvasAssignments() {
     return false;
   });
 }
+
+
+// The following code is all for the Pomodoro Timer Logic
+let timerInterval;
+let isRunning = false;
+let minutes = 25;
+let seconds = 0;
+
+// Initialize default timer state
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.storage.local.set({ minutes: 25, seconds: 0, isRunning: false });
+});
+
+// Start the timer function that handles all the features of when the user
+// starts teh timer, we also call some functions like inject or remove widget.
+function startTimer() {
+  if (isRunning) return;
+
+  chrome.storage.local.get(["minutes", "seconds"], (data) => {
+    let currentMinutes = data.minutes ?? 25;
+    let currentSeconds = data.seconds ?? 0;
+
+    isRunning = true;
+    chrome.storage.local.set({ isRunning: true });
+
+    // Inject the widget on the current tab and all the other open tabs
+    injectWidgetIntoAllTabs();
+
+    timerInterval = setInterval(() => {
+      if (currentMinutes === 0 && currentSeconds === 0) {
+        clearInterval(timerInterval);
+        isRunning = false;
+        chrome.storage.local.set({ isRunning: false });
+
+        chrome.notifications.create("timerDone", {
+          type: "basic",
+          iconUrl: chrome.runtime.getURL("images/pomodor-icon.png"),
+          title: "Pomodoro Timer",
+          message: "Timer is up! Time to take a break!",
+          priority: 2, // 🔺 force it to show
+          requireInteraction: true // ⏳ stays visible until dismissed
+        }, () => {
+          if (chrome.runtime.lastError) {
+            console.error("❌ Notification error:", chrome.runtime.lastError.message);
+          } else {
+            console.log("✅ Pomodoro notification shown: timerDone");
+          }
+        });
+        
+        removeWidgetFromAllTabs();
+        return;
+      }
+
+      if (currentSeconds === 0) {
+        currentMinutes--;
+        currentSeconds = 59;
+      } else {
+        currentSeconds--;
+      }
+
+      chrome.storage.local.set({
+        minutes: currentMinutes,
+        seconds: currentSeconds
+      });
+    }, 1000);
+  });
+}
+
+// Function that handles the functionality of when the timer is paused
+function pauseTimer() {
+  clearInterval(timerInterval);
+  isRunning = false;
+  chrome.storage.local.set({ isRunning: false });
+  // we want to remove the widget pop-up when the timer is on paused, so we assume
+  // the user doesn't want to see the timer until they start it back again
+  removeWidgetFromAllTabs();
+}
+
+// Reset the timer function, this handles the "Reset" button 
+function resetTimer(customMinutes = 25) {
+  clearInterval(timerInterval);
+  isRunning = false;
+  minutes = customMinutes;
+  seconds = 0;
+  chrome.storage.local.set({ minutes, seconds, isRunning: false });
+  removeWidgetFromAllTabs();
+}
+
+// Handle Pomodoro messages, this displays a chrome message as a chrome notification once the timer is 00:00
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (!request || typeof request !== "object" || request?.type) return;
+
+  const action = request.action;
+  if (action === "start") startTimer();
+  else if (action === "pause") pauseTimer();
+  else if (action === "reset") resetTimer(request.minutes || 25);
+  else if (action === "getStatus") {
+    sendResponse({ minutes, seconds, isRunning });
+  } else if (action === "timeUpNotification") {
+    chrome.notifications.create("timerDone", {
+      type: "basic",
+      iconUrl: "images/pomodor-icon.png",
+      title: "Pomodoro Timer",
+      message: "Timer is up! Time to take a break!"
+    });
+  } else {
+    console.warn("Received unknown message action:", action);
+  }
+});
+
+
+// function that injects the widget, makes it appear on the tab that was 
+function injectWidgetOnActiveTab() {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs.length === 0) return;
+    const tab = tabs[0];
+    if (!tab.id || !tab.url?.startsWith("http")) return;
+
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      files: ["scripts/floating-widget.js"]
+    }, () => {
+      if (chrome.runtime.lastError) {
+        console.warn("[Background] Failed to inject widget on active tab:", chrome.runtime.lastError.message);
+      } else {
+        console.log("[Background] Widget injected on active tab ✅");
+      }
+    });
+  });
+}
+
+
+function removeWidgetFromAllTabs() {
+  chrome.tabs.query({}, (tabs) => {
+    for (const tab of tabs) {
+      if (
+        !tab.id ||
+        !tab.url ||
+        tab.url.startsWith("chrome://") ||
+        tab.url.startsWith("chrome-extension://")
+      ) continue;
+
+      chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ["scripts/remove-widget.js"]
+      }, () => {
+        if (chrome.runtime.lastError) {
+          console.warn(`[Background] Failed to remove widget from tab ${tab.id}:`, chrome.runtime.lastError.message);
+        } else {
+          console.log(`[Background] Widget removed from tab ${tab.id} ✅`);
+        }
+      });
+    }
+  });
+}
+
+
+function injectWidgetIntoAllTabs() {
+  chrome.tabs.query({}, (tabs) => {
+    for (const tab of tabs) {
+      if (
+        !tab.id ||
+        !tab.url ||
+        tab.url.startsWith("chrome://") ||
+        tab.url.startsWith("chrome-extension://")
+      ) continue;
+
+      chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ["scripts/floating-widget.js"]
+      }, () => {
+        if (chrome.runtime.lastError) {
+          console.warn(`[Background] Could not inject widget on tab ${tab.id}:`, chrome.runtime.lastError.message);
+        } else {
+          console.log(`[Background] Widget reinjected on tab ${tab.id} ✅`);
+        }
+      });
+    }
+  });
+}
+
