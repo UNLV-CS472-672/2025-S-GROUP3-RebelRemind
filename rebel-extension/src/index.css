@@ -4,6 +4,7 @@
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  min-height: 700px; /* testing this one */
   
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
@@ -17,7 +18,7 @@
 
 
 html, body {
-  /*min-height: 700px;*/
+  min-height: 700px;
   }
 
 a {
