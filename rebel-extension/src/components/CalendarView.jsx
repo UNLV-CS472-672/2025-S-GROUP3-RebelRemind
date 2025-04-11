@@ -112,7 +112,8 @@ const getCanvasAssignments = async () => {
 					title: assignment.title,
 					start: new Date(assignment.due_at),
 					end: new Date(assignment.due_at),
-					description: assignment.context_name
+					course: assignment.context_name,
+					id: 0
 				}));
 				resolve(canvasAssignments);
 			} else { 
@@ -135,7 +136,9 @@ const getUserEvents = async () => {
 					start: event.allDay ? new Date (`${event.date}T00:00:00`) : new Date(`${event.date}T${event.startTime}:00`),
 					end: event.allDay ? new Date (`${event.date}T00:00:00`) : new Date(`${event.date}T${event.endTime}:00`),
 					allDay: event.allDay,
-					description: event.desc
+					description: event.desc,
+					location: event.location,
+					id: 1
 				}))
 				resolve(userCalendarEvents);
 			} else { 
