@@ -28,12 +28,18 @@ import { render, screen, fireEvent, waitFor, within } from '@testing-library/rea
 /* 🔧 Set up mock Chrome extension APIs */
 beforeAll(() => {
   global.chrome = {
+    runtime: {
+      sendMessage: jest.fn(),
+    },
     storage: {
       sync: {
         get: jest.fn(),
         set: jest.fn(),
         remove: jest.fn()
       },
+      local: {
+        get: jest.fn()
+      }
     },
   };
   global.alert = jest.fn();
@@ -111,6 +117,47 @@ describe('Preferences Component', () => {
     await waitFor(() => {
       expect(chrome.storage.sync.set).toHaveBeenCalled();
       expect(global.alert).toHaveBeenCalledWith("Preferences saved!");
+    });
+  });
+
+  test('saves preferences with Canvas integration enabled', async () => {
+    chrome.storage.sync.get.mockImplementation((_, callback) => {
+      callback({
+        preferences: {
+          canvasIntegration: true,
+        }
+      });
+    });
+    global.chrome.storage.local.get.mockImplementation((key, callback) => { // mock chrome.storage with token
+      callback({ canvasPAT: "test_access_token"});
+    })
+    render(<Preferences />);
+    await waitFor(() => screen.getByText(/Save Preferences/));
+    fireEvent.click(screen.getByText(/Save Preferences/));
+
+    await waitFor(() => {
+      expect(chrome.storage.local.get).toHaveBeenCalled();
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({ type: "UPDATE_ASSIGNMENTS" });
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({ type: "START_CANVAS_ALARM" });
+    });
+  });
+
+  test('saves preferences with Canvas integration enabled and no Canvas PAT stored', async () => {
+    chrome.storage.sync.get.mockImplementation((_, callback) => {
+      callback({
+        preferences: {
+          canvasIntegration: true,
+        }
+      });
+    });
+    global.chrome.storage.local.get.mockImplementation((key, callback) => callback({}));
+    render(<Preferences />);
+    await waitFor(() => screen.getByText(/Save Preferences/));
+    fireEvent.click(screen.getByText(/Save Preferences/));
+
+    await waitFor(() => {
+      expect(chrome.storage.local.get).toHaveBeenCalled();
+      expect(global.alert).toHaveBeenCalledWith("Please enter a Canvas Access Token!");
     });
   });
 

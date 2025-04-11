@@ -9,6 +9,9 @@ const mockSet = jest.fn();
 // Setup mock chrome API
 beforeAll(() => {
   global.chrome = {
+    runtime: {
+      sendMessage: jest.fn(),
+    },
     storage: {
       local: {
         get: mockGet,
@@ -62,7 +65,66 @@ test("Empty token", () => {
   expect(global.alert).toHaveBeenCalledWith("Please enter a valid token.");
 });
 
-test("Success", async () => {
+test("Success with preferences set", async () => {
+  chrome.runtime.sendMessage.mockImplementation((msg, callback) => {
+    if (msg.type === "GET_PREFERENCES") {
+      callback({preferences: {canvasIntegration: true}});
+    }
+  });
+  render(<CanvasTokenManager />);
+  const input = screen.getByPlaceholderText("Enter Canvas Token");
+
+  fireEvent.change(input, { target: { value: "valid-token" } });
+  fireEvent.click(screen.getByText("Save Token"));
+
+  await waitFor(() => {
+    expect(mockSet).toHaveBeenCalledWith(
+      { canvasPAT: "valid-token" },
+      expect.any(Function)
+    );
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({ type: "UPDATE_ASSIGNMENTS" });
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({ type: "START_CANVAS_ALARM" });
+  });
+
+  // Simulate the callback
+  mockSet.mock.calls[0][1]();
+  expect(global.alert).toHaveBeenCalledWith(
+    "Your Canvas token has been securely saved."
+  );
+});
+
+test("Success with preferences not set", async () => {
+  chrome.runtime.sendMessage.mockImplementation((msg, callback) => {
+    if (msg.type === "GET_PREFERENCES") {
+      callback({});
+    }
+  });
+  render(<CanvasTokenManager />);
+  const input = screen.getByPlaceholderText("Enter Canvas Token");
+
+  fireEvent.change(input, { target: { value: "valid-token" } });
+  fireEvent.click(screen.getByText("Save Token"));
+
+  await waitFor(() => {
+    expect(mockSet).toHaveBeenCalledWith(
+      { canvasPAT: "valid-token" },
+      expect.any(Function)
+    );
+  });
+
+  // Simulate the callback
+  mockSet.mock.calls[0][1]();
+  expect(global.alert).toHaveBeenCalledWith(
+    "Your Canvas token has been securely saved."
+  );
+});
+
+test("Success with Canvas integration disabled", async () => {
+  chrome.runtime.sendMessage.mockImplementation((msg, callback) => {
+    if (msg.type === "GET_PREFERENCES") {
+      callback({preferences: {canvasIntegration: false}});
+    }
+  });
   render(<CanvasTokenManager />);
   const input = screen.getByPlaceholderText("Enter Canvas Token");
 
