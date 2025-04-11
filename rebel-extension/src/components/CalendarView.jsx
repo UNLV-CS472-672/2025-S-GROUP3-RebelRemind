@@ -67,9 +67,11 @@ function CalendarMenu() {
 		/**
  		* Listens for messages indicating that a user created event has been created or updated.
  		*/
-		const handleMessage = (message) => {
-            if (message.type === "EVENT_CREATED" || message.type === "EVENT_UPDATED") {
+		const handleMessage = (message, sender, sendResponse) => {
+            if (message.type === "EVENT_CREATED" || message.type === "EVENT_UPDATED" || message.type === "UPDATE_ASSIGNMENTS") {
                 fetchEvents();
+				sendResponse(true);
+				return true;
             }
         };
 

@@ -38,6 +38,20 @@ function CanvasAssignments() {
             });
 		};
 		fetchAssignments();
+
+        /**
+ 		* Listens for messages indicating that the assignment list has been updated.
+ 		*/
+        const handleMessage = (message, sender, sendResponse) => {
+            if (message.type === "UPDATE_ASSIGNMENTS") {
+                fetchAssignments();
+                sendResponse(true);
+                return true;
+            }
+        };
+
+        chrome.runtime.onMessage.addListener(handleMessage);
+        return () => chrome.runtime.onMessage.removeListener(handleMessage);
     }, []);
 
     if (assignments.length === 0) {

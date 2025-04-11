@@ -57,7 +57,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (!message?.type) return; // ⛔ skip if it's a Pomodoro-style message
   switch (message.type) {
-    
+
     /**
     * Starts the alarm that will refresh Canvas assignments in storage.
     */
@@ -79,9 +79,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     * Updates the Canvas assignments list that is in storage.
     */
     case "UPDATE_ASSIGNMENTS":
-      fetchCanvasAssignments(); // update storage with new assignments
-      sendResponse(true);
-      return true;
+      fetchCanvasAssignments();
+      break;
 
     /**
      * Initiates user authentication.
@@ -191,6 +190,11 @@ async function fetchCanvasAssignments() {
           allAssignments = assignments.flat();
           chrome.storage.local.set({ Canvas_Assignments: allAssignments }, () => {
             console.log("Assignments Stored!");
+          });
+          chrome.runtime.sendMessage({ type: "UPDATE_ASSIGNMENTS" }, (response) => {
+            if (chrome.runtime.lastError) {
+              // handle receiving end does not exist error (when popup is closed)
+            }
           });
           return true;
         })
