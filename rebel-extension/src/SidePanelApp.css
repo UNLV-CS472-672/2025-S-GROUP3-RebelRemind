@@ -1,11 +1,25 @@
 /* This file contains styles specific to App.jsx. */
 #sidepanel-root {
   max-width: 2000px;
-  min-width: 450px;
+  min-width: 350px;
+  width: 100%;
   background-color: var(--app-background, #8b0000);;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0.5rem;
   text-align: center;
+  justify-content: center;
+  
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /*  ai (ChatGPT-4o, 2) */
+  overflow-x: hidden; /* 🔒 no horizontal scroll */
+  box-sizing: border-box;
 }
 
 .accordion-button {

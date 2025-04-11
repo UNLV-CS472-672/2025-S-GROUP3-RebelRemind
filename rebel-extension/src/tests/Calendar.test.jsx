@@ -2,6 +2,10 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import CalendarView from '../components/CalendarView';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
 global.chrome = {
   runtime: {
     onMessage: {
