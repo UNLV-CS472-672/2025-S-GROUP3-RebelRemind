@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 const DEFAULT_COLOR = "#dc143c";
 const DEFAULT_TEXT = "#ffffff";
 
-const THEMES = {
+export const THEMES = {
   scarletGray: {
     background: "#BB0000",
     text: "#d3d3d3",
@@ -12,7 +12,36 @@ const THEMES = {
     background: "#000000",
     text: "#ff1c1c",
   },
+  sunset: {
+    background: "#ff7e5f",
+    text: "#2d2d2d",
+  },
+  ocean: {
+    background: "#2E8BC0",
+    text: "#ffffff",
+  },
+  lavenderDream: {
+    background: "#b57edc",
+    text: "#ffffff",
+  },
+  forest: {
+    background: "#228B22",
+    text: "#e6ffe6",
+  },
+  peachy: {
+    background: "#FFDAB9",
+    text: "#5a2e2e",
+  },
+  cottonCandy: {
+    background: "#ffb6c1",
+    text: "#5b5b5b",
+  },
+  sebastianPick: {
+    background: "rgb(26, 33, 255)",
+    text: "#ffffff",
+  }
 };
+
 
 const useApplyBackgroundColor = () => {
   const [selectedColor, setSelectedColor] = useState(DEFAULT_COLOR);

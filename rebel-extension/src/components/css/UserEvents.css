@@ -1,122 +1,158 @@
-/* CSS for UserEventInput.jsx and UserEventList.jsx */
-
-/* UserEventInput */
-
-.text-inputs {
+:root {
+    --user-events-bg: rgba(255, 255, 255, 0.9);
+    --user-events-text: var(--app-text-color, #111);
+    --event-card-bg: rgba(255, 255, 255, 0.12);
+    --event-card-blur: blur(12px);
+    --event-border: rgba(255, 255, 255, 0.2);
+  }
+  
+  /* ---------- CONTAINERS ---------- */
+  
+  .mx-auto.bg-white {
+    background-color: var(--event-card-bg) !important;
+    color: var(--user-events-text) !important;
+    backdrop-filter: var(--event-card-blur);
+    -webkit-backdrop-filter: var(--event-card-blur);
+    border: 1px solid var(--event-border);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* ---------- FORM INPUTS ---------- */
+  
+  .text-inputs {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
     margin-left: 30px;
-}
-
-/* Shared styling */
-.event-title,
-.event-desc-input {
+  }
+  
+  .event-title,
+  .event-desc-input {
     width: 92%;
     padding: 0.5rem;
-}
-
-.event-title {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: var(--user-events-text);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
+    font-size: 1rem;
+  }
+  
+  
+  .event-title {
     width: 60%;
-}
+  }
 
-/* Specific to textarea */
-.event-desc-input {
+  .event-desc-input {
     field-sizing: content;
     min-block-size: 10vh;
     max-block-size: 30vh;
     overflow-y: auto;
     overflow-x: hidden;
-}
-
-.event-row {
+  }
+  
+  .event-row {
     display: flex;
     flex-direction: row;
     gap: 1rem;
     justify-content: center;
-    /* center the row inside parent */
     width: 80%;
     margin: 0 auto;
-    /* center horizontally */
-}
-
-.event-col-left,
-.event-col-right {
+  }
+  
+  .event-col-left,
+  .event-col-right {
     display: flex;
     flex-direction: column;
     width: 50%;
-}
-
-.event-col-right {
+  }
+  
+  .event-col-right {
     align-items: flex-end;
-}
-
-.time-row {
+  }
+  
+  .time-row {
     display: flex;
     flex-direction: row;
     align-items: center;
     margin-bottom: 0.5rem;
-}
-
-.time-label {
+  }
+  
+  .time-label {
     width: 50px;
-    /* fixed width so both labels align */
     margin-right: 0.2rem;
-    color: #777;
+    color: var(--user-events-text);
     font-size: 0.95rem;
     text-align: right;
-}
-
-.event-input {
+  }
+  
+  .event-input,
+  .edit-input,
+  .edit-textarea {
     flex: 1;
     padding: 0.5rem;
     font-size: 1rem;
-    border: 1px solid #444;
+    background-color: rgba(255, 255, 255, 0.15);
+    color: var(--user-events-text);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 4px;
-    background-color: #111;
-    color: #fff;
-}
-
-/* UserEventList */
-
-.event-list {
+    backdrop-filter: blur(4px);
+  }
+  
+  .event-title::placeholder,
+  .event-desc-input::placeholder,
+  .event-input::placeholder,
+  .edit-input::placeholder,
+  .edit-textarea::placeholder {
+    color: var(--user-events-text);
+    opacity: 0.85; 
+  }
+  
+  
+  /* ---------- EVENT LIST ---------- */
+  
+  .event-list {
     list-style: none;
     padding: 0;
     margin: 0;
-}
-
-.event-dropdown-item {
-    border-bottom: 1px solid #ddd;
+  }
+  
+  .event-dropdown-item {
+    border-bottom: 1px solid var(--event-border);
     margin-bottom: 0.5rem;
     border-radius: 6px;
     overflow: hidden;
     transition: all 0.3s ease;
-}
-
-.event-dropdown-header {
+  }
+  
+  .event-dropdown-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #f9fafb;
+    background-color: var(--event-card-bg);
+    color: var(--user-events-text);
     padding: 10px 12px;
     cursor: pointer;
     font-weight: 500;
-}
-
-.event-dropdown-header:hover {
-    background-color: #f1f5f9;
-}
-
-.event-dropdown-details {
-    background-color: #fff;
+    backdrop-filter: var(--event-card-blur);
+    border-bottom: 1px solid var(--event-border);
+  }
+  
+  .event-dropdown-header:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .event-dropdown-details {
+    background-color: var(--event-card-bg);
+    color: var(--user-events-text);
     padding: 10px 14px;
     font-size: 0.95rem;
-    color: #333;
-    border-top: 1px solid #eee;
-}
-
-.delete-btn {
+    border-top: 1px solid var(--event-border);
+    backdrop-filter: var(--event-card-blur);
+  }
+  
+  .delete-btn {
     background-color: #e53e3e;
     color: white;
     border: none;
@@ -124,84 +160,74 @@
     padding: 4px 10px;
     cursor: pointer;
     font-size: 0.85rem;
-}
-
-.delete-btn:hover {
+  }
+  
+  .delete-btn:hover {
     background-color: #c53030;
-}
-
-.dropdown-title {
+  }
+  
+  .dropdown-title {
     display: flex;
     align-items: center;
     gap: 8px;
-}
-
-.dropdown-icon {
+  }
+  
+  .dropdown-icon {
     font-size: 0.9rem;
-    color: #555;
+    color: #ddd;
     transition: transform 0.2s ease;
-}
-
-.tab-nav {
+  }
+  
+  /* ---------- TABS ---------- */
+  
+  .tab-nav {
     display: flex;
     justify-content: center;
     border-bottom: 2px solid #f1f1f1;
     margin-bottom: 1rem;
     gap: 1.5rem;
     padding-left: 4px;
-}
-
-.tab-item {
+  }
+  
+  .tab-item {
     padding: 0.5rem 0;
     cursor: pointer;
     font-weight: 500;
-    color: #6b7280;
-    /* Tailwind gray-500 */
+    color: #cbd5e1;
     border-bottom: 2px solid transparent;
     transition: color 0.2s ease, border-color 0.2s ease;
-}
-
-.tab-item:hover {
-    color: #374151;
-    /* gray-700 */
-}
-
-.tab-item.active {
-    color: #b91c1c;
-    /* red-700 */
-    border-bottom: 2px solid #b91c1c;
-}
-
-.event-subheader {
+  }
+  
+  .tab-item:hover {
+    color: #f8fafc;
+  }
+  
+  .tab-item.active {
+    color: #f87171;
+    border-bottom: 2px solid #f87171;
+  }
+  
+  .event-subheader {
     font-weight: 600;
     font-size: 1.1rem;
     margin: 1rem 0 0.5rem;
-    color: #374151;
+    color: var(--user-events-text);
     text-align: left;
-    /* Tailwind gray-700 */
-}
-
-.edit-row {
+  }
+  
+  /* ---------- EDIT MODE ---------- */
+  
+  .edit-row {
     display: flex;
     align-items: center;
     margin-bottom: 0.5rem;
-}
-
-.edit-label {
+  }
+  
+  .edit-label {
     width: 100px;
     text-align: right;
     margin-right: 10px;
     font-weight: bold;
-}
-
-.edit-input,
-.edit-textarea {
-    flex: 1;
-    padding: 4px 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.mx-auto.bg-white h3.text-xl.font-semibold {
-    color: black !important;
+    color: var(--user-events-text);
   }
+  

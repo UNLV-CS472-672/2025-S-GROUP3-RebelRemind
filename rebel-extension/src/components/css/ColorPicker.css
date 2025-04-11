@@ -1,7 +1,4 @@
 .settings-section {
-    /* margin-top: 1.5rem;
-    margin-bottom: 1.5rem; */
-    /* padding: 1rem; */
     background-color: var(--app-background, #8b0000);
     border: 1.5px dashed #fff;
     border-radius: 10px;
@@ -13,14 +10,12 @@
 
 .settings-title {
     font-size: 1.2rem;
-    /* color: #ffe0f0; */
     font-family: 'Comic Sans MS', cursive, sans-serif;
     margin-bottom: 8px;
 }
 
 .settings-label {
     font-size: 0.95rem;
-    /* color: #ffd2f0; */
     font-weight: 600;
     margin-bottom: 6px;
     display: block;
@@ -54,8 +49,6 @@
     --app-background: linear-gradient(135deg, #DC143C, #FF6F91);
 }
 
-/* Make the color-picker itself show the same gradient */
-
 .color-picker-input {
     width: 45px;
     height: 30px;
@@ -65,23 +58,7 @@
     background-image: linear-gradient(135deg, #DC143C, #FF6F91);
 }
 
-
-/* This line appears twice, but it's identical. Keeping it as is. */
-.reset-button {
-    background-color: #8b0000;
-    color: white;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s ease;
-}
-
-.reset-button:hover {
-    background-color: #b01030;
-}
-
+/* unified button style */
 button {
     outline: none;
     border: none;
@@ -97,3 +74,76 @@ button {
 button:hover {
     background-color: #b01030;
 }
+
+/* ----------- theme card styles added below ----------- */
+
+.theme-card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 1rem;
+}
+
+.theme-card {
+    width: 90px;
+    height: 50px;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 6px;
+    margin: 5px;
+    border: 2px solid transparent;
+    transition: transform 0.2s ease, border 0.2s ease;
+}
+
+.theme-card:hover {
+    transform: scale(1.05);
+    border-color: #ccc;
+}
+
+.theme-card.active {
+    border: 2px solid #646cff;
+}
+
+.theme-label {
+    background: rgba(255, 255, 255, 0.7);
+    color: black;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.theme-gallery {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  
+  .theme-gallery-header {
+    padding: 6px 0;
+    user-select: none;
+  }
+  
+  .theme-card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 0.5rem;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
