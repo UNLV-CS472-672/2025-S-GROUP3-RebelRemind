@@ -42,7 +42,7 @@ def DupCheck(table, date, name, time = ''):
 
 	# UNLV Calendar
 	if table == UNLVCalendar:
-		# Format date from string into date object
+		# Format daate from string into date object
 		fmt='%A, %B %d, %Y'
 		date_object = datetime.strptime(date, fmt)
 		# Check if event exists already
@@ -94,6 +94,7 @@ class InvolvementCenter(db.Model):
 	time = db.Column(db.String(100))
 	location = db.Column(db.String(100))
 	organization = db.Column(db.String(100))
+	link = db.Column(db.String(100))
 
 	def __repr__(self):
 		return ("InvolvementCenter(" +
@@ -102,8 +103,8 @@ class InvolvementCenter(db.Model):
 					f"date = {self.date}," +
 					f"time = {self.time}," +
 					f"location = {self.location}," +
-					f"organization = {self.organization})")
-
+					f"organization = {self.organization}," +
+					f"link = {self.link})")
 # Create Rebel Coverage table for database
 class RebelCoverage(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -112,6 +113,7 @@ class RebelCoverage(db.Model):
 	time = db.Column(db.String(100))
 	location = db.Column(db.String(100))
 	organization = db.Column(db.String(100))
+	link = db.Column(db.String(100))
 
 	def __repr__(self):
 		return ("RebelCoverage(" +
@@ -120,7 +122,8 @@ class RebelCoverage(db.Model):
 					f"date = {self.date}," +
 					f"time = {self.time}," +
 					f"location = {self.location}," +
-					f"organization = {self.organization})")
+					f"organization = {self.organization}," +
+					f"link = {self.link})")
 
 # Create UNLV Calendar table for database
 class UNLVCalendar(db.Model):
@@ -129,6 +132,7 @@ class UNLVCalendar(db.Model):
 	date = db.Column(db.Date, nullable=False)
 	time = db.Column(db.String(100))
 	location = db.Column(db.String(100))
+	link = db.Column(db.String(100))
 	organization = db.Column(db.String(100))
 
 	def __repr__(self):
@@ -138,7 +142,8 @@ class UNLVCalendar(db.Model):
 					f"date = {self.date}," +
 					f"time = {self.time}," +
 					f"location = {self.location}," +
-					f"organization = {self.organization})")
+					f"organization = {self.organization}," +
+					f"link = {self.link})")
 
 # Create Organization table for database
 class Organization(db.Model):
@@ -163,6 +168,7 @@ event_put_args.add_argument("date", type=str, help="Event date is required", req
 event_put_args.add_argument("time", type=str, help="Event time can be null", required=False)
 event_put_args.add_argument("location", type=str, help="Event location can be null", required=False)
 event_put_args.add_argument("organization", type=str, help="Event organization can be null", required=False)
+event_put_args.add_argument("link", type=str, help="Event link can be null", required=False)
 
 # Parser for Organization table
 organization_put_args = reqparse.RequestParser()
@@ -183,7 +189,8 @@ event_fields = {
 	'date': fields.String,
 	'time': fields.String,
 	'location': fields.String,
-	'organization': fields.String
+	'organization': fields.String,
+	'link' : fields.String
 }
 
 # Resource fields for Organization model
@@ -312,7 +319,9 @@ class InvolvementCenter_Add(Resource):
 			date=date_object,
 			time=args['time'],
 			location=args.get('location'),
-			organization=args.get('organization')
+			organization=args.get('organization'),
+			link=args.get('link')
+
 		)
 		db.session.add(event)
 		db.session.commit()
@@ -363,7 +372,8 @@ class RebelCoverage_Add(Resource):
 			date=date_object,
 			time=args.get('time'),
 			location=args.get('location'),
-			organization=args.get('organization')
+			organization=args.get('organization'),
+			link=args.get('link')
 		)
 		db.session.add(event)
 		db.session.commit()
@@ -414,7 +424,8 @@ class UNLVCalendar_Add(Resource):
 			date=date_object,
 			time=args.get('time'),
 			location=args.get('location'),
-			organization=args.get('organization')
+			organization=args.get('organization'),
+			link=args.get('link')
 		)
 		db.session.add(event)
 		db.session.commit()
