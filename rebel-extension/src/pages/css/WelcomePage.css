@@ -1,0 +1,71 @@
+/* src/pages/Welcome.css */
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* WelcomePage.css */
+  
+.page-background {
+  height: 100vh;
+  width: 100vw;
+  background-image: url("/images/UNLVImage.jpeg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* background: rgba(150, 150, 150, 0.6); */
+}
+
+/* The gray film overlay */
+.page-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgba(100, 100, 100, 0.5); /* Adjust opacity as needed */
+  z-index: 0;
+}
+
+.welcome-container {
+  z-index: 1;
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50%;
+  width: 50%;
+  font-family: sans-serif;
+  text-align: center;
+  padding: 2rem 1rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+  .welcome-container h1 {
+    font-size: 2rem;
+  }
+  
+  .welcome-container h3 {
+    margin-bottom: 2rem;
+  }
+  
+  .welcome-container button {
+    padding: 0.5rem 1.25rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #8b0000;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .welcome-container button:hover {
+    background-color: #a70000;
+  }
+  

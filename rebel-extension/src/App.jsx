@@ -6,6 +6,7 @@ import SettingsPage from "./pages/SettingsPage";
 import PomodoroPage from "./pages/Pomodoro";
 import useApplyBackgroundColor from "./hooks/useApplyBackgroundColor";
 import UserEventsPage from "./pages/UserEventsPage";
+import WelcomePage from "./pages/WelcomePage";
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
           path="/"
           element={shouldRedirect ? <Navigate to="/pomodoro" /> : <HomePage />}
         />
+        <Route path="/welcome" element={<WelcomePage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/pomodoro" element={<PomodoroPage />} />
         <Route path="/user-events" element={<UserEventsPage />} />

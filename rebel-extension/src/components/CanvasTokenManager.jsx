@@ -47,30 +47,30 @@ const CanvasTokenManager = () => {
     };
 
     return (
-        <div className="p-6 max-w-md rounded-lg shadow-md text-center"> {/* Removed mx-auto so that the background color wouldn't show through */}
+        <div className="p-6 max-w-md rounded-lg shadow-md text-center CVTDiv"> {/* Removed mx-auto so that the background color wouldn't show through */}
             {/* Input Field for Canvas Token */}
-            <div className="relative">
+            <div className="relative CVTTextDiv">
                 <input
                     type={showToken ? "text" : "password"} // Toggles between text and password visibility
                     placeholder="Enter Canvas Token"
                     value={canvasToken}
                     onChange={(e) => setCanvasToken(e.target.value)}
-                    className="border p-2 rounded w-full text-gray-700"
+                    className="border p-2 rounded canvasInputText "
                 />
 
                 {/* Toggle Visibility Button */}
                 <button
                     onClick={() => setShowToken(!showToken)}
-                    className="absolute right-2 top-2"
+                    className="canvasShowBT"
                 >
                     {showToken ? "🙈 Hide" : "👁 Show"}
-                </button>
+                </button>r
             </div>
 
             {/* Save Button */}
             <button
                 onClick={saveCanvasToken}
-                className="mt-2 w-full rounded"
+                className="canvasSubmitBT"
             >
                 Save Token
             </button>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import CanvasTokenManager from "../components/CanvasTokenManager.jsx";
 
 /**
  * Preferences Component
@@ -14,7 +15,7 @@ import React, { useEffect, useState } from "react";
  * @component
  * @returns {JSX.Element} The full Preferences management UI.
  */
-const Preferences = () => {
+const Preferences = ({ setupMode = false }) => {
     /** Core preferences shown as checkboxes */
     const preferencesList = [
         { key: "academicCalendar", label: "Academic Calendar" },
@@ -33,8 +34,8 @@ const Preferences = () => {
 
     // Full list of clubs (could be dynamic in a real API)
     const allClubs = [
-        "UNLV ACM", "Finance Club", "Hackathon Society", "IEEE", "UNLVolunteers", 
-        "1st Generation Club", "Actuarial Science Club", "African Student Alliance", 
+        "UNLV ACM", "Finance Club", "Hackathon Society", "IEEE", "UNLVolunteers",
+        "1st Generation Club", "Actuarial Science Club", "African Student Alliance",
         "AI and Data Science Club", "Alpha Delta Phi"
     ];
 
@@ -46,7 +47,7 @@ const Preferences = () => {
 
     // Interests
     const allInterests = [
-        "Art", "Science", "Theater", "Research Talks", 
+        "Art", "Science", "Theater", "Research Talks",
         "Thesis Defenses", "Live Music", "Cultural Events"
     ];
     const [selectedInterests, setSelectedInterests] = useState([]);
@@ -201,39 +202,225 @@ const Preferences = () => {
     };
 
     return (
-        <div style={{padding: '0.2rem'}}>
-            {/* Preferences Grid */}
-            <div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1rem' }}>
-                    {/* Left column preferences */}
-                    <div style={{ display: 'flex', flexDirection: 'column', rowGap: '1rem' }}>
-                        {preferencesList.slice(0, 3).map(({ key, label }) => (
-                            <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <input type="checkbox" checked={preferences[key]} onChange={() => handlePreferenceChange(key)} />
-                                {label}
-                            </label>
-                        ))}
+        <>
+            {!setupMode ?
+                <div style={{ padding: '0.2rem' }}>
+                    {/* Preferences Grid */}
+                    <div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1rem' }}>
+                            {/* Left column preferences */}
+                            <div style={{ display: 'flex', flexDirection: 'column', rowGap: '1rem' }}>
+                                {preferencesList.slice(0, 3).map(({ key, label }) => (
+                                    <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <input type="checkbox" checked={preferences[key]} onChange={() => handlePreferenceChange(key)} />
+                                        {label}
+                                    </label>
+                                ))}
+                            </div>
+                            {/* Right column preferences */}
+                            <div style={{ display: 'flex', flexDirection: 'column', rowGap: '1rem' }}>
+                                {preferencesList.slice(3).map(({ key, label }) => (
+                                    <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <input type="checkbox" checked={preferences[key]} onChange={() => handlePreferenceChange(key)} />
+                                        {label}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
                     </div>
-                    {/* Right column preferences */}
-                    <div style={{ display: 'flex', flexDirection: 'column', rowGap: '1rem' }}>
-                        {preferencesList.slice(3).map(({ key, label }) => (
-                            <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <input type="checkbox" checked={preferences[key]} onChange={() => handlePreferenceChange(key)} />
-                                {label}
-                            </label>
-                        ))}
-                    </div>
-                </div>
-            </div>
 
-            {/* Interests Section */}
-            {preferences.UNLVCalendar && (
-                <div style={{ marginTop: "2rem" }}>
-                    <div onClick={() => setShowInterests(prev => !prev)} style={{ display: 'flex', justifyContent: 'space-between', cursor: 'pointer' }}>
-                        <span style={{ fontWeight: "bold" }}>Your Interests</span>
-                        <span>{showInterests ? "▲" : "▼"}</span>
+                    {/* Interests Section */}
+                    {preferences.UNLVCalendar && (
+                        <div style={{ marginTop: "2rem" }}>
+                            <div onClick={() => setShowInterests(prev => !prev)} style={{ display: 'flex', justifyContent: 'space-between', cursor: 'pointer' }}>
+                                <span style={{ fontWeight: "bold" }}>Your Interests</span>
+                                <span>{showInterests ? "▲" : "▼"}</span>
+                            </div>
+                            {showInterests && (
+                                <div style={{ marginTop: "1rem", display: "flex", flexWrap: "wrap", gap: "0.5rem", justifyContent: "space-evenly" }}>
+                                    {allInterests.map((interest) => (
+                                        <label key={interest} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedInterests.includes(interest)}
+                                                onChange={() =>
+                                                    setSelectedInterests((prev) =>
+                                                        prev.includes(interest)
+                                                            ? prev.filter((i) => i !== interest)
+                                                            : [...prev, interest]
+                                                    )
+                                                }
+                                            />
+                                            {interest}
+                                        </label>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Club Selector */}
+                    {preferences.involvementCenter && (
+                        <div style={{ marginTop: "1rem" }}>
+                            <div onClick={() => setShowClubs(prev => !prev)} style={{ display: 'flex', justifyContent: 'space-between', cursor: 'pointer' }}>
+                                <span style={{ fontWeight: "bold" }}>Your Organizations</span>
+                                <span>{showClubs ? "▲" : "▼"}</span>
+                            </div>
+                            {showClubs && (
+                                <div style={{ marginTop: "1rem" }}>
+                                    <input
+                                        type="text"
+                                        placeholder="Search for orgs..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        style={{ padding: '0.5rem', width: '100%', marginBottom: '1rem' }}
+                                    />
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                        {filteredClubs.map((club) => (
+                                            <button key={club} onClick={() => handleAddClub(club)} style={{
+                                                padding: '0.3rem 0.6rem',
+                                                borderRadius: '9999px', background: '#555'
+                                            }}>
+                                                {club}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div style={{ marginTop: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                        {involvedClubs.map((club) => (
+                                            <div key={club} style={{
+                                                color: 'white', display: 'flex', alignItems: 'center',
+                                                background: '#8b0000', borderRadius: '9999px', padding: '0.3rem', fontSize: '0.9rem'
+                                            }}>
+                                                <span style={{ padding: '0.3rem' }}>{club}</span>
+                                                <button onClick={() => handleRemoveClub(club)} style={{
+                                                    background: 'none', border: 'none',
+                                                    fontWeight: 'bold', cursor: 'pointer'
+                                                }} aria-label={`Remove ${club}`}>
+                                                    ×
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Sports Selector */}
+                    {preferences.rebelCoverage && (
+                        <div style={{ marginTop: "1rem" }}>
+                            <div onClick={() => setShowSports(prev => !prev)} style={{ display: 'flex', justifyContent: 'space-between', cursor: 'pointer' }}>
+                                <span style={{ fontWeight: "bold" }}>Rebel Sports Coverage</span>
+                                <span>{showSports ? "▲" : "▼"}</span>
+                            </div>
+                            {showSports && (
+                                <div style={{ marginTop: "1rem", display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: "1rem" }}>
+                                    <div>
+                                        <p>Men’s Sports</p>
+                                        {mensSports.map((sport) => (
+                                            <label key={sport} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedMenSports.includes(sport)}
+                                                    onChange={() => toggleMenSport(sport)}
+                                                />
+                                                {sport}
+                                            </label>
+                                        ))}
+                                    </div>
+                                    <div>
+                                        <p>Women’s Sports</p>
+                                        {womensSports.map((sport) => (
+                                            <label key={sport} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedWomenSports.includes(sport)}
+                                                    onChange={() => toggleWomenSport(sport)}
+                                                />
+                                                {sport}
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="mt-3" style={{ display: "flex", justifyContent: "space-between" }}>
+                        <button className="rounded" onClick={savePreferences}>Save Preferences</button>
+                        <button className="rounded" onClick={() => {
+                            const confirmReset = window.confirm("Are you sure you want to reset all your preferences?");
+                            if (!confirmReset) return;
+
+                            chrome.storage.sync.remove([
+                                "preferences", "involvedClubs", "rebelMenSports", "rebelWomenSports", "selectedInterests"
+                            ], () => {
+                                setPreferences(defaultPreferences);
+                                setInvolvedClubs([]);
+                                setSelectedMenSports([]);
+                                setSelectedWomenSports([]);
+                                setSelectedInterests([]);
+
+                                setInitialPreferences(defaultPreferences);
+                                setInitialClubs([]);
+                                setInitialMenSports([]);
+                                setInitialWomenSports([]);
+                                setInitialInterests([]);
+
+                                setUnsaved(false);
+                            });
+                        }}>
+                            Reset Preferences
+                        </button>
                     </div>
-                    {showInterests && (
+
+                    {/* Unsaved Changes Notification */}
+                    {unsaved && (
+                        <div style={{ marginTop: '1rem', color: 'crimson', fontSize: '0.9rem' }}>
+                            You have unsaved changes!
+                        </div>
+                    )}
+                </div>
+                :
+
+                /***  SETUP PREFERENCES PAGE ***/
+
+                <div style={{ padding: '0.2rem', width: '100%' }}>
+                    {/* Preferences Grid */}
+                    <div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1rem', width: '30%', margin: 'auto' }}>
+                            {/* Left column preferences */}
+                            <div style={{ display: 'flex', flexDirection: 'column', rowGap: '1rem' }}>
+                                {preferencesList.slice(0, 3).map(({ key, label }) => (
+                                    <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <input type="checkbox" checked={preferences[key]} onChange={() => handlePreferenceChange(key)} />
+                                        {label}
+                                    </label>
+                                ))}
+                            </div>
+                            {/* Right column preferences */}
+                            <div style={{ display: 'flex', flexDirection: 'column', rowGap: '1rem' }}>
+                                {preferencesList.slice(3).map(({ key, label }) => (
+                                    <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <input type="checkbox" checked={preferences[key]} onChange={() => handlePreferenceChange(key)} />
+                                        {label}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Interests Section */}
+                    <div style={{
+                        marginTop: "2rem",
+                        opacity: preferences.UNLVCalendar ? 1 : 0.5,
+                        pointerEvents: preferences.UNLVCalendar ? "auto" : "none",
+                    }}
+                    >
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ fontWeight: "bold", fontSize: "1rem" }}>Your Interests</span>
+                        </div>
                         <div style={{ marginTop: "1rem", display: "flex", flexWrap: "wrap", gap: "0.5rem", justifyContent: "space-evenly" }}>
                             {allInterests.map((interest) => (
                                 <label key={interest} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
@@ -252,64 +439,66 @@ const Preferences = () => {
                                 </label>
                             ))}
                         </div>
-                    )}
-                </div>
-            )}
-
-            {/* Club Selector */}
-            {preferences.involvementCenter && (
-                <div style={{ marginTop: "1rem" }}>
-                    <div onClick={() => setShowClubs(prev => !prev)} style={{ display: 'flex', justifyContent: 'space-between', cursor: 'pointer' }}>
-                        <span style={{ fontWeight: "bold" }}>Your Organizations</span>
-                        <span>{showClubs ? "▲" : "▼"}</span>
                     </div>
-                    {showClubs && (
+
+                    {/* Club Selector */}
+                    <div style={{
+                        marginTop: "1rem", opacity: preferences.involvementCenter ? 1 : 0.5,
+                        pointerEvents: preferences.involvementCenter ? "auto" : "none",
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ fontWeight: "bold", fontSize: "1rem" }}>Your Organizations</span>
+                        </div>
                         <div style={{ marginTop: "1rem" }}>
                             <input
                                 type="text"
                                 placeholder="Search for orgs..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                style={{ padding: '0.5rem', width: '100%', marginBottom: '1rem' }}
+                                style={{ padding: '0.5rem', width: '90%', marginBottom: '1rem' }}
                             />
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                                 {filteredClubs.map((club) => (
-                                    <button key={club} onClick={() => handleAddClub(club)} style={{ padding: '0.3rem 0.6rem', 
-                                                                                            borderRadius: '9999px', background: '#555' }}>
+                                    <button className="PrefClubSelect" key={club} onClick={() => handleAddClub(club)} style={{
+                                        padding: '0.3rem 0.6rem',
+                                        borderRadius: '9999px', background: '#aaa'
+                                    }}>
                                         {club}
                                     </button>
                                 ))}
                             </div>
-                            <div style={{ marginTop: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                            <div style={{ marginTop: '1rem', marginBottom: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                                 {involvedClubs.map((club) => (
-                                    <div key={club} style={{ color: 'white', display: 'flex', alignItems: 'center', 
-                                                             background: '#8b0000', borderRadius: '9999px', padding: '0.3rem', fontSize: '0.9rem' }}>
+                                    <div key={club} style={{
+                                        color: 'white', display: 'flex', alignItems: 'center',
+                                        background: '#8b0000', borderRadius: '9999px', padding: '0.3rem', fontSize: '0.9rem'
+                                    }}>
                                         <span style={{ padding: '0.3rem' }}>{club}</span>
-                                        <button onClick={() => handleRemoveClub(club)} style={{ background: 'none', border: 'none', 
-                                                    fontWeight: 'bold', cursor: 'pointer' }} aria-label={`Remove ${club}`}>
+                                        <button onClick={() => handleRemoveClub(club)} style={{
+                                            background: 'none', border: 'none',
+                                            fontWeight: 'bold', cursor: 'pointer', color: 'white'
+                                        }} aria-label={`Remove ${club}`}>
                                             ×
                                         </button>
                                     </div>
                                 ))}
                             </div>
                         </div>
-                    )}
-                </div>
-            )}
-
-            {/* Sports Selector */}
-            {preferences.rebelCoverage && (
-                <div style={{ marginTop: "1rem" }}>
-                    <div onClick={() => setShowSports(prev => !prev)} style={{ display: 'flex', justifyContent: 'space-between', cursor: 'pointer' }}>
-                        <span style={{ fontWeight: "bold" }}>Rebel Sports Coverage</span>
-                        <span>{showSports ? "▲" : "▼"}</span>
                     </div>
-                    {showSports && (
-                        <div style={{ marginTop: "1rem", display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: "1rem" }}>
+
+                    {/* Sports Selector */}
+                    <div style={{
+                        marginTop: "0.5rem", opacity: preferences.rebelCoverage ? 1 : 0.5,
+                        pointerEvents: preferences.rebelCoverage ? "auto" : "none",
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ fontWeight: "bold", fontSize: "1rem" }}>Rebel Sports Coverage</span>
+                        </div>
+                        <div style={{ marginTop: "0.5rem", display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: "1rem", width: '50%', margin: 'auto' }}>
                             <div>
-                                <p>Men’s Sports</p>
+                                <p style={{ fontWeight: "bold" }}>Men’s Sports</p>
                                 {mensSports.map((sport) => (
-                                    <label key={sport} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                    <label key={sport} style={{ display: "flex", marginTop: "0.5rem", alignItems: "center", gap: "0.5rem" }}>
                                         <input
                                             type="checkbox"
                                             checked={selectedMenSports.includes(sport)}
@@ -320,9 +509,9 @@ const Preferences = () => {
                                 ))}
                             </div>
                             <div>
-                                <p>Women’s Sports</p>
+                                <p style={{ fontWeight: "bold" }}>Women’s Sports</p>
                                 {womensSports.map((sport) => (
-                                    <label key={sport} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                    <label key={sport} style={{ display: "flex", marginTop: "0.5rem", alignItems: "center", gap: "0.5rem" }}>
                                         <input
                                             type="checkbox"
                                             checked={selectedWomenSports.includes(sport)}
@@ -333,46 +522,54 @@ const Preferences = () => {
                                 ))}
                             </div>
                         </div>
-                    )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="mt-3" style={{ display: "flex", justifyContent: "center", gap: '2rem', marginTop: '2rem' }}>
+                        <button className="PrefClearBtn"
+                            onClick={() => {
+                                const confirmReset = window.confirm("Are you sure you want to reset all your preferences?");
+                                if (!confirmReset) return;
+
+                                chrome.storage.sync.remove([
+                                    "preferences", "involvedClubs", "rebelMenSports", "rebelWomenSports", "selectedInterests"
+                                ], () => {
+                                    setPreferences(defaultPreferences);
+                                    setInvolvedClubs([]);
+                                    setSelectedMenSports([]);
+                                    setSelectedWomenSports([]);
+                                    setSelectedInterests([]);
+
+                                    setInitialPreferences(defaultPreferences);
+                                    setInitialClubs([]);
+                                    setInitialMenSports([]);
+                                    setInitialWomenSports([]);
+                                    setInitialInterests([]);
+
+                                    setUnsaved(false);
+                                });
+                            }}>
+                            Clear Preferences
+                        </button>
+                        <button className="PrefSaveBtn" onClick={savePreferences}>Save Preferences</button>
+                    </div>
+                    <div style={{
+                        marginTop: "1rem", opacity: preferences.canvasIntegration ? 1 : 0.5,
+                        pointerEvents: preferences.canvasIntegration ? "auto" : "none", textAlign: "left"
+                    }} className="canvas-container">
+                        <span style={{ textAlign: "left", fontWeight: "bold", fontSize: "1rem" }}>Canvas Personal Access Token</span>
+                        <p>Your Canvas Personal Access Token is stored locally on your browser and used to integrate our app with Canvas!
+                           We do not store this token, or any of your personal information externally.
+                        </p>
+                        <p style={ {fontWeight: "bold"} }>On Canvas, go to Account {">"} Settings {">"} Approved Integrations {">"}  New Access Token {">"}  Enter "Rebel Remind"</p>
+                        <p>Copy and paste your token here. Make sure to be wary of the time limit you set! Be sure to securely save it. If you log out of our app,
+                            it will delete the token!
+                        </p>
+                        <CanvasTokenManager />
+                    </div>
                 </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="mt-3" style={{ display: "flex", justifyContent: "space-between" }}>
-                <button className="rounded" onClick={savePreferences}>Save Preferences</button>
-                <button className="rounded" onClick={() => {
-                    const confirmReset = window.confirm("Are you sure you want to reset all your preferences?");
-                    if (!confirmReset) return;
-
-                    chrome.storage.sync.remove([
-                        "preferences", "involvedClubs", "rebelMenSports", "rebelWomenSports", "selectedInterests"
-                    ], () => {
-                        setPreferences(defaultPreferences);
-                        setInvolvedClubs([]);
-                        setSelectedMenSports([]);
-                        setSelectedWomenSports([]);
-                        setSelectedInterests([]);
-
-                        setInitialPreferences(defaultPreferences);
-                        setInitialClubs([]);
-                        setInitialMenSports([]);
-                        setInitialWomenSports([]);
-                        setInitialInterests([]);
-
-                        setUnsaved(false);
-                    });
-                }}>
-                    Reset Preferences
-                </button>
-            </div>
-
-            {/* Unsaved Changes Notification */}
-            {unsaved && (
-                <div style={{ marginTop: '1rem', color: 'crimson', fontSize: '0.9rem' }}>
-                    You have unsaved changes!
-                </div>
-            )}
-        </div>
+            }
+        </>
     );
 };
 

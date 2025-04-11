@@ -1,0 +1,122 @@
+/* Allow full-page scrolling */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: sans-serif;
+    background-color: #fcfcfc;
+    color: #222;
+    overflow-x: hidden;
+    /* Prevent horizontal scroll */
+    overflow-y: auto;
+    /* Allow vertical scroll */
+}
+
+.page-background-pref {
+    min-height: 100vh;
+    /* ✅ Let it grow beyond the screen */
+    width: 100vw;
+    background-image: url("/images/UNLVImage.jpeg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    /* ✅ Align content at the top */
+    padding: 2rem 1rem;
+    /* ✅ Prevent content from hugging edges */
+    position: relative;
+    /* ✅ Required for overlay (::before) */
+}
+
+/* The gray film overlay */
+.page-background-pref::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(100, 100, 100, 0.5);
+    /* Adjust opacity as needed */
+    z-index: 0;
+}
+
+/* Preferences wrapper that grows with content */
+.preferences-container {
+    z-index: 1;
+    width: 70%;
+    max-width: 1000px;
+    font-family: sans-serif;
+    text-align: center;
+    padding: 2rem 1rem;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+}
+
+.canvas-container p {
+    padding-top: 0.5rem;
+}
+
+h1,
+p {
+    margin: 0;
+    padding: 0;
+}
+
+button {
+    cursor: pointer;
+}
+
+.CVTDiv {
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    /* stack contents */
+    align-items: flex-start;
+    /* align to left */
+}
+
+.CVTTextDiv {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.canvasInputText {
+    width: 12rem;
+}
+
+.canvasSubmitBT {
+    margin-top: 0.5rem;
+}
+
+.CVTDiv button,
+.PrefSaveBtn,
+.PrefClearBtn,
+.bt {
+    padding: 0.5rem 1.25rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #8b0000;
+    color: white;
+    transition: background-color 0.2s ease;
+}
+
+.CVTDiv button {
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+}
+
+
+.CVTDiv button:hover,
+.PrefClubSelect:hover,
+.PrefSaveBtn:hover,
+.PrefClearBtn:hover,
+.bt:hover {
+    background-color: #a70000 !important;
+    color: white;
+}
