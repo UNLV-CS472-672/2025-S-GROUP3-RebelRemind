@@ -12,7 +12,7 @@ describe("ColorPicker", () => {
 
   beforeEach(() => {
     useApplyBackgroundColor.mockReturnValue({
-      selectedColor: "#8b0000",
+      selectedColor: "#BB0000",
       themeKey: "custom",
       handleColorChange: mockHandleColorChange,
       handleResetColor: mockHandleResetColor,
