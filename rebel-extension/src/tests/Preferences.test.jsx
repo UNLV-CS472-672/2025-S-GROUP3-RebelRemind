@@ -120,7 +120,7 @@ describe('Preferences Component', () => {
     });
   });
 
-  test('saves preferences with Canvas integration enabled', async () => {
+  test('saves preferences with Canvas integration enabled', async () => { // check for correct runtime messages being sent
     chrome.storage.sync.get.mockImplementation((_, callback) => {
       callback({
         preferences: {
@@ -142,7 +142,7 @@ describe('Preferences Component', () => {
     });
   });
 
-  test('saves preferences with Canvas integration enabled and no Canvas PAT stored', async () => {
+  test('saves preferences with Canvas integration enabled and no Canvas PAT stored', async () => { // check for proper alert when no token is stored
     chrome.storage.sync.get.mockImplementation((_, callback) => {
       callback({
         preferences: {

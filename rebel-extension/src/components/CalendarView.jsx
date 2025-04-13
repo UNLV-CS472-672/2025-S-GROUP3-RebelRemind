@@ -113,7 +113,7 @@ const getCanvasAssignments = async () => {
 					start: new Date(assignment.due_at),
 					end: new Date(assignment.due_at),
 					course: assignment.context_name,
-					id: 0
+					id: 0 // set id to 0 for Canvas assignments
 				}));
 				resolve(canvasAssignments);
 			} else { 
@@ -138,7 +138,7 @@ const getUserEvents = async () => {
 					allDay: event.allDay,
 					description: event.desc,
 					location: event.location,
-					id: 1
+					id: 1 // set id to 1 for user created events
 				}))
 				resolve(userCalendarEvents);
 			} else { 

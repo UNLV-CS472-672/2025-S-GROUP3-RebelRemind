@@ -1,3 +1,17 @@
+/**
+ * CanvasAssignments Component Tests
+ * 
+ * This test suite validates the functionality of the Canvas Assignments component.
+ * This component allows users to view their upcoming Canvas assignments within the accordion menu on the main extension popup.
+ * 
+ * Features Tested:
+ * - All 3 assignment categories are displayed properly (today, tomorrow, and future due dates)
+ * - No assignments found response
+ * - Displayed assignments are sorted by due date
+ * 
+ * Authored by: Gunnar Dalton
+ */
+
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import CanvasAssignments from "../components/CanvasAssignments";
@@ -28,11 +42,11 @@ test("No assignments in storage", async () => {
     })
     render(<CanvasAssignments />);
     await waitFor(() => {
-        expect(screen.getByText(/No assignments found./)).toBeInTheDocument();
+        expect(screen.getByText(/No assignments found./)).toBeInTheDocument(); // proper response if no assignments have been fetched
     });
 });
 
-test("Today assignment", async() => {
+test("Today assignment", async() => { // check for proper text if an assignment is due today
     const today = new Date();
     today.setHours(22, 30);
     const dateString = today.toLocaleString();
@@ -42,7 +56,7 @@ test("Today assignment", async() => {
     render(<CanvasAssignments />);
     await waitFor(() => {
         // ai-gen start (ChatGPT-4o, 1)
-        const matches = screen.getAllByText((_, element) =>
+        const matches = screen.getAllByText((_, element) => // check if text is displayed
             element?.textContent === "CS 101: Assignment 1 due at 10:30 PM today"
         );
         expect(matches.length).toBeGreaterThan(0);
@@ -50,7 +64,7 @@ test("Today assignment", async() => {
     });
 });
 
-test("Tomorrow assignment", async() => {
+test("Tomorrow assignment", async() => { // check for proper text if an assignment is due tomorrow
     const today = new Date();
     const tomorrow = new Date();
     tomorrow.setDate(today.getDate() + 1);
@@ -68,10 +82,10 @@ test("Tomorrow assignment", async() => {
     });
 });
 
-test("Future assignment", async() => {
+test("Future assignment", async() => { // check for proper text if an assignment is due after tomorrow
     const today = new Date();
     const dueDate = new Date();
-    dueDate.setDate(today.getDate() + 5);
+    dueDate.setDate(today.getDate() + 5); // assignment is due 5 days after today
     dueDate.setHours(22, 30);
     const dateString = dueDate.toLocaleString();
     const dueDateString = dueDate.toLocaleDateString(undefined, { 
@@ -90,7 +104,7 @@ test("Future assignment", async() => {
     });
 });
 
-test("Combination of assignments", async() => {
+test("Combination of assignments", async() => { // check that assignments are sorted in proper order when displayed
     const today = new Date();
     today.setHours(22, 30);
     const tomorrow = new Date();
