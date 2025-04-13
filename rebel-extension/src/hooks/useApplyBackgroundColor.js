@@ -1,17 +1,13 @@
 import { useEffect, useState } from "react";
 
-const DEFAULT_COLOR = "#dc143c";
-const DEFAULT_TEXT = "#ffffff";
+const DEFAULT_COLOR = "#BB0000";
+const DEFAULT_TEXT = "#d3d3d3";
 
 export const THEMES = {
-  scarletGray: {
-    background: "#BB0000",
-    text: "#d3d3d3",
-  },
-  blackRed: {
-    background: "#000000",
-    text: "#ff1c1c",
-  },
+  obsidian: {
+    background: "#121212",   
+    text: "#e0e0e0",          
+  },  
   sunset: {
     background: "#ff7e5f",
     text: "#2d2d2d",
@@ -28,16 +24,16 @@ export const THEMES = {
     background: "#228B22",
     text: "#e6ffe6",
   },
-  peachy: {
-    background: "#FFDAB9",
-    text: "#5a2e2e",
-  },
   cottonCandy: {
     background: "#ffb6c1",
     text: "#5b5b5b",
+  },  
+  nightSky: {
+    background: "#0b1d3a",  
+    text: "#dbeafe",         
   },
   sebastianPick: {
-    background: "rgb(26, 33, 255)",
+    background: "#1a21ff",
     text: "#ffffff",
   }
 };

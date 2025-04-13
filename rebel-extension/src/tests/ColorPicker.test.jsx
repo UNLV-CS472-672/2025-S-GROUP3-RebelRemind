@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import ColorPicker from "../components/ColorChanging";
 import useApplyBackgroundColor from "../hooks/useApplyBackgroundColor";
 
@@ -8,12 +8,15 @@ jest.mock("../hooks/useApplyBackgroundColor");
 describe("ColorPicker", () => {
   const mockHandleColorChange = jest.fn();
   const mockHandleResetColor = jest.fn();
+  const mockHandleThemeSelection = jest.fn();
 
   beforeEach(() => {
     useApplyBackgroundColor.mockReturnValue({
       selectedColor: "#8b0000",
+      themeKey: "custom",
       handleColorChange: mockHandleColorChange,
       handleResetColor: mockHandleResetColor,
+      handleThemeSelection: mockHandleThemeSelection,
     });
   });
 
@@ -35,5 +38,20 @@ describe("ColorPicker", () => {
     render(<ColorPicker />);
     fireEvent.click(screen.getByRole("button", { name: /back to original/i }));
     expect(mockHandleResetColor).toHaveBeenCalled();
+  });
+
+  it("renders theme gallery and responds to theme card click", () => {
+    render(<ColorPicker />);
+
+    // Open theme gallery
+    fireEvent.click(screen.getByText(/choose a preset theme/i));
+
+    // Find theme cards
+    const themeCards = screen.getAllByText(/.+/).filter(el => el.className.includes("theme-label"));
+    expect(themeCards.length).toBeGreaterThan(0);
+
+    // Click the first theme card
+    fireEvent.click(themeCards[0]);
+    expect(mockHandleThemeSelection).toHaveBeenCalled();
   });
 });

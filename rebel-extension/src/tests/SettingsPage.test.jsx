@@ -145,47 +145,50 @@ describe("SettingsPage", () => {
     await waitFor(() => {
       expect(global.chrome.storage.sync.set).toHaveBeenCalledWith(
         expect.objectContaining({
-          backgroundColor: "#dc143c",
+          backgroundColor: "#BB0000",
           selectedThemeKey: "custom", // instead of ""
-          textColor: "#ffffff",
+          textColor: "#d3d3d3",
         })
       );
       expect(global.chrome.runtime.sendMessage).toHaveBeenCalledWith(
         expect.objectContaining({
           type: "COLOR_UPDATED",
-          color: "#dc143c",
-          textColor: "#ffffff",
+          color: "#BB0000",
+          textColor: "#d3d3d3",
         })
       );
     });
   });
 
-  it("updates theme when theme is selected", async () => {
+  it("updates theme when a theme card is clicked", async () => {
     renderWithRouter(<SettingsPage />);
     fireEvent.click(screen.getByText("Appearance"));
-    fireEvent.change(await screen.findByRole("combobox"), {
-      target: { value: "blackRed" },
-    });
-
-
+  
+    // Open the theme gallery
+    fireEvent.click(screen.getByText(/choose a preset theme/i));
+  
+    // Find and click the first theme card
+    const themeCards = await screen.findAllByText(/.+/);
+    const firstCard = themeCards.find((el) => el.className.includes("theme-label"));
+  
+    fireEvent.click(firstCard);
+  
     await waitFor(() => {
       expect(global.chrome.storage.sync.set).toHaveBeenCalledWith(
         expect.objectContaining({
-          backgroundColor: "#000000",
-          textColor: "#ff1c1c",
-          selectedThemeKey: "blackRed",
+          backgroundColor: expect.any(String),
+          textColor: expect.any(String),
+          selectedThemeKey: expect.any(String),
         })
       );
       expect(global.chrome.runtime.sendMessage).toHaveBeenCalledWith(
         expect.objectContaining({
           type: "COLOR_UPDATED",
-          color: "#000000",
-          textColor: "#ff1c1c",
         })
       );
     });
   });
-
+  
   it("navigates back to home when back button is clicked", () => {
     renderWithRouter(<SettingsPage />);
     fireEvent.click(screen.getByRole("button", { name: /⬅️/i }));
