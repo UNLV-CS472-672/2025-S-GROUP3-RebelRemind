@@ -30,7 +30,7 @@ def map_event(event_json):
     # Strip date
     e_date = str(local_time.date())
     # Strip time
-    e_time = str(local_time.time())
+    e_time = str(local_time.strftime('%I:%M %p'))
 
     return {
         'name': event_json['name'],
