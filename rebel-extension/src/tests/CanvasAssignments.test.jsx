@@ -56,7 +56,8 @@ test("Today assignment", async() => { // check for proper text if an assignment 
     render(<CanvasAssignments />);
     await waitFor(() => {
         // ai-gen start (ChatGPT-4o, 1)
-        const matches = screen.getAllByText((_, element) => // check if text is displayed
+        // check if text is displayed properly
+        const matches = screen.getAllByText((_, element) => 
             element?.textContent === "CS 101: Assignment 1 due at 10:30 PM today"
         );
         expect(matches.length).toBeGreaterThan(0);
