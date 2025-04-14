@@ -31,6 +31,7 @@ import { setMinutes } from "date-fns";
  * - react-boostrap / Modal for displaying events in a pop-up window. (Formatted manually but styled via CalendarView.css
  *
  * Authored by: Jeremy Besitula
+ * Assignment and User Created Event support by: Gunnar Dalton
  *
  * Put into component CalendarView.jsx by Jeremy Besitula
  * @returns {JSX.Element} The react-big-calendar component UI.
@@ -106,7 +107,13 @@ function CalendarMenu() {
 		}
 	};
 
+	/**
+     * Effect Hook: Load the stored Canvas assignments and user created events when the component mounts.
+     */
 	useEffect(() => {
+		/**
+ 		* Calls the correct functions to get Canvas assignments and user created events and places them together in one array.
+ 		*/
 		const fetchEvents = async () => {
 			const canvasAssignments = await getCanvasAssignments();
 			const userEvents = await getUserEvents();
@@ -114,9 +121,14 @@ function CalendarMenu() {
 		};
 		fetchEvents();
 
-		const handleMessage = (message) => {
-            if (message.type === "EVENT_CREATED" || message.type === "EVENT_UPDATED") {
+		/**
+ 		* Listens for messages indicating that a user created event has been created or updated.
+ 		*/
+		const handleMessage = (message, sender, sendResponse) => {
+            if (message.type === "EVENT_CREATED" || message.type === "EVENT_UPDATED" || message.type === "UPDATE_ASSIGNMENTS") {
                 fetchEvents();
+				sendResponse(true);
+				return true;
             }
         };
 
@@ -159,6 +171,9 @@ function CalendarMenu() {
 
 export default CalendarMenu;
 
+/**
+ * Gets the list of Canvas assignments from storage and formats it in the correct way to be handled by the calendar.
+ */
 const getCanvasAssignments = async () => {
 	return new Promise ((resolve) => {
 		chrome.storage.local.get("Canvas_Assignments", (data) => {
@@ -168,7 +183,8 @@ const getCanvasAssignments = async () => {
 					title: assignment.title,
 					start: new Date(assignment.due_at),
 					end: new Date(assignment.due_at),
-					description: assignment.context_name
+					course: assignment.context_name,
+					id: 0 // set id to 0 for Canvas assignments
 				}));
 				resolve(canvasAssignments);
 			} else { 
@@ -178,8 +194,10 @@ const getCanvasAssignments = async () => {
 	})
 };
 
+/**
+ * Gets the list of user created events from storage and formats it in the correct way to be handled by the calendar.
+ */
 const getUserEvents = async () => {
-	console.log("Here");
 	return new Promise ((resolve) => {
 		chrome.storage.local.get("userEvents", (data) => {
 			if (data.userEvents) { 
@@ -189,7 +207,9 @@ const getUserEvents = async () => {
 					start: event.allDay ? new Date (`${event.date}T00:00:00`) : new Date(`${event.date}T${event.startTime}:00`),
 					end: event.allDay ? new Date (`${event.date}T00:00:00`) : new Date(`${event.date}T${event.endTime}:00`),
 					allDay: event.allDay,
-					description: event.desc
+					description: event.desc,
+					location: event.location,
+					id: 1 // set id to 1 for user created events
 				}))
 				resolve(userCalendarEvents);
 			} else { 
