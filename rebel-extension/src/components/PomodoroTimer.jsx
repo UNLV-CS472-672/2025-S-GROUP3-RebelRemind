@@ -1,6 +1,37 @@
+/**
+ * Pomodoro Timer
+ * 
+ * This code implements a Pomodoro Timer with functionality to start, pause, reset,
+ * and switch between short and long breaks. The timer uses React state and useEffect
+ * hooks to manage the countdown and control the timer's flow.
+ * 
+ * Features Implemented:
+ * - **Timer Countdown:** The timer starts at 25 minutes by default and counts down
+ *   to 00:00, transitioning from minutes to seconds.
+ * - **Start, Pause, and Reset:** Users can start, pause, or reset the timer to its
+ *   initial 25-minute countdown.
+ * - **Break Options:** Includes options to switch the timer to a 5-minute short break
+ *   or a 15-minute long break.
+ * - **Finish Alarm:** When the timer reaches 00:00, an audio alarm is played to
+ *   indicate the end of the Pomodoro session or break.
+ * - **State Management:** Uses React's useState and useEffect to manage timer state
+ *   (minutes, seconds, running status), and play an alarm sound upon completion.
+ * - **Audio Preload:** The audio file is preloaded to ensure smooth playback when
+ *   the timer ends.
+ * 
+ * Author - Chandni Mirpuri Silva
+ * 
+ * Documentation provided by Chatgpt 
+ * 
+ * This implementation provides an interactive Pomodoro timer to improve productivity
+ * and focus with audible reminders for the timer's completion.
+ */
+
+
 import React, { useState, useEffect, useRef } from "react";
 import FinishAlarm from "../assets/FinishAlarm.mp3";
 import "./css/Pomodoro.css";
+import { FaVolumeUp, FaVolumeMute } from "react-icons/fa"; // added this for volume muter
 
 function PomodoroTimer() {
   const [minutes, setMinutes] = useState(25);
@@ -9,10 +40,12 @@ function PomodoroTimer() {
   const [showEditBoxes, setShowEditBoxes] = useState(true);
   const [isTimerDone, setIsTimerDone] = useState(false);
   const alarmRef = useRef(new Audio(FinishAlarm));
+  const [isMuted, setIsMuted] = useState(false);       // const to mute the volume
 
   useEffect(() => {
     console.log('Component mounted or updated');
     alarmRef.current.load();
+    alarmRef.current.muted = isMuted; // ← ✅ ADD THIS RIGHT AFTER
 
     chrome.storage.local.get(["minutes", "seconds", "isRunning"], (data) => {
       const isTimerDone = data.minutes === 0 && data.seconds === 0 && !data.isRunning;
@@ -59,7 +92,7 @@ function PomodoroTimer() {
       chrome.storage.onChanged.removeListener(handleStorageChange);
       console.log('Component unmounted');
     };
-  }, []);
+  }, [isMuted]);
 
   useEffect(() => {
     console.log('Timer updated:', minutes, seconds, 'isRunning:', isRunning);
@@ -118,13 +151,13 @@ function PomodoroTimer() {
   return (
     <div className="pomodoro-container">
       <h3>Pomodoro Timer</h3>
-
+  
       {isTimerDone && (
         <div className="timer-done-message">
           <p>Timer is up! Time to take a Break!</p>
         </div>
       )}
-
+  
       {showEditBoxes && (
         <div className="input-group">
           <input
@@ -153,11 +186,36 @@ function PomodoroTimer() {
           />
         </div>
       )}
+  
+      {/* Mute/unmute volume button */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          width: "100%", 
+          marginTop: "-12px", // tighter pull-up
+          marginBottom: "-6px" // reduce gap under button too
+        }}
+      >
+        <button
+          onClick={() => setIsMuted(prev => !prev)}
+          className="volume-button"
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: 0 // removes default button padding
+          }}
+        >
+          {isMuted ? <FaVolumeMute size={24} /> : <FaVolumeUp size={24} />}
+        </button>
+      </div>
+
 
       <div className="timer-display">
         {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
       </div>
-
+  
       <div className="timer-buttons">
         {!isRunning ? (
           <button onClick={handleStart}>Start</button>
@@ -166,44 +224,13 @@ function PomodoroTimer() {
         )}
         <button onClick={() => handleReset(25)}>Reset</button>
       </div>
-
+  
       <div className="break-options">
         <button onClick={handleShortBreak}>Short Break (5 mins)</button>
         <button onClick={handleLongBreak}>Long Break (15 mins)</button>
       </div>
     </div>
-  );
+  ); // THIS closes my return
 }
 
 export default PomodoroTimer;
-
-
-
-/**
- * Pomodoro Timer
- * 
- * This code implements a Pomodoro Timer with functionality to start, pause, reset,
- * and switch between short and long breaks. The timer uses React state and useEffect
- * hooks to manage the countdown and control the timer's flow.
- * 
- * Features Implemented:
- * - **Timer Countdown:** The timer starts at 25 minutes by default and counts down
- *   to 00:00, transitioning from minutes to seconds.
- * - **Start, Pause, and Reset:** Users can start, pause, or reset the timer to its
- *   initial 25-minute countdown.
- * - **Break Options:** Includes options to switch the timer to a 5-minute short break
- *   or a 15-minute long break.
- * - **Finish Alarm:** When the timer reaches 00:00, an audio alarm is played to
- *   indicate the end of the Pomodoro session or break.
- * - **State Management:** Uses React's useState and useEffect to manage timer state
- *   (minutes, seconds, running status), and play an alarm sound upon completion.
- * - **Audio Preload:** The audio file is preloaded to ensure smooth playback when
- *   the timer ends.
- * 
- * Author - Chandni Mirpuri Silva
- * 
- * Documentation provided by Chatgpt 
- * 
- * This implementation provides an interactive Pomodoro timer to improve productivity
- * and focus with audible reminders for the timer's completion.
- */
