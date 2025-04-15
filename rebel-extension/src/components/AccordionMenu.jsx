@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 
 import Accordion from 'react-bootstrap/Accordion';
+import CanvasAssignments from "./CanvasAssignments";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 /**
@@ -25,8 +26,10 @@ function AccordionMenu() {
       	<Accordion.Item eventKey="0">
       	<Accordion.Header>📚 Upcoming Assignments</Accordion.Header>
           <Accordion.Body>
-          • <strong> 🗺️ History 405:</strong> Homework 3 due by this Sunday <strong> <br />
-          • <strong> 💻 CS 472:</strong> DP II</strong> due by next week Tuesday.
+          {/* • <strong> 🗺️ History 405:</strong> Homework 3 due by this Sunday <strong> <br />
+          • <strong> 💻 CS 472:</strong> DP II</strong> due by next week Tuesday. */}
+          <CanvasAssignments>
+          </CanvasAssignments>
           </Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="1">
