@@ -140,8 +140,7 @@ function CalendarMenu() {
   	<div >
     	  <Calendar
       	  localizer={localizer}
-      	  events={calendarEvents}
-      	  //events={events}	
+      	  events={events}	
           defaultView= 'day'		
           views= {['day', 'week']}	
       	  startAccessor="start"
