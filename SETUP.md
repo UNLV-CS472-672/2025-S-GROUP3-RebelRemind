@@ -107,7 +107,4 @@ Select the "New Access Token" button. This will bring up a popup for generating 
 Enter "Rebel Remind" for the purpose and select "Generate Token". (You can enter an expiration date if you would like but not necessary.)
 This will display your "Access Token Details" and give you your token. Make sure you copy the token to a safe place for future use because you will be unable to view the token again after closing the popup.
 Return to the popup and paste your Canvas Access Token into the token field and click "Save Token". Now chrome.storage should have your token stored.
-Click on "Get Your Canvas Assignments" on the main page to load your Canvas assignments into the extension storage. A confirmation popup will show this is completed.
-Feel free to add any events in the "Personalize Events" menu. These will also appear in the calendar.
-Now you can load the calendar by clicking "Calendar View".
-You should be able to find any Canvas due dates and created events in your calendar.
+Your Canvas assignments will now be visible on the main popup and in the Calendar view.

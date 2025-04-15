@@ -26,7 +26,6 @@ def default():
 
             location_elem = event.find_next_sibling("div", class_="col-sm-12 text-sm")
             location = location_elem.text.strip() if location_elem else "No Location"
-            
             # Extract date 
             date_elem = event.find_previous("div", class_="card-header")
             date = date_elem.text.strip() if date_elem else "TBD"
@@ -36,7 +35,8 @@ def default():
                 "name": title,
                 "date": date,  
                 "time": time,
-                "location": location
+                "location": location,
+                "link": link
             }
 
             # Send event data to Flask API

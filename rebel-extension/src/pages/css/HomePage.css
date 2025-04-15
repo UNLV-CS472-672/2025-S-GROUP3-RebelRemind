@@ -3,7 +3,7 @@
 :root {
   /* Default background and text (override these from JS) */
   --app-background: #8b0000;
-  --app-text-color: #ffffff;
+  /* --app-text-color: #ffffff; */ /* Commented out by Sebastian */
 }
 
 #root {
@@ -157,7 +157,7 @@ button {
   outline: none;
   border: none;
   background-color: #8b0000;
-  color: white;
+  /* color: white; */
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
