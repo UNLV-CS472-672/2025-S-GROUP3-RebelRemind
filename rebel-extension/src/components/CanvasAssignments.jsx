@@ -14,6 +14,7 @@ function CanvasAssignments() {
     const [assignments, setAssignments] = useState([]);
     const [completedAssignments, setCompletedAssignments] = useState([]);
     const [showCompleted, setShowCompleted] = useState(false);
+    const [justCompleted, setJustCompleted] = useState([]);
 
     /**
      * Effect Hook: Load the Canvas Assignments and format them when the component mounts.
@@ -81,6 +82,7 @@ function CanvasAssignments() {
     const markComplete = (assignment) => { 
         const completed = [...completedAssignments, { id: assignment.id, due_at: assignment.due_at }];
         setCompletedAssignments(completed);
+        setJustCompleted([...justCompleted, assignment.id]);
         chrome.storage.local.set({ completedAssignments: completed });
     }
 
@@ -99,7 +101,7 @@ function CanvasAssignments() {
     // ai-gen start (ChatGPT-4o, 0)
     const assignmentsToDisplay = [...assignments]
         .sort((a, b) => new Date(a.due_at) - new Date(b.due_at))
-        .filter(a => showCompleted || !isComplete(a.id));
+        .filter(a => showCompleted || !isComplete(a.id) || justCompleted.includes(a.id));
     // ai-gen end
 
     if (assignments.length === 0) {
