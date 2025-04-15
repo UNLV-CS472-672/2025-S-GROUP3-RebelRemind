@@ -1,3 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Yeseva+One&display=swap');
+
+.pomodoro-title {
+  font-family: 'Yeseva One', serif;
+  font-size: 2.5rem;
+  font-weight: normal;
+  color: #1a1a1a;
+  letter-spacing: 1px;
+}
 
 /* Pomodoro Styling from here: */
 .pomodoro-container {
@@ -23,8 +32,8 @@
   .pomodoro-container::before {
     content: ""; /* Necessary for pseudo-elements */
     position: absolute;
-    left: 25px; /* Adjust the position */
-    top: 25px;  /* Adjust the top position */
+    left: 15px; /* Adjust the position */
+    top: 70px;  /* Adjust the top position */
     width: 80px;  /* Increased size of the logo */
     height: 80px; /* Adjusted height to maintain a square aspect */
     background-image: url('../../assets/rebelmascot.png'); /* Path to your Rebel mascot image */

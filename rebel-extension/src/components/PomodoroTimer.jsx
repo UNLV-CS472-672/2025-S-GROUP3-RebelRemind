@@ -149,8 +149,9 @@ function PomodoroTimer() {
   };
 
   return (
-    <div className="pomodoro-container">
-      <h3>Pomodoro Timer</h3>
+      <div className="pomodoro-container">
+        <h3 className="pomodoro-title">Pomodoro Timer</h3>
+    
   
       {isTimerDone && (
         <div className="timer-done-message">
