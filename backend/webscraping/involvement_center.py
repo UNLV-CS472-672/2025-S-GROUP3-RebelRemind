@@ -37,7 +37,8 @@ def map_event(event_json):
         'date': e_date,
         'time': e_time,
         'location': event_json['location'],
-        'organization': event_json['organizationName']
+        'organization': event_json['organizationName'],
+        'link': f"https://involvementcenter.unlv.edu/event/{event_json['id']}"
     }
 
 if __name__ == '__main__':

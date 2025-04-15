@@ -7,7 +7,6 @@
  * Authored by: Gunnar Dalton
  */
 
-
 /**
  * Gets a list of assignments from the Canvas API for the specified course and outputs in a useful format.
  */
@@ -44,7 +43,7 @@ export async function getAssignments(courseID, accessToken) {
             }
             // ai-gen end
         }
-        // ai-gen (ChatGPT-4o, 2)
+        // ai-gen start (ChatGPT-4o, 2)
         const selectedKeys = ["title", "context_name"];
         const nestedKeys = ["due_at"];
 
