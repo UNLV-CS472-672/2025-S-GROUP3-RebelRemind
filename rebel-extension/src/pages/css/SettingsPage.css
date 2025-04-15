@@ -107,3 +107,11 @@
         transform: translateY(0);
     }
 }
+
+.theme-card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 1rem;
+  }
+  
