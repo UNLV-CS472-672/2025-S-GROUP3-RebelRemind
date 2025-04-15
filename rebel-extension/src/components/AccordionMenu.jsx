@@ -75,12 +75,26 @@ function AccordionMenu() {
           <Accordion.Body>
             {ic_events.map(event => (
               <div key={event.id}>
-                • {event.name} - <strong>{event.time}</strong> located in <strong>{event.location}</strong>!
+                <a 
+                  href={event.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-black hover:underline"
+                >
+                  • {event.name} - <strong>{event.time}</strong> located in <strong>{event.location}</strong>!
+                </a>
               </div>
             ))}
             {uc_events.map(event => (
               <div key={event.id}>
-                • {event.name} - <strong>{event.time}</strong>!
+                <a 
+                  href={event.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-black hover:underline"
+                >
+                  • {event.name} - <strong>{event.time}</strong>!
+                </a>
               </div>
             ))}
           </Accordion.Body>
@@ -90,12 +104,26 @@ function AccordionMenu() {
           <Accordion.Body>
             {ac_events.map(event => (
               <div key={event.id}>
-                • <strong>{event.name}</strong>
+                <a 
+                  href={event.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-black hover:underline"
+                >
+                  • <strong>{event.name}</strong>
+                </a>
               </div>
             ))}
             {rc_events.map(event => (
               <div key={event.id}>
-                • <strong>{event.name}</strong> {event.time}
+                <a 
+                  href={event.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-black hover:underline"
+                >
+                  • <strong>{event.name}</strong> {event.time}
+                </a>
               </div>
             ))}
           </Accordion.Body>
