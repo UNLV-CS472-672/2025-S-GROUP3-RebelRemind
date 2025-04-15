@@ -45,7 +45,7 @@ export async function getAssignments(courseID, accessToken) {
         }
         // ai-gen start (ChatGPT-4o, 2)
         const selectedKeys = ["title", "context_name"];
-        const nestedKeys = ["due_at"];
+        const nestedKeys = ["due_at", "id", "user_submitted"];
 
         const calendarFormattedAssignments = allAssignments.map(assignment => {
             const filteredMain = Object.fromEntries(
