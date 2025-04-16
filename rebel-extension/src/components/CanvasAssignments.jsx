@@ -72,6 +72,15 @@ function CanvasAssignments() {
     }, []);
 
     /**
+     * Effect Hook: Resets justCompleted when showCompleted is toggled off
+     */
+    useEffect(() => {
+        if (!showCompleted) {
+            setJustCompleted([]);
+        }
+    }, [showCompleted]);
+
+    /**
     * Checks the completed assignments list for a given assignment id. Returns true if assignment is complete.
     */
     const isComplete = (id) => completedAssignments.some(item => item.id === id); 
@@ -104,9 +113,28 @@ function CanvasAssignments() {
         .filter(a => showCompleted || !isComplete(a.id) || justCompleted.includes(a.id));
     // ai-gen end
 
-    if (assignments.length === 0) {
+    if (assignments.length === 0) { // handles no assignments listed case
         return <p>No assignments found.</p>;
-      }
+    }
+
+    if (assignmentsToDisplay.length === 0 && !showCompleted) { // handles all assignments are completed case
+        return (
+            <div>
+                <p>All upcoming assignments are completed!</p>
+                <div className="mt-2">
+                    {/* Show Completed checkbox */}
+                    <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={showCompleted}
+                            onChange={() => setShowCompleted(!showCompleted)}
+                        />
+                        <span> Show Completed</span>
+                    </label>
+                </div>
+            </div>
+        )
+    }
 
     return (
         // ai-gen start (ChatGPT-4o, 2)
@@ -135,7 +163,7 @@ function CanvasAssignments() {
                                 onClick={() => undoComplete(assignment.id)}
                                 className="rounded flex items-center justify-center"
                                 style={{ alignSelf: "center", height: "fit-content", padding: "0px 2px 3px 2px" }}
-                                title="Undo Complete"
+                                title="Undo Completed"
                             >
                                 <Undo2 size={18} strokeWidth={2.5} />
                             </button>
@@ -154,7 +182,7 @@ function CanvasAssignments() {
                 ))}
             </ul>
             <div className="mt-2">
-                {/* Show completed checkbox */}
+                {/* Show Completed checkbox */}
                 <label className="flex items-center gap-2 cursor-pointer">
                     <input
                         type="checkbox"
