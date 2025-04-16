@@ -4,7 +4,7 @@ import AccordionMenu from "../components/AccordionMenu";
 import SidePanelButton from "../components/SidePanelButton";
 
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react"; 
+import { useEffect, useState, useRef } from "react"; 
 
 /**
  * Main UI Layout for the Chrome Extension.
@@ -12,6 +12,13 @@ import { useEffect, useState } from "react";
 function HomePage() {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
+  const DropdownRef = useRef(null);
+  
+  const handleClickAway = (event) => {
+    if (DropdownRef.current && !DropdownRef.current.contains(event.target)) {
+      setShowDropdown(false);
+    }
+  };
 
   // Resize popup to original size when HomePage loads
   useEffect(() => {
@@ -20,9 +27,16 @@ function HomePage() {
       window.resizeTo(330, 400);
     }, 50);
   }, []);
+  
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickAway);
+    return () => {
+      document.removeEventListener('mousedown', handleClickAway);
+    };
+  }, []);
 
   return (
-    <div>
+    <div >
       <img
         src="/images/rebel-remind.png"
         alt="Rebel Remind Logo"
@@ -30,36 +44,40 @@ function HomePage() {
       />
       <CloseButton />
 
-      <div className="settings-button-container">
-        <button
-          className="settings-button"
-          onClick={() => navigate("/settings")}
-        >
-          ⚙️
-        </button>
-      </div>
-
       <AccordionMenu />
 
       {/*Change View Dropdown Floating */}
-      <div className="change-view-container">
-        <button
-          className="change-view-btn"
-          onClick={() => setShowDropdown((prev) => !prev)}
-        >
-          Change View
-        </button>
+      <div style={{ display: 'flex', gap: '269px' }} >
+		  <div className="change-view-container">
+		    <button
+		      className="change-view-btn"
+		      onClick={() => setShowDropdown((prev) => !prev)}
+		      style= {{position: 'sticky'}}
+		    >
+		      Change View
+		    </button>
 
-        {showDropdown && (
-          <div className="change-view-dropdown">
-            <button onClick={() => navigate("/user-events")}>
-              Personalize Events
-            </button>
-            <SidePanelButton />
-            <button onClick={() => navigate("/pomodoro")}>Pomodoro</button>
-          </div>
-        )}
-      </div>
+		    {showDropdown && (
+		      <div className="change-view-dropdown" ref={DropdownRef} style= {{position: 'fixed'}}>
+		        <button onClick={() => navigate("/user-events")}>
+		          Personalize Events
+		        </button>
+		        <SidePanelButton />
+		        <button onClick={() => navigate("/pomodoro")}>Pomodoro</button>
+		      </div>
+		    )}
+		  </div>
+		  
+		   <div className="settings-button-container">
+		    <button
+		      className="settings-button"
+		      onClick={() => navigate("/settings")}
+		      style={{position: 'sticky'}}
+		    >
+		      ⚙️
+		    </button>
+		  </div>
+      </div >
     </div>
   );
 }
