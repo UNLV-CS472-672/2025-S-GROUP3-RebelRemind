@@ -173,7 +173,7 @@ async function fetchCanvasAssignments() {
   // Await access token before continuing
   getCanvasPAT().then((accessToken) => {
     if (!accessToken) {
-      console.error("No access token found.");
+      console.log("No access token found.");
       return false;
     }
 
@@ -198,16 +198,16 @@ async function fetchCanvasAssignments() {
           });
           return true;
         })
-        .catch((error) => {
-          console.error("Error fetching assignments", error);
+        .catch((error) => { // error is logged instead of sending error to Chrome
+          console.log("Error fetching assignments", error);
           return false;
         });
     }).catch((error) => {
-      console.error("Error with getCourses()", error);
+      console.log("Error with getCourses()", error);
       return false;
     });
   }).catch((error) => {
-    console.error("Error fetching access token", error);
+    console.log("Error fetching access token", error);
     return false;
   });
 }

@@ -44,7 +44,7 @@ export async function getAssignments(courseID, accessToken) {
             // ai-gen end
         }
         // ai-gen start (ChatGPT-4o, 2)
-        const selectedKeys = ["title", "context_name"];
+        const selectedKeys = ["title", "context_name", "html_url"];
         const nestedKeys = ["due_at", "id", "user_submitted"];
 
         const calendarFormattedAssignments = allAssignments.map(assignment => {
@@ -60,7 +60,7 @@ export async function getAssignments(courseID, accessToken) {
         return calendarFormattedAssignments;
 
     } catch (error) {
-        console.error("Error fetching events:", error);
+        console.log("Error fetching assignments:", error); // error is logged instead of sending error to Chrome
     }
 }
 
@@ -131,7 +131,7 @@ export async function getCourses(accessToken) {
         return activeCourses;
 
     } catch (error) {
-        console.error("Error fetching events:", error);
+        console.log("Error fetching courses:", error);
         return false;
     }
 }
