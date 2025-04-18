@@ -2,7 +2,7 @@
   max-width: 1000px;
   min-width: 450px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
   text-align: center;
   background-color: var(--app-background, "#8b0000"); /* Use dynamic background color */
   transition: background-color 0.3s ease; 
