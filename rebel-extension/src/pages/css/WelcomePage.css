@@ -1,11 +1,3 @@
-/* src/pages/Welcome.css */
-
-html, body, #root {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
 /* WelcomePage.css */
   
 .page-background {
@@ -68,4 +60,3 @@ html, body, #root {
   .welcome-container button:hover {
     background-color: #a70000;
   }
-  

@@ -1,3 +1,5 @@
+/* PreferencesSetup.css */
+
 /* Allow full-page scrolling */
 html,
 body {
@@ -15,7 +17,7 @@ body {
 
 .page-background-pref {
     min-height: 100vh;
-    /* ✅ Let it grow beyond the screen */
+    /* Let it grow beyond the screen */
     width: 100vw;
     background-image: url("/images/UNLVImage.jpeg");
     background-size: cover;
@@ -25,11 +27,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    /* ✅ Align content at the top */
+    /* Align content at the top */
     padding: 2rem 1rem;
-    /* ✅ Prevent content from hugging edges */
+    /* Prevent content from hugging edges */
     position: relative;
-    /* ✅ Required for overlay (::before) */
+    /* Required for overlay (::before) */
 }
 
 /* The gray film overlay */
@@ -120,3 +122,16 @@ button {
     background-color: #a70000 !important;
     color: white;
 }
+
+/* When a user clicks a section that they have to select a preference for */
+.highlight-flash {
+    outline: 3px solid #a70000;
+    animation: flash 1s ease;
+  }
+  
+  @keyframes flash {
+    0% { outline-color: #a70000; }
+    50% { outline-color: transparent; }
+    100% { outline-color: #a70000; }
+  }
+  
