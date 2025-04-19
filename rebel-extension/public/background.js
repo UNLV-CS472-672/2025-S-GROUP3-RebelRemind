@@ -220,9 +220,21 @@ let minutes = 25;
 let seconds = 0;
 
 // Initialize default timer state
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.local.set({ minutes: 25, seconds: 0, isRunning: false });
-});
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === "install") {
+    chrome.tabs.create({
+      url: chrome.runtime.getURL("welcome.html"),
+    });
+  }
+
+    chrome.storage.local.set({
+      minutes: 25,
+      seconds: 0,
+      isRunning: false,
+    });
+  }
+);
+
 
 // Start the timer function that handles all the features of when the user
 // starts teh timer, we also call some functions like inject or remove widget.
