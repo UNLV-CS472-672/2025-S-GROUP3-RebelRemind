@@ -2,6 +2,13 @@
     margin-bottom: 10px;
 }
 
+.settings-page-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2rem;
+}
+
 .back-button-container {
     position: absolute;
     top: 10px;
