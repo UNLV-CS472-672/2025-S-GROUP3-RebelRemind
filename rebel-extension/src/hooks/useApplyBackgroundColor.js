@@ -1,18 +1,43 @@
 import { useEffect, useState } from "react";
 
-const DEFAULT_COLOR = "#dc143c";
-const DEFAULT_TEXT = "#ffffff";
+const DEFAULT_COLOR = "#BB0000";
+const DEFAULT_TEXT = "#d3d3d3";
 
-const THEMES = {
-  scarletGray: {
-    background: "#BB0000",
-    text: "#d3d3d3",
+export const THEMES = {
+  obsidian: {
+    background: "#121212",   
+    text: "#e0e0e0",          
+  },  
+  sunset: {
+    background: "#ff7e5f",
+    text: "#2d2d2d",
   },
-  blackRed: {
-    background: "#000000",
-    text: "#ff1c1c",
+  ocean: {
+    background: "#2E8BC0",
+    text: "#ffffff",
   },
+  lavenderDream: {
+    background: "#b57edc",
+    text: "#ffffff",
+  },
+  forest: {
+    background: "#228B22",
+    text: "#e6ffe6",
+  },
+  cottonCandy: {
+    background: "#ffb6c1",
+    text: "#5b5b5b",
+  },  
+  nightSky: {
+    background: "#0b1d3a",  
+    text: "#dbeafe",         
+  },
+  sebastianPick: {
+    background: "#1a21ff",
+    text: "#ffffff",
+  }
 };
+
 
 const useApplyBackgroundColor = () => {
   const [selectedColor, setSelectedColor] = useState(DEFAULT_COLOR);

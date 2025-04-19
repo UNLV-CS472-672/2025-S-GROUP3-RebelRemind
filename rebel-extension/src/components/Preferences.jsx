@@ -187,23 +187,45 @@ const Preferences = ({ setupMode = false }) => {
         }));
     };
 
-    // Save all preferences to Chrome Storage
+    /**
+     * Save current preferences and selections to Chrome Storage.
+     * Also updates the initial values so "unsaved" doesn't show.
+     * Requests for Canvas assignments to be updated in storage and an alarm to be started if Canvas integration is enabled.
+     * Stops alarm for refreshing Canvas assignments if Canvas integration is disabled.
+     */
     const savePreferences = () => {
-        chrome.storage.sync.set({
-            preferences,
-            involvedClubs,
-            rebelMenSports: selectedMenSports,
-            rebelWomenSports: selectedWomenSports,
-            selectedInterests,
-        }, () => {
-            setInitialPreferences(preferences);
-            setInitialClubs(involvedClubs);
-            setInitialMenSports(selectedMenSports);
-            setInitialWomenSports(selectedWomenSports);
-            setInitialInterests(selectedInterests);
-            setUnsaved(false);
-            alert("Preferences saved!");
-        });
+        chrome.storage.sync.set(
+            {
+                preferences,
+                involvedClubs,
+                rebelMenSports: selectedMenSports,
+                rebelWomenSports: selectedWomenSports,
+                selectedInterests,
+            },
+            () => {
+                setInitialPreferences(preferences);
+                setInitialClubs(involvedClubs);
+                setInitialMenSports(selectedMenSports);
+                setInitialWomenSports(selectedWomenSports);
+                setInitialInterests(selectedInterests);
+                setUnsaved(false);
+                alert("Preferences saved!");
+            }
+        );
+        if (preferences.canvasIntegration) { // Checks Canvas integration preference
+            chrome.storage.local.get("canvasPAT", (data) => {
+                if (data.canvasPAT) {
+                    chrome.runtime.sendMessage({ type: "UPDATE_ASSIGNMENTS" }); // Get assignments if Canvas Access Token is present
+                    chrome.runtime.sendMessage({ type: "START_CANVAS_ALARM" }); // Start alarm to trigger future fetches
+                }
+                else {
+                    alert("Please enter a Canvas Access Token!"); // Tell users they need an access token to use Canvas integration
+                }
+            });
+        }
+        else {
+            chrome.runtime.sendMessage({ type: "CLEAR_CANVAS_ALARM"}); // Stops Canvas alarm if integration is shut off
+        }
     };
 
     // Toggle sports

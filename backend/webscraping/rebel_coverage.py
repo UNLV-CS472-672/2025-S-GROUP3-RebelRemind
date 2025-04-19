@@ -27,6 +27,10 @@ def default():
             trunc_item = item[dist:].replace('\n','')
             item = item.replace('\n','', 0)
             item = item.replace('\n',' ')
+
+            link_tag = time.find('a', href=True)
+            link = link_tag['href'] if link_tag else None
+
             if any(day in item.upper() for day in weekdays):
                 event_date = trunc_item
             else:
@@ -34,12 +38,12 @@ def default():
                     time = time.find('td').text
                 else:
                     time = 0
-                data_table.append({"name": item, "date": event_date, "time": time})
+                data_table.append({"name": item, "date": event_date, "time": time, "link": link,})
 
         # print(data_table)
 
         for i in range(len(data_table)):
-            requests.put(BASE + f"rebelcoverage_add", json={"name": data_table[i]["name"], "date": data_table[i]["date"], "time": data_table[i]["time"]})
+            requests.put(BASE + f"rebelcoverage_add", json={"name": data_table[i]["name"], "date": data_table[i]["date"], "time": data_table[i]["time"], "link" : data_table[i]["link"],})
         
         with open('scraped_RebelCoverage.json', 'w') as json_file:
             json.dump(data_table, json_file, indent=4)

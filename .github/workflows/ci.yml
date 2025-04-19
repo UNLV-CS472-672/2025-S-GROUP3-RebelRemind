@@ -32,6 +32,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      TZ: 'America/Los_Angeles'
+      LANG: 'en_US.UTF-8'
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

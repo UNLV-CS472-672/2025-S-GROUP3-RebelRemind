@@ -44,6 +44,15 @@ const CanvasTokenManager = () => {
             console.log("Canvas PAT saved.");
             alert("Your Canvas token has been securely saved.");
         });
+
+        chrome.runtime.sendMessage({ type: "GET_PREFERENCES" }, (response) => {
+            if (response && response.preferences) {
+                if (response.preferences.canvasIntegration) { // check if Canvas integration is enabled
+                    chrome.runtime.sendMessage({ type: "UPDATE_ASSIGNMENTS" }); // update assignments display
+                    chrome.runtime.sendMessage({ type: "START_CANVAS_ALARM" }); // start automated assignment fetching
+                }
+            } 
+        });
     };
 
     return (

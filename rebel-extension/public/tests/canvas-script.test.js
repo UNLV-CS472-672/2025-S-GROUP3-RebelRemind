@@ -1,3 +1,17 @@
+/**
+ * canvas-script Tests
+ * 
+ * This test suite validates the functionality of the Canvas API interactions.
+ * This script handles fetching assignments from Canvas for the user.
+ * 
+ * Features Tested:
+ * - Canvas access token can be properly fetched from Chrome storage.
+ * - The course list for a given user is being retrieved properly.
+ * - Assignments for a given course are being retrieved and handled properly.
+ * 
+ * Authored by: Gunnar Dalton
+ */
+
 import { getAssignments, getCourses, getCanvasPAT } from "../scripts/canvas-script";
 
 beforeEach(() => {

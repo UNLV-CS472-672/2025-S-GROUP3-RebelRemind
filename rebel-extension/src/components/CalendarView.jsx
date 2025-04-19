@@ -1,6 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import "../App.css";
 import "./css/CalendarView.css";
+import calendarEvents from "./calendarEvents.js";
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
 
 //date-fns localizer for big-calendar
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
@@ -17,17 +20,20 @@ import { setMinutes } from "date-fns";
  *			     (from locale or machine) and displays a calendar based on the day.
  * Uses: react-big-calendar to display and format the calendar
  *	 date-fns for reading and parsing the date from the locale.
+ *       react-bootstrap to display events via the "Modal" component.
  *
  * Features:
- * - Selecting "Daily Reminders" places a Calendar object into the extension,
- *   and renders a Day-Only view of the calendar. Should display assignments and events from backend (TBD).
+ * - Selecting "Day" or "Week" displays a range of dates based on the current date (or locale).
+ *   Renders Day-view or Week-view. Should display assignments and events from backend (TBD).
  *
  * Components:
- * - react-big-calendar.css for styling. (Modified to fit the extension's color scheme and size)
+ * - CalendarView.css for styling. (Modified to fit the extension's color scheme and size)
+ * - react-boostrap / Modal for displaying events in a pop-up window. (Formatted manually but styled via CalendarView.css
  *
  * Authored by: Jeremy Besitula
+ * Assignment and User Created Event support by: Gunnar Dalton
  *
- * Put into component DailyCalendar.jsx by Jeremy Besitula
+ * Put into component CalendarView.jsx by Jeremy Besitula
  * @returns {JSX.Element} The react-big-calendar component UI.
  */
  
@@ -48,8 +54,66 @@ function CalendarMenu() {
 	const maxLimit = setMinutes(setHours(new Date(), 23), 59);
 
 	const [events, setEvents] = useState([]);
+	const [select, setSelect] = useState();
+	const [show, setShow] = useState(false);
+	const [modalTitle, setmodalTitle] = useState('Modal Title');
+	const [modalBody, setmodalBody] = useState('Modal Body');
+	
+	const handleClose = () => setShow(false);
+  	const handleShow = () => setShow(true);
+	
+	const handleSelect = (event) => {
+		setSelect(event);
+		setShow(true);
+		setmodalTitle(event.title);
+		
+		//IDEA:  USE A STATE OR THE EVENT TO DIRECT CONTROL FLOW TO 2 DIFFERENT TEMPLATES FOR FORMATTING
+		//	 EVENT (1) 	--> TITLE, STARTS, ENDS, DESCRIPTION, LOCATION
+		//				*NOTE: EVENT MAY HAVE A COMBINATION OF: DESCRIPTION AND LOCATION, ONE OR THE OTHER IS MISSING, BOTH ARE MISSING
+		//	 ASSIGNMENT (0) --> TITLE, DUE, COURSE
+		
+		if(event.id === 1){
+			const eventStart = "Started at:\t\t" + ((event.start).toString()).slice(0,15) + ", " + (event.start).toLocaleTimeString('en-US', {
+			hour: 'numeric',
+			minute: 'numeric',
+			hour12: 'true'
+			}) + '\n';
+			const eventEnd = "Ends at:\t\t" + ((event.end).toString()).slice(0,15) + ", " + (event.end).toLocaleTimeString('en-US', {
+			hour: 'numeric',
+			minute: 'numeric',
+			hour12: 'true'
+			}) + '\n';
+			const eventDate = ((event.start).getTime() === (event.end).getTime()) ? ("Date:\t\t\t" + ((event.start).toString()).slice(0,15) + ", " + (event.start).toLocaleTimeString('en-US', {
+			hour: 'numeric',
+			minute: 'numeric',
+			hour12: 'true'
+			}) + '\n') : ( undefined ) ;
+			const eventLocation = event.location === undefined ? "" : ("Location:\t\t" + (event.location).toString() + '\n');
+			const eventDesc = event.description === undefined ? "" :  ("Description:\t" + (event.description).toString());
+		
+			if(eventDate === undefined){
+				setmodalBody(eventStart + eventEnd + eventLocation + eventDesc);}
+			else{
+				setmodalBody(eventDate + eventLocation + eventDesc);}
+			
+		} else {
+			const eventDue = "Due at:\t\t" + ((event.end).toString()).slice(0,15) + ", " + (event.end).toLocaleTimeString('en-US', {
+			hour: 'numeric',
+			minute: 'numeric',
+			hour12: 'true'
+			}) + '\n';
+			const eventCourse = "Course:\t\t" + (event.course).toString();
+			setmodalBody(eventDue + eventCourse);
+		}
+	};
 
+	/**
+     * Effect Hook: Load the stored Canvas assignments and user created events when the component mounts.
+     */
 	useEffect(() => {
+		/**
+ 		* Calls the correct functions to get Canvas assignments and user created events and places them together in one array.
+ 		*/
 		const fetchEvents = async () => {
 			const canvasAssignments = await getCanvasAssignments();
 			const userEvents = await getUserEvents();
@@ -57,9 +121,14 @@ function CalendarMenu() {
 		};
 		fetchEvents();
 
-		const handleMessage = (message) => {
-            if (message.type === "EVENT_CREATED" || message.type === "EVENT_UPDATED") {
+		/**
+ 		* Listens for messages indicating that a user created event has been created or updated.
+ 		*/
+		const handleMessage = (message, sender, sendResponse) => {
+            if (message.type === "EVENT_CREATED" || message.type === "EVENT_UPDATED" || message.type === "UPDATE_ASSIGNMENTS") {
                 fetchEvents();
+				sendResponse(true);
+				return true;
             }
         };
 
@@ -80,14 +149,30 @@ function CalendarMenu() {
       	  min= {minLimit}
       	  max= {maxLimit}
       	  defaultDate = {new Date()}
-      	  style={{ height: 600 }}
+      	  selected = {select}
+      	  onSelectEvent = {handleSelect}
+      	  style={{ height: 700 }}
     	  />
+    	  <Modal show={show} onHide={handleClose}>
+        	<Modal.Header closeButton closeVariant="black">
+          		<Modal.Title>{modalTitle}</Modal.Title>
+        	</Modal.Header>
+        	<Modal.Body style={{ whiteSpace: 'pre' }} >{modalBody}</Modal.Body>
+        	<Modal.Footer>
+          	<Button variant="secondary" onClick={handleClose} style={{color:"#ffffff"}}>
+            		Close
+          	</Button>
+        	</Modal.Footer>
+      	  </Modal>
   	</div>
 	);  
 }
 
 export default CalendarMenu;
 
+/**
+ * Gets the list of Canvas assignments from storage and formats it in the correct way to be handled by the calendar.
+ */
 const getCanvasAssignments = async () => {
 	return new Promise ((resolve) => {
 		chrome.storage.local.get("Canvas_Assignments", (data) => {
@@ -97,7 +182,8 @@ const getCanvasAssignments = async () => {
 					title: assignment.title,
 					start: new Date(assignment.due_at),
 					end: new Date(assignment.due_at),
-					description: assignment.context_name
+					course: assignment.context_name,
+					id: 0 // set id to 0 for Canvas assignments
 				}));
 				resolve(canvasAssignments);
 			} else { 
@@ -107,8 +193,10 @@ const getCanvasAssignments = async () => {
 	})
 };
 
+/**
+ * Gets the list of user created events from storage and formats it in the correct way to be handled by the calendar.
+ */
 const getUserEvents = async () => {
-	console.log("Here");
 	return new Promise ((resolve) => {
 		chrome.storage.local.get("userEvents", (data) => {
 			if (data.userEvents) { 
@@ -118,7 +206,9 @@ const getUserEvents = async () => {
 					start: event.allDay ? new Date (`${event.date}T00:00:00`) : new Date(`${event.date}T${event.startTime}:00`),
 					end: event.allDay ? new Date (`${event.date}T00:00:00`) : new Date(`${event.date}T${event.endTime}:00`),
 					allDay: event.allDay,
-					description: event.desc
+					description: event.desc,
+					location: event.location,
+					id: 1 // set id to 1 for user created events
 				}))
 				resolve(userCalendarEvents);
 			} else { 
