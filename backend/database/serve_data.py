@@ -106,23 +106,26 @@ class InvolvementCenter(db.Model):
                     f"location = {self.location}," +
                     f"organization = {self.organization}," +
                     f"link = {self.link})")
+    
 # Create Rebel Coverage table for database
 class RebelCoverage(db.Model):
-	id = db.Column(db.Integer, primary_key=True)
-	name = db.Column(db.String(500), nullable=False)
-	date = db.Column(db.Date, nullable=False)
-	time = db.Column(db.String(100))
-	location = db.Column(db.String(100))
-	sport = db.Column(db.String(100))
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(500), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.String(100))
+    location = db.Column(db.String(100))
+    sport = db.Column(db.String(100))
+    link = db.Column(db.String(100))
 
-	def __repr__(self):
-		return ("RebelCoverage(" +
+    def __repr__(self):
+        return ("RebelCoverage(" +
 					f"id = {self.id},"
 					f"name = {self.name}," +
 					f"date = {self.date}," +
 					f"time = {self.time}," +
 					f"location = {self.location}," +
-					f"sport = {self.sport})")
+					f"sport = {self.sport}," +
+                    f"link = {self.link})")
 
 # Create UNLV Calendar table for database
 class UNLVCalendar(db.Model):
@@ -177,6 +180,7 @@ rebel_put_args.add_argument("date", type=str, help="Event date is required", req
 rebel_put_args.add_argument("time", type=str, help="Event time can be null", required=False)
 rebel_put_args.add_argument("location", type=str, help="Event location can be null", required=False)
 rebel_put_args.add_argument("sport", type=str, help="Sport can be null", required=False)
+rebel_put_args.add_argument("link", type=str, help="Event link can be null", required=False)
 
 # Parser for Organization table
 organization_put_args = reqparse.RequestParser()
@@ -209,7 +213,8 @@ rebel_fields = {
 	'date': fields.String,
 	'time': fields.String,
 	'location': fields.String,
-	'sport': fields.String
+	'sport': fields.String,
+    'link' : fields.String
 }
 
 # Resource fields for Organization model
@@ -399,7 +404,8 @@ class RebelCoverage_Add(Resource):
 			date=date_object,
 			time=args.get('time'),
 			location=args.get('location'),
-			sport=args.get('sport')
+			sport=args.get('sport'),
+            link=args.get('link')
 		)
 		db.session.add(event)
 		db.session.commit()
