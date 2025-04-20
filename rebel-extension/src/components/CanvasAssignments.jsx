@@ -15,6 +15,10 @@ function CanvasAssignments() {
     const [completedAssignments, setCompletedAssignments] = useState([]);
     const [showCompleted, setShowCompleted] = useState(false);
     const [justCompleted, setJustCompleted] = useState([]);
+    const [CanvasIntegrationPreference, setCanvasIntegrationPreference] = useState(false);
+    const [validToken, setValidToken] = useState(false);
+    const [CanvasFetchStatus, setCanvasFetchStatus] = useState(false);
+    const [CanvasFetchError, setCanvasFetchError] = useState("");
 
     /**
      * Effect Hook: Load the Canvas Assignments and format them when the component mounts.
@@ -54,6 +58,41 @@ function CanvasAssignments() {
                 }
             });
 		};
+
+        /**
+        * Check that Canvas integration is enabled and there is a Canvas Access Token in storage.
+        */
+        const checkPreferencesAndToken = async() => {
+            chrome.storage.sync.get("preferences", (data) => {
+                if (data.preferences.canvasIntegration) {
+                    setCanvasIntegrationPreference(true);
+                }
+            });
+            chrome.storage.local.get("canvasPAT", (data) => {
+                if (data.canvasPAT) {
+                    setValidToken(true);
+                }
+            });
+        };
+
+        /**
+        * Check for any errors fetching from Canvas so they can be displayed to user.
+        */
+        const checkFetchStatus = async() => {
+            chrome.storage.local.get("CanvasFetchStatus", (data) => {
+                if (!data.CanvasFetchStatus.success) {
+                    setCanvasFetchStatus(false);
+                    setCanvasFetchError(data.CanvasFetchStatus.error);
+                }
+                else {
+                    setCanvasFetchStatus(true);
+                    setCanvasFetchError("");
+                }
+            });
+        }
+
+        checkFetchStatus();
+        checkPreferencesAndToken();
 		fetchAssignments();
 
         /**
@@ -61,6 +100,7 @@ function CanvasAssignments() {
  		*/
         const handleMessage = (message, sender, sendResponse) => { // call to update from background
             if (message.type === "UPDATE_ASSIGNMENTS") {
+                checkFetchStatus();
                 fetchAssignments();
                 sendResponse(true);
                 return true;
@@ -112,6 +152,23 @@ function CanvasAssignments() {
         .sort((a, b) => new Date(a.due_at) - new Date(b.due_at))
         .filter(a => showCompleted || !isComplete(a.id) || justCompleted.includes(a.id));
     // ai-gen end
+
+    if (!CanvasIntegrationPreference) { // Canvas integration is disabled
+        return <p>Canvas integration is disabled! Please check your preferences to enable this feature.</p>
+    }
+
+    if (CanvasIntegrationPreference && !validToken) { // Canvas integration is enabled but no token is in storage
+        return <p>You do not have a Canvas Access Token stored! Please save a token into storage to enable this feature.</p>
+    }
+
+    if (!CanvasFetchStatus) { // There was an error fetching assignments from Canvas
+        if (CanvasFetchError === "Invalid Canvas Access Token") { // HTTP 401 error
+            return <p>Your Canvas Access Token is invalid! Please check your saved token and try again.</p>
+        }
+        else { // All other error cases
+            return <p>An error occured while fetching your assignments! Please check your saved token or try again later.</p>
+        }
+    }
 
     if (assignments.length === 0) { // handles no assignments listed case
         return <p>No assignments found.</p>;

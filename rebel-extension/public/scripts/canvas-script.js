@@ -25,6 +25,9 @@ export async function getAssignments(courseID, accessToken) {
             });
 
             if (!response.ok) {
+                const fetchStatus = { success: false, error: response.status };
+                chrome.storage.local.set({ CanvasFetchStatus: fetchStatus }); // pass error to storage
+                chrome.storage.local.set({ Canvas_Assignments: [] }); // empty assignment storage
                 throw new Error(`HTTP Error: ${response.status}`);
             }
             // ai-gen start (ChatGPT-4o, 0)
@@ -102,6 +105,14 @@ export async function getCourses(accessToken) {
             if (!response.ok) {
                 if (response.status == 401) {
                     console.log("There may be an issue with your Canvas Access Token. Please check that and try again!");
+                    const fetchStatus = { success: false, error: "Invalid Canvas Access Token" };
+                    chrome.storage.local.set({ CanvasFetchStatus: fetchStatus }); // pass error to storage
+                    chrome.storage.local.set({ Canvas_Assignments: [] }); // empty assignment storage
+                }
+                else {
+                    const fetchStatus = { success: false, error: response.status };
+                    chrome.storage.local.set({ CanvasFetchStatus: fetchStatus });
+                    chrome.storage.local.set({ Canvas_Assignments: [] });
                 }
                 throw new Error(`HTTP Error: ${response.status}`);
             }

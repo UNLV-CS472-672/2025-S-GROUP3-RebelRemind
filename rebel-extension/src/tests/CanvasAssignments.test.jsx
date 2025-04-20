@@ -29,6 +29,9 @@ beforeAll(() => {
           get: jest.fn(),
           set: jest.fn()
         },
+        sync: {
+            get: jest.fn()
+        }
       },
     };
     const now = new Date();
@@ -44,9 +47,26 @@ beforeAll(() => {
     jest.clearAllMocks();
   });
 
+test("Valid fetch but no assignments returned", async () => {
+    global.chrome.storage.local.get.mockImplementation((key, callback) => { // mock chrome.storage as being empty
+        callback({ Canvas_Assignments: [],  CanvasFetchStatus: { success: true, error: null }, canvasPAT: "test_access_token"});
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({preferences: { canvasIntegration: true }});
+    });
+
+    render(<CanvasAssignments />);
+    await waitFor(() => {
+        expect(screen.getByText(/No assignments found./)).toBeInTheDocument(); // proper response if no assignments have been fetched
+    });
+});
+
 test("No assignments in storage", async () => {
     global.chrome.storage.local.get.mockImplementation((key, callback) => { // mock chrome.storage as being empty
-        callback([]);
+        callback({ CanvasFetchStatus: { success: true, error: null }, canvasPAT: "test_access_token"});
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({preferences: { canvasIntegration: true }});
     });
 
     render(<CanvasAssignments />);
@@ -60,7 +80,12 @@ test("Today assignment", async() => { // check for proper text if an assignment 
     today.setHours(22, 30);
     const dateString = today.toLocaleString();
     global.chrome.storage.local.get.mockImplementation((key, callback) => { 
-        callback({Canvas_Assignments: [{ context_name: "CS 101", title: "Assignment 1", due_at: dateString, id: 1, user_submitted: false }]});
+        callback({ Canvas_Assignments: [{ context_name: "CS 101", title: "Assignment 1", due_at: dateString, id: 1, user_submitted: false }], 
+            CanvasFetchStatus: { success: true, error: null },
+            canvasPAT: "test_access_token"});
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({preferences: { canvasIntegration: true }});
     });
 
     render(<CanvasAssignments />);
@@ -78,7 +103,12 @@ test("Tomorrow assignment", async() => { // check for proper text if an assignme
     tomorrow.setHours(22, 30);
     const dateString = tomorrow.toLocaleString();
     global.chrome.storage.local.get.mockImplementation((key, callback) => { 
-        callback({Canvas_Assignments: [{ context_name: "CS 102", title: "Assignment 2", due_at: dateString, id: 2, user_submitted: false }]});
+        callback({Canvas_Assignments: [{ context_name: "CS 102", title: "Assignment 2", due_at: dateString, id: 2, user_submitted: false }], 
+            CanvasFetchStatus: { success: true, error: null },
+            canvasPAT: "test_access_token"});
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({preferences: { canvasIntegration: true }});
     });
 
     render(<CanvasAssignments />);
@@ -100,7 +130,12 @@ test("Future assignment", async() => { // check for proper text if an assignment
         day: "numeric"
     });
     global.chrome.storage.local.get.mockImplementation((key, callback) => { 
-        callback({Canvas_Assignments: [{ context_name: "CS 103", title: "Assignment 3", due_at: dateString, id: 3, user_submitted: false }]});
+        callback({Canvas_Assignments: [{ context_name: "CS 103", title: "Assignment 3", due_at: dateString, id: 3, user_submitted: false }], 
+            CanvasFetchStatus: { success: true, error: null },
+            canvasPAT: "test_access_token"});
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({preferences: { canvasIntegration: true }});
     });
 
     render(<CanvasAssignments />);
@@ -132,7 +167,12 @@ test("Combination of assignments", async() => { // check that assignments are so
             { context_name: "CS 104", title: "Assignment 4", due_at: futuredateString, id: 4, user_submitted: false }, 
             { context_name: "CS 105", title: "Assignment 5", due_at: todayString, id: 5, user_submitted: false },
             { context_name: "CS 106", title: "Assignment 6", due_at: tomorrowString, id: 6, user_submitted: false }
-        ]});
+        ], 
+        CanvasFetchStatus: { success: true, error: null },
+        canvasPAT: "test_access_token"});
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({preferences: { canvasIntegration: true }});
     });
 
     render(<CanvasAssignments />);
@@ -175,7 +215,12 @@ test("Already submitted assignment to Canvas", async() => { // check that user_s
             { context_name: "CS 107", title: "Assignment 7", due_at: todayString, id: 7, user_submitted: false }, 
             { context_name: "CS 108", title: "Assignment 8", due_at: tomorrowString, id: 8, user_submitted: true },
             { context_name: "CS 109", title: "Assignment 9", due_at: futuredateString, id: 9, user_submitted: false }
-        ], completedAssignments: [] }); // no completed assignments in storage
+        ], completedAssignments: [], 
+        CanvasFetchStatus: { success: true, error: null },
+        canvasPAT: "test_access_token"}); // no completed assignments in storage
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({preferences: { canvasIntegration: true }});
     });
 
     render(<CanvasAssignments />);
@@ -220,7 +265,12 @@ test("All assignments are completed", async() => {
             completedAssignments: [
                 { id: 17, due_at: todayString }, 
                 { id: 19, due_at: futuredateString }
-            ]});
+            ], 
+            CanvasFetchStatus: { success: true, error: null },
+            canvasPAT: "test_access_token"});
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({preferences: { canvasIntegration: true }});
     });
 
     render(<CanvasAssignments />);
@@ -235,7 +285,12 @@ test("Mark assignment complete", async() => {
     const dateString = today.toLocaleString();
     global.chrome.storage.local.get.mockImplementation((key, callback) => { 
         callback({Canvas_Assignments: [{ context_name: "CS 113", title: "Assignment 13", due_at: dateString, id: 13, user_submitted: false }],
-            completedAssignments: [] });
+            completedAssignments: [], 
+            CanvasFetchStatus: { success: true, error: null },
+            canvasPAT: "test_access_token"});
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({preferences: { canvasIntegration: true }});
     });
 
     render(<CanvasAssignments />);
@@ -264,7 +319,12 @@ test("Undo a completed assignment", async() => {
     const dateString = today.toLocaleString();
     global.chrome.storage.local.get.mockImplementation((key, callback) => { 
         callback({Canvas_Assignments: [{ context_name: "CS 114", title: "Assignment 14", due_at: dateString, id: 14, user_submitted: false }], 
-            completedAssignments: [{ id: 14, due_at: dateString }]}); // assignment is already completed
+            completedAssignments: [{ id: 14, due_at: dateString }], 
+            CanvasFetchStatus: { success: true, error: null },
+            canvasPAT: "test_access_token"}); // assignment is already completed
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({preferences: { canvasIntegration: true }});
     });
 
     render(<CanvasAssignments />);
@@ -321,7 +381,12 @@ test("Mark complete and undo complete an assignment", async() => {
             { context_name: "CS 110", title: "Assignment 10", due_at: todayString, id: 10, user_submitted: false }, 
             { context_name: "CS 111", title: "Assignment 11", due_at: tomorrowString, id: 11, user_submitted: true },
             { context_name: "CS 112", title: "Assignment 12", due_at: futuredateString, id: 12, user_submitted: false }], 
-            completedAssignments: [] });
+            completedAssignments: [], 
+            CanvasFetchStatus: { success: true, error: null },
+            canvasPAT: "test_access_token"});
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({preferences: { canvasIntegration: true }});
     });
 
     render(<CanvasAssignments />);
@@ -415,7 +480,12 @@ test("Handling UPDATE_ASSIGNMENTS message", async() => {
     const dateString = today.toLocaleString();
     global.chrome.storage.local.get.mockImplementation((key, callback) => { 
         callback({Canvas_Assignments: [{ context_name: "CS 115", title: "Assignment 15", due_at: dateString, id: 15, user_submitted: false }], 
-            completedAssignments: []});
+            completedAssignments: [], 
+            CanvasFetchStatus: { success: true, error: null },
+            canvasPAT: "test_access_token"});
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({preferences: { canvasIntegration: true }});
     });
 
     const sendReponse = jest.fn();
@@ -427,8 +497,9 @@ test("Handling UPDATE_ASSIGNMENTS message", async() => {
     expect(response).toBe(true);
     await waitFor(() => { // check that fetchAssignments() runs twice and sendResponse runs as expected
         expect(chrome.storage.local.get).toHaveBeenCalledWith(["Canvas_Assignments", "completedAssignments"], expect.any(Function));
-        expect(chrome.storage.local.get).toHaveBeenCalledTimes(2);
+        expect(chrome.storage.local.get).toHaveBeenCalledTimes(5);
         expect(chrome.storage.local.set).toHaveBeenCalledTimes(2);
+        expect(chrome.storage.sync.get).toHaveBeenCalledTimes(1);
         expect(sendReponse).toHaveBeenCalledWith(true);
         expect(sendReponse).toHaveBeenCalledTimes(1);
     });
@@ -444,7 +515,12 @@ test("Handling INVALID_MESSAGE message", async() => {
     const dateString = today.toLocaleString();
     global.chrome.storage.local.get.mockImplementation((key, callback) => { 
         callback({Canvas_Assignments: [{ context_name: "CS 116", title: "Assignment 16", due_at: dateString, id: 16, user_submitted: false }], 
-            completedAssignments: []});
+            completedAssignments: [], 
+            CanvasFetchStatus: { success: true, error: null },
+            canvasPAT: "test_access_token"});
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({preferences: { canvasIntegration: true }});
     });
 
     const sendReponse = jest.fn();
@@ -455,8 +531,89 @@ test("Handling INVALID_MESSAGE message", async() => {
 
     expect(response).toBe(undefined);
     await waitFor(() => { // check that fetchAssignments() runs once and sendResponse does not run
-        expect(chrome.storage.local.get).toHaveBeenCalledTimes(1);
+        expect(chrome.storage.local.get).toHaveBeenCalledTimes(3);
         expect(chrome.storage.local.set).toHaveBeenCalledTimes(1);
+        expect(chrome.storage.sync.get).toHaveBeenCalledTimes(1);
         expect(sendReponse).not.toHaveBeenCalled();
     });
-})
+});
+
+test("Canvas integration preference is disabled", async() => {
+    const today = new Date();
+    today.setHours(22, 30);
+    const dateString = today.toLocaleString();
+    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
+        callback({ Canvas_Assignments: [{ context_name: "CS 117", title: "Assignment 17", due_at: dateString, id: 17, user_submitted: false }], 
+            CanvasFetchStatus: { success: true, error: null },
+            canvasPAT: "test_access_token"});
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({preferences: { canvasIntegration: false }});
+    });
+
+    render(<CanvasAssignments />);
+
+    await waitFor(() => {
+        expect(screen.getByText(/Canvas integration is disabled! Please check your preferences to enable this feature./)).toBeInTheDocument(); // message that is displayed if all upcoming assignments in storage are already completed
+    });
+});
+
+test("No Canvas Access Token in storage", async() => {
+    const today = new Date();
+    today.setHours(22, 30);
+    const dateString = today.toLocaleString();
+    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
+        callback({ Canvas_Assignments: [{ context_name: "CS 118", title: "Assignment 18", due_at: dateString, id: 18, user_submitted: false }], 
+            CanvasFetchStatus: { success: true, error: null },
+            canvasPAT: ""});
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({preferences: { canvasIntegration: true }});
+    });
+
+    render(<CanvasAssignments />);
+
+    await waitFor(() => {
+        expect(screen.getByText(/You do not have a Canvas Access Token stored! Please save a token into storage to enable this feature./)).toBeInTheDocument(); // message that is displayed if all upcoming assignments in storage are already completed
+    });
+});
+
+test("Invalid Canvas Access Token error", async() => {
+    const today = new Date();
+    today.setHours(22, 30);
+    const dateString = today.toLocaleString();
+    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
+        callback({ Canvas_Assignments: [{ context_name: "CS 119", title: "Assignment 19", due_at: dateString, id: 19, user_submitted: false }], 
+            CanvasFetchStatus: { success: false, error: "Invalid Canvas Access Token" },
+            canvasPAT: "test_access_token"});
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({preferences: { canvasIntegration: true }});
+    });
+
+    render(<CanvasAssignments />);
+
+    await waitFor(() => {
+        expect(screen.getByText(/Your Canvas Access Token is invalid! Please check your saved token and try again./)).toBeInTheDocument(); // message that is displayed if all upcoming assignments in storage are already completed
+    });
+});
+
+test("Miscellaneous Canvas fetching error", async() => {
+    const today = new Date();
+    today.setHours(22, 30);
+    const dateString = today.toLocaleString();
+    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
+        callback({ Canvas_Assignments: [{ context_name: "CS 120", title: "Assignment 20", due_at: dateString, id: 20, user_submitted: false }], 
+            CanvasFetchStatus: { success: false, error: "Miscellaneous error" },
+            canvasPAT: "test_access_token"});
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({preferences: { canvasIntegration: true }});
+    });
+
+    render(<CanvasAssignments />);
+
+    await waitFor(() => {
+        expect(screen.getByText(/An error occured while fetching your assignments! Please check your saved token or try again later./)).toBeInTheDocument(); // message that is displayed if all upcoming assignments in storage are already completed
+    });
+});

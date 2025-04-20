@@ -188,9 +188,11 @@ async function fetchCanvasAssignments() {
         .then((assignments) => {
           // Flatten the array
           allAssignments = assignments.flat();
+          const fetchStatus = { success: true, error: null }; // fetching had no errors
           chrome.storage.local.set({ Canvas_Assignments: allAssignments }, () => {
             console.log("Assignments Stored!");
           });
+          chrome.storage.local.set({ CanvasFetchStatus: fetchStatus });
           chrome.runtime.sendMessage({ type: "UPDATE_ASSIGNMENTS" }, (response) => {
             if (chrome.runtime.lastError) {
               // handle receiving end does not exist error (when popup is closed)
