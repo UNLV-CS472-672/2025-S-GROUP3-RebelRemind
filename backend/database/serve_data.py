@@ -375,10 +375,10 @@ class AcademicCalendar_Delete_Past(Resource):
     def delete(self):
         delete_count = db.session.query(AcademicCalendar).filter(AcademicCalendar.date < (datetime.now().date())).delete()
         db.session.commit()
-        if not delete_count:
+        # if not delete_count:
             # abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
-            return jsonify(message="No past Academic Calendar events found to delete."), HTTPStatus.OK
-        return jsonify(message=f"Deleted {delete_count} past Academic Calendar events."), HTTPStatus.OK
+            # return jsonify(message="No past Academic Calendar events found to delete."), HTTPStatus.OK
+        # return jsonify(message=f"Deleted {delete_count} past Academic Calendar events."), HTTPStatus.OK
 
 class AcademicCalendar_Delete_All(Resource):
     # DELETE all items from Academic Calendar table
@@ -429,10 +429,10 @@ class InvolvementCenter_Delete_Past(Resource):
     def delete(self):
         delete_count = db.session.query(InvolvementCenter).filter(InvolvementCenter.date < (datetime.now().date())).delete()
         db.session.commit()
-        if not delete_count:
+        # if not delete_count:
             # abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
-            return jsonify(message="No past Involvement Center events found to delete."), HTTPStatus.OK
-        return jsonify(message=f"Deleted {delete_count} past Involvement Center events."), HTTPStatus.OK
+            # return jsonify(message="No past Involvement Center events found to delete."), HTTPStatus.OK
+        # return jsonify(message=f"Deleted {delete_count} past Involvement Center events."), HTTPStatus.OK
 
 class InvolvementCenter_Delete_All(Resource):
     # DELETE all items from Involvement Center table
@@ -484,9 +484,9 @@ class RebelCoverage_Delete_Past(Resource):
 	def delete(self):
 		result = db.session.query(RebelCoverage).filter(RebelCoverage.date < (datetime.now().date())).delete()
 		db.session.commit()
-		if not result:
-			abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
-		return result
+		# if not result:
+			# abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
+		# return result
 
 class RebelCoverage_Delete_All(Resource):
 	# GET items from Rebel Coverage table
@@ -535,10 +535,10 @@ class UNLVCalendar_Delete_Past(Resource):
     def delete(self):
         delete_count = db.session.query(UNLVCalendar).filter(UNLVCalendar.date < (datetime.now().date())).delete()
         db.session.commit()
-        if not delete_count:
+        # if not delete_count:
             # abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
-            return jsonify(message="No past UNLV Calendar events found to delete."), HTTPStatus.OK
-        return jsonify(message=f"Deleted {delete_count} past UNLV Calendar events."), HTTPStatus.OK
+            # return jsonify(message="No past UNLV Calendar events found to delete."), HTTPStatus.OK
+        # return jsonify(message=f"Deleted {delete_count} past UNLV Calendar events."), HTTPStatus.OK
 
 class UNLVCalendar_Delete_All(Resource):
     # DELETE all items from UNLV Calendar table
