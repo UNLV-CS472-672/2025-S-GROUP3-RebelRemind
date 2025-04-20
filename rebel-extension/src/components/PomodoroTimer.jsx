@@ -42,57 +42,52 @@ function PomodoroTimer() {
   const alarmRef = useRef(new Audio(FinishAlarm));
   const [isMuted, setIsMuted] = useState(false);       // const to mute the volume
 
-  useEffect(() => {
-    console.log('Component mounted or updated');
-    alarmRef.current.load();
-    alarmRef.current.muted = isMuted; // ← ✅ ADD THIS RIGHT AFTER
+// Change the whole useEffect function because mute functionality was resetting
+// to 25:00 and also was not unmutting after muting it.
+// Handle just the audio mute toggle without affecting timer logic
+useEffect(() => {
+  alarmRef.current.muted = isMuted;
+}, [isMuted]);
 
-    chrome.storage.local.get(["minutes", "seconds", "isRunning"], (data) => {
-      const isTimerDone = data.minutes === 0 && data.seconds === 0 && !data.isRunning;
-    
-      if (isTimerDone) {
-        chrome.storage.local.set({ minutes: 25, seconds: 0 }); // Auto-reset
-        setMinutes(25);
-        setSeconds(0);
-        setIsRunning(false);
-        setShowEditBoxes(true);
-        console.log("Auto-resetting timer to 25:00 after completion");
-      } else {
-        if (data.minutes !== undefined) setMinutes(data.minutes);
-        if (data.seconds !== undefined) setSeconds(data.seconds);
-        if (data.isRunning !== undefined) {
-          setIsRunning(data.isRunning);
-          setShowEditBoxes(!data.isRunning);
-        }
-      }
-    });
-    
-    /* istanbul ignore next */
-    const handleStorageChange = (changes) => {
-      if (changes.minutes) {
-        setMinutes(changes.minutes.newValue);
-        console.log(`Storage changed - minutes: ${changes.minutes.newValue}`);
-      }
-      /* istanbul ignore next */
-      if (changes.seconds) {
-        setSeconds(changes.seconds.newValue);
-        console.log(`Storage changed - seconds: ${changes.seconds.newValue}`);
-      }
-      /* istanbul ignore next */
-      if (changes.isRunning) {
-        setIsRunning(changes.isRunning.newValue);
-        setShowEditBoxes(!changes.isRunning.newValue);
-        console.log(`Storage changed - isRunning: ${changes.isRunning.newValue}`);
-      }
-    };
+// Handle timer state on mount
+useEffect(() => {
+  chrome.storage.local.get(["minutes", "seconds", "isRunning"], (data) => {
+    const isTimerDone = data.minutes === 0 && data.seconds === 0 && !data.isRunning;
 
-    chrome.storage.onChanged.addListener(handleStorageChange);
+    if (isTimerDone) {
+      chrome.storage.local.set({ minutes: 25, seconds: 0 }); // Auto-reset
+      setMinutes(25);
+      setSeconds(0);
+      setIsRunning(false);
+      setShowEditBoxes(true);
+      console.log("Auto-resetting timer to 25:00 after completion");
+    } else {
+      if (data.minutes !== undefined) setMinutes(data.minutes);
+      if (data.seconds !== undefined) setSeconds(data.seconds);
+      if (data.isRunning !== undefined) {
+        setIsRunning(data.isRunning);
+        setShowEditBoxes(!data.isRunning);
+      }
+    }
+  });
 
-    return () => {
-      chrome.storage.onChanged.removeListener(handleStorageChange);
-      console.log('Component unmounted');
-    };
-  }, [isMuted]);
+  const handleStorageChange = (changes) => {
+    if (changes.minutes) {
+      setMinutes(changes.minutes.newValue);
+    }
+    if (changes.seconds) {
+      setSeconds(changes.seconds.newValue);
+    }
+    if (changes.isRunning) {
+      setIsRunning(changes.isRunning.newValue);
+      setShowEditBoxes(!changes.isRunning.newValue);
+    }
+  };
+
+  chrome.storage.onChanged.addListener(handleStorageChange);
+  return () => chrome.storage.onChanged.removeListener(handleStorageChange);
+}, []); // ← empty dependency array = run only once on mount
+
 
   useEffect(() => {
     console.log('Timer updated:', minutes, seconds, 'isRunning:', isRunning);
