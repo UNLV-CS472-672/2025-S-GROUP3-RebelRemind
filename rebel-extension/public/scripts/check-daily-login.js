@@ -1,5 +1,5 @@
 export function checkDailyTask() {
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toLocaleDateString('en-CA')
 
   return new Promise((resolve) => {
     chrome.storage.local.get(["lastRunDate"], (result) => {

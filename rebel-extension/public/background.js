@@ -14,6 +14,9 @@
 import { authenticateUser } from "./scripts/identity-script.js";
 import { getAssignments, getCourses, getCanvasPAT } from "./scripts/canvas-script.js";
 import { openSidePanel } from "./scripts/sidepanel.js";
+import { fetchEvents } from "./scripts/involvement-center.js";
+import { checkDailyTask } from "./scripts/check-daily-login.js";
+
 
 /**
 * Listens for and handles any Chrome alarms.
@@ -24,27 +27,187 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   }
 });
 
-/**
- * This section is meant to handle all functions that need to be ran when the user logs into Chrome
- *
- * If you want to set a function to only run the first time of the day they are logged into Chrome, use
- * within the if statement
- *
- * If you want the function to run everytime they log into Chrome, place outside the if statement
- *
- * If you need something to run everytime the pop up is open, you can add it in the App.jsx for the pop up, Or
- * add a functionality in the frontend to call a script here.
- */
-// chrome.runtime.onStartup.addListener(() => {
-//   if (checkDailyTask()) {
-//     // Functions only to be done once a day.
-//     // I don't recommend Canvas or assignments because Professors might add new stuff midday so we should update as much as possible.
-//   }
-//   // Functions that should be ran anytime the user logins to Google. Will be run in background.
-//   //
-// });
+//region BACKGROUND
 
-//region Message Listener
+/**
+ * Handles background logic for scheduling and displaying daily event reminders.
+ * 
+ * This function is triggered automatically when Chrome starts or at scheduled intervals 
+ * (via alarms or runtime listeners). It fetches daily event data, filters relevant events, 
+ * and displays a system notification with a summary of upcoming activities.
+ * 
+ * Designed to run silently in the background as part of the RebelRemind extension.
+ * 
+ * Author: Billy Estrada
+ */
+
+//region notif
+// Utility to calculate the next 9:00 AM time
+function getNextNineAM() {
+  const now = new Date();
+  const next = new Date();
+  next.setHours(9, 0, 0, 0);
+  if (now > next) {
+    next.setDate(next.getDate() + 1); // schedule for tomorrow
+  }
+  return next.getTime();
+}
+
+// Setup alarm on extension install
+chrome.runtime.onInstalled.addListener(() => {
+  console.log("Extension installed: running first-time daily task");
+  handleDailyTask(true); // Run on install
+
+  chrome.alarms.create("dailyCheck", {
+    when: getNextNineAM(),
+    periodInMinutes: 1440 //24 hours
+    // periodInMinutes: 1 //24 hours
+  });
+});
+
+// Run logic when Chrome starts (fallback if alarm missed)
+chrome.runtime.onStartup.addListener(() => {
+  const currentHour = new Date().getHours();
+  console.log("Chrome started at", currentHour);
+  if (currentHour >= 9) {
+    handleDailyTask(true); // after 9am is true
+  }
+});
+
+// Respond to the daily alarm
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === "dailyCheck") {
+    handleDailyTask();
+  }
+});
+
+// Core function to handle daily task logic
+async function handleDailyTask(isStartup = false) {
+  try {
+    const shouldRun = await checkDailyTask();
+    const currentHour = new Date().getHours();
+
+    // Only run if the task hasn't already run, and it's after 9AM (if startup fallback)
+    if (!shouldRun && (!isStartup || currentHour >= 9)) {
+      console.log("Triggering daily task");
+
+      const fetchAssignments = async () => {
+        return new Promise((resolve) => {
+          chrome.storage.local.get("Canvas_Assignments", (data) => {
+            if (Array.isArray(data.Canvas_Assignments)) {
+              resolve(data.Canvas_Assignments);
+            } else {
+              resolve([]);
+            }
+          });
+        });
+      };
+      
+      const assignmentList = await fetchAssignments();
+      console.log("Canvas Assignments:", assignmentList);
+
+      //Constants do not touch
+      const now = new Date();
+      const todayForFetching = now.toLocaleDateString('en-CA')
+      const filterToday = (arr) =>
+        safeArray(arr).filter(event => {
+          if (!event.date || !event.time) return false;
+
+          const isAllDay = event.time === "(ALL DAY)";
+          if (event.date !== todayForFetching) return false;
+          if (isAllDay) return true;
+          
+          const dateTime = new Date(`${event.date} ${event.time}`); 
+          return dateTime > now;
+        });
+      const filterTodayCanvas = (arr) =>
+        safeArray(arr).filter(item => {
+          if (!item.due_at) return false;
+      
+          const dueDate = new Date(item.due_at);
+          const localDateStr = dueDate.toLocaleDateString('en-CA'); 
+          
+          return localDateStr === todayForFetching && dueDate > now;
+        });
+
+      //Basically error check if a response is valid
+      const safeArray = (data) => Array.isArray(data) ? data : [];
+
+      //Check incoming fetched events
+      const [data1, data2, data3, data4] = await fetchEvents(todayForFetching);
+
+      const academiccalendar_daily = filterToday(data1).length;
+      const involvementcenter_daily = filterToday(data2).length;
+      const rebelcoverage_daily = filterToday(data3).length;
+      const unlvcalendar_daily = filterToday(data4).length;
+      const canvas_daily = filterTodayCanvas(assignmentList).length;
+
+      const allEvents = [...safeArray(data1), ...safeArray(data2), ...safeArray(data3), ...safeArray(data4)];
+      console.log(...safeArray(data1));
+      console.log(...safeArray(data2));
+      console.log(...safeArray(data3));
+      console.log(...safeArray(data4));
+
+      const eventsToday = academiccalendar_daily + involvementcenter_daily + rebelcoverage_daily + unlvcalendar_daily + canvas_daily > 0;
+
+      const parts = [];
+
+      if (canvas_daily > 0) {
+        parts.push(`${canvas_daily} Canvas ${canvas_daily === 1 ? 'assignment' : 'assignments'}`);
+      }
+
+      if (academiccalendar_daily > 0) {
+        parts.push(`${academiccalendar_daily} Academic ${academiccalendar_daily === 1 ? 'event' : 'events'}`);
+      }
+
+      if (involvementcenter_daily > 0) {
+        parts.push(`${involvementcenter_daily} Involvement Center ${involvementcenter_daily === 1 ? 'event' : 'events'}`);
+      }
+
+      if (rebelcoverage_daily > 0) {
+        parts.push(`${rebelcoverage_daily} Rebel Coverage ${rebelcoverage_daily === 1 ? 'event' : 'events'}`);
+      }
+
+      if (unlvcalendar_daily > 0) {
+        parts.push(`${unlvcalendar_daily} UNLV ${unlvcalendar_daily === 1 ? 'event' : 'events'}`);
+      }
+
+      const dynamicTitle = parts.join(', ');
+
+      if (eventsToday){
+        chrome.notifications.create('', {
+          type: 'basic',
+          iconUrl: chrome.runtime.getURL("images/logo_128x128.png"), // must exist and be declared in manifest.json
+          title: "UNLV Events today",
+          message: dynamicTitle,
+          priority: 2
+        }, (notificationId) => {
+          if (chrome.runtime.lastError) {
+            console.error('Notification error:', chrome.runtime.lastError.message);
+          } else {
+            console.log('Notification shown with ID:', notificationId);
+          }
+        });
+      }
+    } else {
+      console.log("Daily task skipped (already run or too early)");
+    }
+  } catch (error) {
+    console.error("Error during daily task execution:", error);
+  }
+}
+
+chrome.notifications.onClicked.addListener((notificationId) => {
+  chrome.tabs.create({
+    url: "https://www.it.unlv.edu/webcampus" // or any internal HTML file
+  });
+});
+
+//endregion
+
+//endregion
+
+//region MESSAGES
 
 /**
  * Handles incoming messages from content scripts, popup scripts, or other parts of the extension.
@@ -163,6 +326,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+//endregion
+
+//region CANVAS
+
 /**
 * Fetches all assignments from Canvas and places them into storage.
 */
@@ -213,7 +380,9 @@ async function fetchCanvasAssignments() {
     return false;
   });
 }
+//endregion
 
+//region POMODORO
 
 // The following code is all for the Pomodoro Timer Logic
 let timerInterval;
@@ -406,3 +575,4 @@ function injectWidgetIntoAllTabs() {
   });
 }
 
+//endregion
