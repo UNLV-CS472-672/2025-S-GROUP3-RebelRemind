@@ -73,7 +73,7 @@ const CanvasTokenManager = () => {
                     className="canvasShowBT"
                 >
                     {showToken ? "🙈 Hide" : "👁 Show"}
-                </button>r
+                </button>
             </div>
 
             {/* Save Button */}
