@@ -93,10 +93,6 @@ function HomePage() {
           )}
         </div>
       </div>
-
-      <div className="accordion-text mt-3">
-        <p>Your Events at a Glance!</p>
-      </div>
       <AccordionMenu />
 
     </div>
