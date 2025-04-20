@@ -72,7 +72,7 @@ function AccordionMenu() {
         </Accordion.Item>
         <Accordion.Item eventKey="1">
           <Accordion.Header>📅 Your Events</Accordion.Header>
-          <Accordion.Body>
+          <Accordion.Body className="accordion-panel-scroll">
             {ic_events.map(event => (
               <div key={event.id}>
                 <a 
