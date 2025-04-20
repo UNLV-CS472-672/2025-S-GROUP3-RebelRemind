@@ -145,15 +145,15 @@ useEffect(() => {
 
   return (
       <div className="pomodoro-container">
-        <h3 className="pomodoro-title">Pomodoro Timer</h3>
+      <h1 className="pomodoro-title">Pomodoro Timer</h1>
     
   
-      {isTimerDone && (
-        <div className="timer-done-message">
-          <p>Timer is up! Time to take a Break!</p>
-        </div>
-      )}
-  
+    {isTimerDone && (
+      <span className="timer-done-message">
+        Timer is up! Set a new Break/Study Timer!
+      </span>
+    )}
+
       {showEditBoxes && (
         <div className="input-group">
           <input
@@ -193,20 +193,13 @@ useEffect(() => {
           marginBottom: "-6px" // reduce gap under button too
         }}
       >
-        <button
-          onClick={() => setIsMuted(prev => !prev)}
-          className="volume-button"
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            padding: 0 // removes default button padding
-          }}
-        >
-          {isMuted ? <FaVolumeMute size={24} /> : <FaVolumeUp size={24} />}
-        </button>
+    <button
+      onClick={() => setIsMuted(prev => !prev)}
+      className="volume-button"
+    >
+      {isMuted ? "🔇" : "🔊"}
+    </button>
       </div>
-
 
       <div className="timer-display">
         {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
