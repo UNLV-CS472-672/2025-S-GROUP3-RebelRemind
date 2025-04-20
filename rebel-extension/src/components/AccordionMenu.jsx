@@ -95,12 +95,20 @@ import Toggle from "./Toggle";
         <Accordion.Item eventKey="1">
           <Accordion.Header>📅 Your Events</Accordion.Header>
           <Accordion.Body>
+            {/* Additional category filtering
+             will go here for 
+                  -involvement center */}
             <Events events={ic_events} viewMode={viewMode} />
           </Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="2">
           <Accordion.Header>🎉 UNLV Events</Accordion.Header>
           <Accordion.Body>
+            {/* Additional category filtering
+             will go here for 
+                  -UNLV cal
+                  - academic cal 
+                  -  rebel cov */}
             <Events events={[...uc_events, ...ac_events, ...rc_events]} viewMode={viewMode} />
           </Accordion.Body>
         </Accordion.Item>
