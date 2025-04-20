@@ -101,7 +101,7 @@ function AccordionMenu() {
         </Accordion.Item>
         <Accordion.Item eventKey="2">
           <Accordion.Header>🎉 UNLV Events</Accordion.Header>
-          <Accordion.Body>
+          <Accordion.Body className="accordion-panel-scroll">
             {ac_events.map(event => (
               <div key={event.id}>
                 <a 

@@ -72,17 +72,17 @@
 }
 
 .accordion {
-  padding: 0 1rem 0 1rem;
+  padding: 0 1rem 0rem 1rem;
 }
 
 /* Adding this to make the accordion 3 tabs scrollable */
 
 
 .accordion-panel-scroll {
-  max-height: 150px;  /* limit panel height */
+  max-height: 105px;  /* limit panel height */
   min-height: 80px;   /* optional base size */
   overflow-y: auto;   /* scroll only inside this panel */
-  padding-right: 8px;
+  /* padding-right: 8px; */
 }
 
 
