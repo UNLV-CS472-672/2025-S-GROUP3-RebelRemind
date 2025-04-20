@@ -4,7 +4,7 @@ import AccordionMenu from "../components/AccordionMenu";
 import SidePanelButton from "../components/SidePanelButton";
 
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState, useRef } from "react"; 
+import { useEffect, useState, useRef } from "react";
 
 /**
  * Main UI Layout for the Chrome Extension.
@@ -12,6 +12,7 @@ import { useEffect, useState, useRef } from "react";
 function HomePage() {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [user, setUser] = useState(null);
   const DropdownRef = useRef(null);
   
   const handleClickAway = (event) => {
@@ -19,15 +20,8 @@ function HomePage() {
       setShowDropdown(false);
     }
   };
-
-  // Resize popup to original size when HomePage loads
-  useEffect(() => {
-    // Wait a tick to make sure layout is rendered
-    setTimeout(() => {
-      window.resizeTo(330, 400);
-    }, 50);
-  }, []);
   
+  //Used to handle clicking away from the dropdown
   useEffect(() => {
     document.addEventListener('mousedown', handleClickAway);
     return () => {
@@ -35,49 +29,76 @@ function HomePage() {
     };
   }, []);
 
-  return (
-    <div >
-      <img
-        src="/images/rebel-remind.png"
-        alt="Rebel Remind Logo"
-        className="rebel-remind-logo"
-      />
-      <CloseButton />
+  // Resize popup to original size when HomePage loads
+  useEffect(() => {
+    // Wait a tick to make sure layout is rendered
+    setTimeout(() => {
+      window.resizeTo(330, 400);
+    }, 50);
+    chrome.storage.sync.get(["user"], (data) => {
+      if (data.user) {
+        setUser(data.user);
+      }
+    });
+  }, []);
 
+  return (
+    <div>
+      <div className="banner">
+        <img
+          src="/images/rebel-remind.png"
+          alt="Rebel Remind Logo"
+          className="rebel-remind-logo"
+          style={{ width: "65%" }}
+        />
+
+        {/*Change View Dropdown Floating */}
+        <div className="profile-container">
+          {/* Ensures user.picture exists */}
+          {user ?
+            (
+              <img
+                src={user.picture}
+                alt="Profile Picture"
+                width="40px"
+                style={{ borderRadius: '80%', cursor: "pointer", boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)" }}
+                onClick={() => setShowDropdown((prev) => !prev)}
+              />
+            )
+            :
+            (
+              <div className="settings-button-container">
+                <button
+                  className="settings-button"
+                  onClick={() => navigate("/settings")}
+                >
+                  ⚙️
+                </button>
+              </div>
+            )
+          }
+          {showDropdown && (
+            <div className="change-view-dropdown" ref={DropdownRef}>
+              <button onClick={() => navigate("/user-events")}>
+                Create an Event
+              </button>
+              <SidePanelButton />
+              <button onClick={() => navigate("/pomodoro")}>
+                Pomodoro
+              </button>
+              <button onClick={() => navigate("/settings")}>
+                Settings
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="accordion-text mt-3">
+        <p>Your Events at a Glance!</p>
+      </div>
       <AccordionMenu />
 
-      {/*Change View Dropdown Floating */}
-      <div style={{ display: 'flex', gap: '269px' }} >
-		  <div className="change-view-container">
-		    <button
-		      className="change-view-btn"
-		      onClick={() => setShowDropdown((prev) => !prev)}
-		      style= {{position: 'sticky'}}
-		    >
-		      Change View
-		    </button>
-
-		    {showDropdown && (
-		      <div className="change-view-dropdown" ref={DropdownRef} style= {{position: 'fixed'}}>
-		        <button onClick={() => navigate("/user-events")}>
-		          Personalize Events
-		        </button>
-		        <SidePanelButton />
-		        <button onClick={() => navigate("/pomodoro")}>Pomodoro</button>
-		      </div>
-		    )}
-		  </div>
-		  
-		   <div className="settings-button-container">
-		    <button
-		      className="settings-button"
-		      onClick={() => navigate("/settings")}
-		      style={{position: 'sticky'}}
-		    >
-		      ⚙️
-		    </button>
-		  </div>
-      </div >
     </div>
   );
 }

@@ -731,22 +731,29 @@ class RebelCoverage_Daily(Resource):
 class RebelCoverage_Weekly(Resource):
     @marshal_with(rebel_fields)
     def get(self, date):
-        start_date = datetime.strptime(date, "%Y-%m-%d").date()
+        try:
+            start_date = datetime.strptime(date, "%Y-%m-%d").date()
+        except ValueError:
+            abort(HTTPStatus.BAD_REQUEST, message="Invalid start date format. Please use YYYY-MM-DD.")
         end_date = start_date + timedelta(days=7)
         result = db.session.query(RebelCoverage).filter(
             RebelCoverage.date >= start_date,
             RebelCoverage.date < end_date
         ).order_by(RebelCoverage.date.asc()).all()
         if not result:
-            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+            abort(HTTPStatus.NOT_FOUND, message=f"No Rebel Coverage events found for the week starting {date}")
         return result
 
 class RebelCoverage_Monthly(Resource):
     @marshal_with(rebel_fields)
     def get(self, month):
+        try:
+            datetime.strptime(month, "%Y-%m")
+        except ValueError:
+             abort(HTTPStatus.BAD_REQUEST, message="Invalid month format. Please use YYYY-MM.")
         result = db.session.query(RebelCoverage).filter(func.strftime("%Y-%m", RebelCoverage.date) == month).order_by(RebelCoverage.date.asc()).all()
         if not result:
-            abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+            abort(HTTPStatus.NOT_FOUND, message=f"No Rebel Coverage events found for month {month}")
         return result
 
 # List daily items in UNLV Calendar table

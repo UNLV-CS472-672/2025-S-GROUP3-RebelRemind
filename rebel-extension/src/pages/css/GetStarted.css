@@ -1,0 +1,73 @@
+/* GetStarted.css */
+
+span.instruct {
+    width: 90%;
+    text-align: left;
+    margin-bottom: 1.5rem;
+}
+
+img {
+    width: 50%;
+    border: 2px solid #ccc; /* soft gray border */
+    border-radius: 6px; /* rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* subtle depth */
+    transition: transform 0.2s ease;
+  }
+  
+  img:hover {
+    transform: scale(1.02);
+  }
+  
+
+.bt {
+    padding: 0.5rem 1.25rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #8b0000;
+    color: white;
+    transition: background-color 0.2s ease;
+}
+
+.bt:hover {
+    background-color: #a70000 !important;
+    color: white;
+}
+
+/* Get Started Page */
+.get-started-container {
+    z-index: 1;
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    padding: 2rem 5rem;
+    font-family: sans-serif;
+    text-align: center;
+    padding: 2rem 1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    background: rgba(255, 255, 255, 0.8);
+    margin: 3rem 0;
+  }
+
+  .start-page-background {
+  width: 100vw;
+  background-image: url("/images/UNLVImage.jpeg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* The gray film overlay */
+.start-page-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgba(100, 100, 100, 0.5); /* Adjust opacity as needed */
+  z-index: 0;
+}
