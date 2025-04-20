@@ -17,44 +17,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 api = Api(app)
 db = SQLAlchemy(app)
 
-def DupCheck(table, date, name, time = ''):
-    # Academic Calendar
-    if table == AcademicCalendar:
-        # Format date from string into date object
-        fmt='%A, %B %d, %Y'
-        date_object = datetime.strptime(date, fmt)
-        # Check if event exists already
-        result = db.session.query(table).filter(and_(table.date == func.date(date_object), table.name == name)).all()
-
-    # Involvement Center
-    if table == InvolvementCenter:
-        # Format date from string into date object
-        date_object = datetime.fromisoformat(date)
-        # Check if event exists already
-        result = db.session.query(table).filter(and_(table.date == func.date(date_object), table.name == name, table.time == time)).all()
-
-    # Rebel Coverage
-    if table == RebelCoverage:
-        # Format date from string into date object
-        fmt="%m/%d/%Y"
-        # Convert string to datetime object
-        date_object = datetime.strptime(date, fmt)
-        # Check if event exists already
-        result = db.session.query(table).filter(and_(table.date == func.date(date_object), table.name == name, table.time == time)).all()
-
-    # UNLV Calendar
-    if table == UNLVCalendar:
-        # Format date from string into date object
-        fmt='%A, %B %d, %Y'
-        date_object = datetime.strptime(date, fmt)
-        # Check if event exists already
-        result = db.session.query(table).filter(and_(table.date == func.date(date_object), table.name == name, table.time == time)).all()
-
-    # Check if event exists already
-    if result:
-        return False
-    return date_object
-
 def format_time(base_time):
     if not base_time:
         exit()
@@ -121,6 +83,46 @@ def format_time(base_time):
         colon_pos = formatted_time.find(":")
         formatted_time = str(int(formatted_time[:colon_pos])) + formatted_time[colon_pos:]
         return formatted_time
+
+def DupCheck(table, date, name, time = ''):
+    if time:
+        time = format_time(time)
+    # Academic Calendar
+    if table == AcademicCalendar:
+        # Format date from string into date object
+        fmt='%A, %B %d, %Y'
+        date_object = datetime.strptime(date, fmt)
+        # Check if event exists already
+        result = db.session.query(table).filter(and_(table.date == func.date(date_object), table.name == name)).all()
+
+    # Involvement Center
+    if table == InvolvementCenter:
+        # Format date from string into date object
+        date_object = datetime.fromisoformat(date)
+        # Check if event exists already
+        result = db.session.query(table).filter(and_(table.date == func.date(date_object), table.name == name, table.time == time)).all()
+
+    # Rebel Coverage
+    if table == RebelCoverage:
+        # Format date from string into date object
+        fmt="%m/%d/%Y"
+        # Convert string to datetime object
+        date_object = datetime.strptime(date, fmt)
+        # Check if event exists already
+        result = db.session.query(table).filter(and_(table.date == func.date(date_object), table.name == name, table.time == time)).all()
+
+    # UNLV Calendar
+    if table == UNLVCalendar:
+        # Format date from string into date object
+        fmt='%A, %B %d, %Y'
+        date_object = datetime.strptime(date, fmt)
+        # Check if event exists already
+        result = db.session.query(table).filter(and_(table.date == func.date(date_object), table.name == name, table.time == time)).all()
+
+    # Check if event exists already
+    if result:
+        return False
+    return date_object
 
 # Create User table for database
 class User(db.Model):
