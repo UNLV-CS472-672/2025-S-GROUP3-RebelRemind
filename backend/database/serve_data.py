@@ -55,6 +55,73 @@ def DupCheck(table, date, name, time = ''):
         return False
     return date_object
 
+def format_time(base_time):
+    if not base_time:
+        exit()
+    formatted_time = ""
+    colon_pos = 0
+    am_pm_pos = 0
+    base_time = base_time.upper()
+
+    # for (All Day), TBA, or non time
+    all_char = True
+    for i in range(len(base_time)):
+        if base_time[i].isnumeric():
+            all_char = False
+    if all_char:
+        return base_time
+    
+    colon_pos = base_time.find(":")
+
+    # for 8:30 pm and 17:15:00 military time formats
+    if colon_pos > 0:
+        # for military format
+        if base_time[colon_pos + 2:].find(":") > 0:
+            if int(base_time[:colon_pos]) < 12:
+                formatted_time = base_time[:colon_pos + 3] + " AM"
+                # midnight
+                if formatted_time[:2] == "00":
+                    formatted_time = "12" + formatted_time[2:]
+            else:
+                if int(base_time[:colon_pos]) > 12:
+                    pm_time = str(int(base_time[:colon_pos]) % 12)
+                else:
+                    pm_time = "12"
+                formatted_time = pm_time + base_time[colon_pos:colon_pos + 3]
+                formatted_time = formatted_time + " PM"
+            colon_pos = formatted_time.find(":")
+            formatted_time = str(int(formatted_time[:colon_pos])) + formatted_time[colon_pos:]
+            return formatted_time
+        # for 8:30 pm format
+        formatted_time = base_time[:colon_pos + 3]
+        am_pm_pos = base_time.find("A")
+        if am_pm_pos > 0:
+            formatted_time = formatted_time + " AM"
+        am_pm_pos = base_time.find("P")
+        if am_pm_pos > 0:
+            formatted_time = formatted_time + " PM"
+        colon_pos = formatted_time.find(":")
+        formatted_time = str(int(formatted_time[:colon_pos])) + formatted_time[colon_pos:]
+        return formatted_time
+    
+    # for 11 am format
+    if colon_pos == -1:
+        for i in range(len(base_time)):
+            if not base_time[i].isnumeric():
+                formatted_time = base_time[:i] + ":00"
+                break   
+        for i in range(len(base_time)):
+            is_alpha = base_time[i].isalpha()
+            if is_alpha:
+                if base_time[i] == "A":
+                    formatted_time = formatted_time + " AM"
+                if base_time[i] == "P":
+                    formatted_time = formatted_time + " PM"
+                break
+        colon_pos = formatted_time.find(":")
+        formatted_time = str(int(formatted_time[:colon_pos])) + formatted_time[colon_pos:]
+        return formatted_time
+
 # Create User table for database
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -347,7 +414,7 @@ class InvolvementCenter_Add(Resource):
         event = InvolvementCenter(
             name=args['name'],
             date=date_object,
-            time=args['time'], # Assuming time is required based on DupCheck usage
+            time=format_time(args['time']), # Assuming time is required based on DupCheck usage
             location=args.get('location'),
             organization=args.get('organization'),
             link=args.get('link')
@@ -402,7 +469,7 @@ class RebelCoverage_Add(Resource):
 		event = RebelCoverage(
 			name=args['name'],
 			date=date_object,
-			time=args.get('time'),
+			time=format_time(args.get('time')),
 			location=args.get('location'),
 			sport=args.get('sport'),
             link=args.get('link')
@@ -453,7 +520,7 @@ class UNLVCalendar_Add(Resource):
         event = UNLVCalendar(
             name=args['name'],
             date=date_object,
-            time=args.get('time'),
+            time=format_time(args.get('time')),
             location=args.get('location'),
             category=args.get('category'), # Use category from args
             link=args.get('link')
