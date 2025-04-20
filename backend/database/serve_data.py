@@ -372,7 +372,7 @@ class AcademicCalendar_Add(Resource):
 class AcademicCalendar_Delete_Past(Resource):
     # DELETE past items from Academic Calendar table
     # @marshal_with(event_fields) # Less suitable for bulk delete confirmation
-    def delete(self):
+    def get(self):
         delete_count = db.session.query(AcademicCalendar).filter(AcademicCalendar.date < (datetime.now().date())).delete()
         db.session.commit()
         # if not delete_count:
@@ -426,7 +426,7 @@ class InvolvementCenter_Add(Resource):
 class InvolvementCenter_Delete_Past(Resource):
     # DELETE past items from Involvement Center table
     # @marshal_with(event_fields) # Less suitable for bulk delete confirmation
-    def delete(self):
+    def get(self):
         delete_count = db.session.query(InvolvementCenter).filter(InvolvementCenter.date < (datetime.now().date())).delete()
         db.session.commit()
         # if not delete_count:
@@ -481,7 +481,7 @@ class RebelCoverage_Add(Resource):
 class RebelCoverage_Delete_Past(Resource):
 	# GET items from Rebel Coverage table
 	@marshal_with(rebel_fields)
-	def delete(self):
+	def get(self):
 		result = db.session.query(RebelCoverage).filter(RebelCoverage.date < (datetime.now().date())).delete()
 		db.session.commit()
 		# if not result:
@@ -532,7 +532,7 @@ class UNLVCalendar_Add(Resource):
 class UNLVCalendar_Delete_Past(Resource):
     # DELETE past items from UNLV Calendar table
     # @marshal_with(event_fields) # Less suitable for bulk delete confirmation
-    def delete(self):
+    def get(self):
         delete_count = db.session.query(UNLVCalendar).filter(UNLVCalendar.date < (datetime.now().date())).delete()
         db.session.commit()
         # if not delete_count:
