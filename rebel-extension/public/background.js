@@ -14,7 +14,7 @@
 import { authenticateUser } from "./scripts/identity-script.js";
 import { getAssignments, getCourses, getCanvasPAT } from "./scripts/canvas-script.js";
 import { openSidePanel } from "./scripts/sidepanel.js";
-import { fetchEvents } from "./scripts/involvement-center.js";
+import { fetchEvents } from "./scripts/fetch-events.js";
 import { checkDailyTask } from "./scripts/check-daily-login.js";
 
 

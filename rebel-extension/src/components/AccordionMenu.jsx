@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from "react";
-import { fetchEvents } from "../../public/scripts/involvement-center.js";
 
 import Accordion from 'react-bootstrap/Accordion';
 import CanvasAssignments from "./CanvasAssignments";
@@ -29,23 +28,34 @@ function AccordionMenu() {
   const today = now.toLocaleDateString('en-CA')
 
   useEffect(() => {
-    const getEvents = async () => {
-      const [data1, data2, data3, data4] = await fetchEvents(today);
-  
-      if (data1 && !data1.hasOwnProperty("message")) {
-        setACEvents(data1);
-      }
-      if (data2 && !data2.hasOwnProperty("message")) {
-        setICEvents(data2);
-      }
-      if (data3 && !data3.hasOwnProperty("message")) {
-        setRCEvents(data3);
-      }
-      if (data4 && !data4.hasOwnProperty("message")) {
-        setUCEvents(data4);
+    const fetchEvents = async () => {
+      try {
+        const [res1, res2, res3, res4] = await Promise.all([
+          fetch(`http://franklopez.tech:5050/academiccalendar_daily/${today}`),
+          fetch(`http://franklopez.tech:5050/involvementcenter_daily/${today}`),
+          fetch(`http://franklopez.tech:5050/rebelcoverage_daily/${today}`),
+          fetch(`http://franklopez.tech:5050/unlvcalendar_daily/${today}`),
+        ]);
+
+        const [data1, data2, data3, data4] = await Promise.all([
+          res1.json(), res2.json(), res3.json(), res4.json()
+        ]);
+
+        if (!data1.hasOwnProperty("message")) {
+          setACEvents(data1);
+        } if (!data2.hasOwnProperty("message")) {
+          setICEvents(data2);
+        } if (!data3.hasOwnProperty("message")) {
+          setRCEvents(data3);
+        } if (!data4.hasOwnProperty("message")) {
+          setUCEvents(data4);
+        }
+      } catch (err) {
+        console.error('Error fetching events:', err);
       }
     };
-    getEvents();
+
+    fetchEvents();
   }, []);
   
   return (
@@ -54,6 +64,8 @@ function AccordionMenu() {
       	<Accordion.Item eventKey="0">
       	<Accordion.Header>📚 Upcoming Assignments</Accordion.Header>
           <Accordion.Body>
+          {/* • <strong> 🗺️ History 405:</strong> Homework 3 due by this Sunday <strong> <br />
+          • <strong> 💻 CS 472:</strong> DP II</strong> due by next week Tuesday. */}
           <CanvasAssignments>
           </CanvasAssignments>
           </Accordion.Body>

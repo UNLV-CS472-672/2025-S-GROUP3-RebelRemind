@@ -1,3 +1,45 @@
+/**
+ * NotificationHistory Component
+ * --------------------------------------
+ * Displays a list of past notifications stored in Chrome local storage.
+ *
+ * Upon mounting, this component fetches the `notificationHistory` array from
+ * `chrome.storage.local` and renders it in a styled toast format using Bootstrap classes.
+ * Each toast contains:
+ *  - A date
+ *  - A summary
+ *  - A list of associated events with optional links
+ *
+ * If no notifications are available, a fallback message is shown.
+ *
+ * Dependencies:
+ * - Requires "notificationHistory" to be an array of entries structured as:
+ *   {
+ *     id: string;
+ *     date: string;
+ *     summary: string;
+ *     events: Array<{
+ *       source: string;
+ *       name?: string;
+ *       title?: string;
+ *       time: string;
+ *       link?: string;
+ *     }>
+ *   }
+ *
+ * Example usage:
+ * ```jsx
+ * <NotificationHistory />
+ * ```
+ *
+ * Note:
+ * This component is intended for use inside a Chrome Extension environment
+ * where `chrome.storage.local` is available.
+ *
+ * @component
+ * @author Billy Estrada
+ * Prompted ChatGPT for dynamic UI of notification 
+ */
 import React, { useEffect, useState } from "react";
 
 const NotificationHistory = () => {
