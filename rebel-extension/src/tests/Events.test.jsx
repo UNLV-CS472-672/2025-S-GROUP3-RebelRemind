@@ -7,10 +7,6 @@ describe('Events component', () => {
     { id: 2, name: 'Event B', time: '2:00 PM', link: 'https://example.com', organization: 'Org B', date: '2025-04-21' },
   ];
 
-  // Define specific weekdays to ensure consistency
-  const sunday = new Date('2025-04-20'); // Sunday
-  const monday = new Date('2025-04-21'); // Monday
-
   const mockWeeklyEvents = [
     {
       id: 1,
@@ -18,7 +14,7 @@ describe('Events component', () => {
       time: '1:00 PM',
       link: 'https://example.com',
       organization: 'Org A',
-      date: sunday.toISOString(),
+      date: '2025-04-20', // Sunday
     },
     {
       id: 2,
@@ -26,7 +22,7 @@ describe('Events component', () => {
       time: '3:00 PM',
       link: 'https://example.com',
       organization: 'Org B',
-      date: monday.toISOString(),
+      date: '2025-04-21', // Monday
     },
   ];
 
@@ -45,7 +41,7 @@ describe('Events component', () => {
   it('groups and renders events by weekday when in weekly view', () => {
     render(<Events events={mockWeeklyEvents} viewMode="weekly" />);
     expect(screen.getByText('Sunday')).toBeInTheDocument();
-    expect(screen.getByText((content) => content.includes('Monday'))).toBeInTheDocument();
+    expect(screen.getByText('Monday')).toBeInTheDocument();
     expect(screen.getByText(/Weekly Event Sunday/i)).toBeInTheDocument();
     expect(screen.getByText(/Weekly Event Monday/i)).toBeInTheDocument();
   });
