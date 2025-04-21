@@ -4,12 +4,18 @@ function Events({ events, viewMode }) {
  if (!events || events.length === 0) {
     return <div className="no-events"> No events found for this view.</div>;
   }
+  const sortedEvents = [...events].sort((a, b) => {
+    const aDate = new Date(`${a.date} ${a.time}`);
+    const bDate = new Date(`${b.date} ${b.time}`);
+    return aDate - bDate; // soonest to latest
+  });
 
   if (viewMode === "weekly") {
     const grouped = {};
-    events.forEach(event => {
-      const date = new Date(event.date);
-      const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
+    sortedEvents.forEach(event => {
+      const [year, month, day] = event.date.split('-');
+      const date = new Date(year, month - 1, day);
+            const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
       if (!grouped[weekday]) grouped[weekday] = [];
       grouped[weekday].push(event);
     });
@@ -40,7 +46,7 @@ function Events({ events, viewMode }) {
 
   return (
     <ul className="event-list">
-      {events.map(event => (
+      {sortedEvents.map(event => (
         <li key={event.id} className="event-item">
           <a href={event.link} target="_blank" rel="noopener noreferrer" className="event-link">
             <span className="event-name">
