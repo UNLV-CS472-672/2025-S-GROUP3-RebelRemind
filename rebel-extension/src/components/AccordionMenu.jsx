@@ -67,8 +67,8 @@ import Toggle from "./Toggle";
   }, [viewMode]);
 
   return (
-    <div>
-      <div className="accordion-header" style={{ 
+    <div className="accordion-scroll-wrapper">
+        <div className="accordion-header" style={{ 
         paddingTop: "1rem",
         display: "flex", 
         justifyContent: "space-between", 
@@ -84,17 +84,19 @@ import Toggle from "./Toggle";
           onChange={() => setViewMode(prev => (prev === "daily" ? "weekly" : "daily"))}
         />
       </div>
-
-      <Accordion alwaysOpen>
-        <Accordion.Item eventKey="0">
-          <Accordion.Header>📚 Upcoming Assignments</Accordion.Header>
-          <Accordion.Body>
-            <CanvasAssignments />
+      <Accordion defaultActiveKey={["0", "1", "2"]} alwaysOpen>
+      	<Accordion.Item eventKey="0">
+      	<Accordion.Header>📚 Upcoming Assignments</Accordion.Header>
+          <Accordion.Body className="accordion-panel-scroll">
+          {/* • <strong> 🗺️ History 405:</strong> Homework 3 due by this Sunday <strong> <br />
+          • <strong> 💻 CS 472:</strong> DP II</strong> due by next week Tuesday. */}
+          <CanvasAssignments>
+          </CanvasAssignments>
           </Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="1">
           <Accordion.Header>📅 Your Events</Accordion.Header>
-          <Accordion.Body>
+          <Accordion.Body className="accordion-panel-scroll">
             {/* Additional category filtering
              will go here for 
                   -involvement center */}
@@ -103,7 +105,7 @@ import Toggle from "./Toggle";
         </Accordion.Item>
         <Accordion.Item eventKey="2">
           <Accordion.Header>🎉 UNLV Events</Accordion.Header>
-          <Accordion.Body>
+          <Accordion.Body className="accordion-panel-scroll">
             {/* Additional category filtering
              will go here for 
                   -UNLV cal

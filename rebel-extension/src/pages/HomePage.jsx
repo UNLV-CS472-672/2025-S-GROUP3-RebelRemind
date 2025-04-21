@@ -1,5 +1,4 @@
 import "./css/HomePage.css";
-import CloseButton from "../components/CloseButton";
 import AccordionMenu from "../components/AccordionMenu";
 import SidePanelButton from "../components/SidePanelButton";
 
