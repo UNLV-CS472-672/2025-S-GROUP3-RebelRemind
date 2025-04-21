@@ -59,11 +59,11 @@ function AccordionMenu() {
   }, []);
   
   return (
-    <div>
-      <Accordion alwaysOpen>
+    <div className="accordion-scroll-wrapper">
+      <Accordion defaultActiveKey={["0", "1", "2"]} alwaysOpen>
       	<Accordion.Item eventKey="0">
       	<Accordion.Header>📚 Upcoming Assignments</Accordion.Header>
-          <Accordion.Body>
+          <Accordion.Body className="accordion-panel-scroll">
           {/* • <strong> 🗺️ History 405:</strong> Homework 3 due by this Sunday <strong> <br />
           • <strong> 💻 CS 472:</strong> DP II</strong> due by next week Tuesday. */}
           <CanvasAssignments>
@@ -72,7 +72,7 @@ function AccordionMenu() {
         </Accordion.Item>
         <Accordion.Item eventKey="1">
           <Accordion.Header>📅 Your Events</Accordion.Header>
-          <Accordion.Body>
+          <Accordion.Body className="accordion-panel-scroll">
             {ic_events.map(event => (
               <div key={event.id}>
                 <a 
@@ -101,7 +101,7 @@ function AccordionMenu() {
         </Accordion.Item>
         <Accordion.Item eventKey="2">
           <Accordion.Header>🎉 UNLV Events</Accordion.Header>
-          <Accordion.Body>
+          <Accordion.Body className="accordion-panel-scroll">
             {ac_events.map(event => (
               <div key={event.id}>
                 <a 
