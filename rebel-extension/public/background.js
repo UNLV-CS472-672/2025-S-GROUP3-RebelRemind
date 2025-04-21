@@ -189,17 +189,39 @@ async function handleDailyTask(isStartup = false) {
           }
         });
       }
+
+    //schema 
+    const notificationData = {
+      id: Date.now().toString(),
+      date: todayForFetching,
+      summary: dynamicTitle,
+      events: [
+        ...filterToday(data1).map(e => ({ ...e, source: "Academic" })),
+        ...filterToday(data2).map(e => ({ ...e, source: "Involvement Center" })),
+        ...filterToday(data3).map(e => ({ ...e, source: "Rebel Coverage" })),
+        ...filterToday(data4).map(e => ({ ...e, source: "UNLV Calendar" })),
+        ...filterTodayCanvas(assignmentList).map(e => ({ ...e, source: "Canvas" })),
+      ]
+    };
+    
+    // Push to local store
+    chrome.storage.local.get("notificationHistory", (data) => {
+      const history = Array.isArray(data.notificationHistory) ? data.notificationHistory : [];
+      history.unshift(notificationData);
+      chrome.storage.local.set({ notificationHistory: history.slice(0, 7) }); // Last 7 days
+    });
     } else {
       console.log("Daily task skipped (already run or too early)");
     }
   } catch (error) {
     console.error("Error during daily task execution:", error);
   }
+
 }
 
 chrome.notifications.onClicked.addListener((notificationId) => {
   chrome.tabs.create({
-    url: "https://www.it.unlv.edu/webcampus" // or any internal HTML file
+    url: chrome.runtime.getURL("welcome.html#/notifications")
   });
 });
 

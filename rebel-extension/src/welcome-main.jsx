@@ -26,6 +26,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import Welcome from "./pages/WelcomePage";
+import Notifications from "./pages/NotificationsPage";
 import PreferencesSetup from "./pages/PreferencesSetup";
 import GetStarted from "./pages/GetStarted";
 
@@ -35,6 +36,7 @@ createRoot(document.getElementById("root")).render(
       <Route path="/" element={<Welcome />} />
       <Route path="/setup-preferences" element={<PreferencesSetup />} />
       <Route path="/get-started" element={<GetStarted />} />
+      <Route path="/notifications" element={<Notifications />} />
     </Routes>
   </HashRouter>
 );
