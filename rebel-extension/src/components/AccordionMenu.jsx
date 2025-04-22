@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { fetchEvents } from "../../public/scripts/involvement-center.js";
+import { fetchEvents } from "../../public/scripts/fetch-events.js";
 
 import Accordion from 'react-bootstrap/Accordion';
 import CanvasAssignments from "./CanvasAssignments";
