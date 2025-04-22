@@ -18,8 +18,8 @@ def default():
         response = requests.put(BASE + f"involvementcenter_add", json=event)
         results.append(event)
     
-    with open('scraped_InvolvementCenter.json', 'w', encoding='utf-8') as f:
-        json.dump(results, f, indent=4)
+    # with open('scraped_InvolvementCenter.json', 'w', encoding='utf-8') as f:
+    #     json.dump(results, f, indent=4)
 
 def map_event(event_json):
     start = event_json['startsOn']

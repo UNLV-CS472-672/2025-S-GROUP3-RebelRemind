@@ -39,9 +39,9 @@ def default():
         calendar_data = calendar_data[:-3]
             
         # Write the cleaned data to the output file in JSON format
-        filename="scraped_AcademicCalendar.json"
-        with open(filename, "w", encoding="utf-8") as f:
-            json.dump(calendar_data, f, indent=4) # indent for readability
+        # filename="scraped_AcademicCalendar.json"
+        # with open(filename, "w", encoding="utf-8") as f:
+        #     json.dump(calendar_data, f, indent=4) # indent for readability
 
         # PUT calendar events into the database
         calendar_id = 0
@@ -49,7 +49,8 @@ def default():
             calendar_id += 1
             put_data = {
                 "name": event['Event'],
-                "date": event['Date']
+                "startDate": event['Date'],
+                "endDate": event['Date']
             }
             requests.put(BASE + f"academiccalendar_add", json=put_data) # Use json= for the request body
 

@@ -1,9 +1,6 @@
 import requests
 import unittest
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'webscraping')))
-from involvement_center import default
+from webscraping.involvement_center import default
 from database import BASE
 
 class TestFlaskAPI(unittest.TestCase):

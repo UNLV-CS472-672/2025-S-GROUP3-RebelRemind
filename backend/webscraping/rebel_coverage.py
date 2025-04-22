@@ -1,13 +1,12 @@
 import requests
 import json
 from bs4 import BeautifulSoup
+from database import BASE
 
-# from database import BASE
-BASE = "http://127.0.0.1:5050/"
-url = 'https://unlvrebels.com/coverage'
+URL = 'https://unlvrebels.com/coverage'
 
 def default():
-    response = requests.get(url)
+    response = requests.get(URL)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "html.parser")
         # Get the main table
@@ -41,11 +40,18 @@ def default():
                     time = time.find('td').text
                 else:
                     time = 0
-                data_table.append({"name": item, "date": event_date, "time": time, "sport": sport, "link": link})
+                data_table.append({
+                    "name": item,
+                    "startDate": event_date,
+                    "startTime": time,
+                    "endDate": event_date,
+                    "sport": sport,
+                    "link": link
+                })
 
-        for i in range(len(data_table)):
-            requests.put(BASE + f"rebelcoverage_add", json={"name": data_table[i]["name"], "date": data_table[i]["date"], "time": data_table[i]["time"], "sport": data_table[i]["sport"], "link" : data_table[i]["link"]})
-        
+        for event in data_table:
+            response = requests.put(BASE + "rebelcoverage_add", json=event)
+
         # with open('scraped_RebelCoverage.json', 'w') as json_file:
         #     json.dump(data_table, json_file, indent=4)
 

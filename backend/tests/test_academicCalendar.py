@@ -1,27 +1,17 @@
 import unittest
 import requests
 import sys
-import os
 import time
 
-
-script_dir = os.path.dirname(__file__)  # Directory of the test script itself
-
-scraper_path = os.path.abspath(os.path.join(script_dir, '..', 'webscraping'))
-sys.path.insert(0, scraper_path)
-
 try:
-   
-    from academic_calendar import default as scrape_academic_calendar
-    
-    from academic_calendar import BASE
+    from webscraping.academic_calendar import default as scrape_academic_calendar
+    from webscraping.academic_calendar import BASE
 except ImportError as e:
     print(f"Error importing scraper: {e}")
-    print(f"Please ensure 'academic_calendar.py' exists in '{scraper_path}'")
+    print(f"Please ensure 'academic_calendar.py' exists in webscraping folder")
     sys.exit(1) # Exit if scraper can't be imported
 
 # --- Test Class ---
-
 class TestAcademicScraperAPI(unittest.TestCase):
 
     @classmethod

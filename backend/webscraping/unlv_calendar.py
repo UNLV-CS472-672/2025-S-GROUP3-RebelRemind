@@ -3,25 +3,23 @@ import json
 from bs4 import BeautifulSoup
 from database import BASE
 import openai
+
 # URL of the UNLV event calendar
-url = "https://www.unlv.edu/calendar"
+URL = "https://www.unlv.edu/calendar"
 
 openai.api_key = ''
-
-
 
 def ai_categorize_event(event_name):
     try:
         prompt = f"""
-Given the following event title: "{event_name}"
+        Given the following event title: "{event_name}"
 
-Choose the most appropriate category from this list:
-Arts, Academics, Career, Culture, Diversity, Health, Social, Sports, Tech, Community
+        Choose the most appropriate category from this list:
+        Arts, Academics, Career, Culture, Diversity, Health, Social, Sports, Tech, Community
 
-Return only the category name.
-If no category fits, return "None".
-"""
-
+        Return only the category name.
+        If no category fits, return "None".
+        """
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -60,7 +58,7 @@ If no category fits, return "None".
         
 def default():
     # Make request inside function
-    response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+    response = requests.get(URL, headers={"User-Agent": "Mozilla/5.0"})
     index = 0
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "html.parser")
@@ -81,13 +79,13 @@ def default():
             # Extract date 
             date_elem = event.find_previous("div", class_="card-header")
             date = date_elem.text.strip() if date_elem else "TBD"
-            
            
             # Prepare event data to send to the Flask API
             event_data = {
                 "name": title,
-                "date": date,  
-                "time": time,
+                "startDate": date,  
+                "startTime": time,
+                "endDate": date,
                 "location": location,
                 "category": None,
                 "link": link
@@ -101,12 +99,12 @@ def default():
             #     pass
 
             events.append(event_data)  # Add event data to the events list
-          #  index += 1
-          #  if index == 10:
-             #   break
+            # index += 1
+            # if index == 10:
+            #   break
             
-        with open('scraped_UNLVCalendar.json', 'w') as json_file:
-            json.dump(events, json_file, indent=4)  # Write events as formatted JSON
+        # with open('scraped_UNLVCalendar.json', 'w') as json_file:
+        #     json.dump(events, json_file, indent=4)  # Write events as formatted JSON
 
     else:
         print(f"Failed to access the page. Status code: {response.status_code}")
