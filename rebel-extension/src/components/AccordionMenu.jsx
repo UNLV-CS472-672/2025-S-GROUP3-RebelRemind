@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { fetchEvents } from "../../public/scripts/fetch-events.js";
 
 import Accordion from 'react-bootstrap/Accordion';
 import CanvasAssignments from "./CanvasAssignments";
@@ -42,30 +43,25 @@ import Toggle from "./Toggle";
   }, [viewMode]);
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const [res1, res2, res3, res4] = await Promise.all([
-          fetch(`http://franklopez.tech:5050/academiccalendar_${viewMode}/${today}`),
-          fetch(`http://franklopez.tech:5050/involvementcenter_${viewMode}/${today}`),
-          fetch(`http://franklopez.tech:5050/rebelcoverage_${viewMode}/${today}`),
-          fetch(`http://franklopez.tech:5050/unlvcalendar_${viewMode}/${today}`)
-        ]);
-
-        const [data1, data2, data3, data4] = await Promise.all([
-          res1.json(), res2.json(), res3.json(), res4.json()
-        ]);
-        setACEvents(!data1.message ? data1 : []);
-        setICEvents(!data2.message ? data2 : []);
-        setRCEvents(!data3.message ? data3 : []);
-        setUCEvents(!data4.message ? data4 : []);
-      } catch (err) {
-        console.error('Error fetching events:', err);
+    const getEvents = async () => {
+      const [data1, data2, data3, data4] = await fetchEvents(today);
+  
+      if (data1 && !data1.hasOwnProperty("message")) {
+        setACEvents(data1);
+      }
+      if (data2 && !data2.hasOwnProperty("message")) {
+        setICEvents(data2);
+      }
+      if (data3 && !data3.hasOwnProperty("message")) {
+        setRCEvents(data3);
+      }
+      if (data4 && !data4.hasOwnProperty("message")) {
+        setUCEvents(data4);
       }
     };
-
-    fetchEvents();
-  }, [viewMode]);
-
+    getEvents();
+  }, []);
+  
   return (
     <div className="accordion-scroll-wrapper">
         <div className="accordion-header" style={{ 
@@ -87,11 +83,13 @@ import Toggle from "./Toggle";
       <Accordion defaultActiveKey={["0", "1", "2"]} alwaysOpen>
       	<Accordion.Item eventKey="0">
       	<Accordion.Header>📚 Upcoming Assignments</Accordion.Header>
+
           <Accordion.Body className="accordion-panel-scroll">
           {/* • <strong> 🗺️ History 405:</strong> Homework 3 due by this Sunday <strong> <br />
           • <strong> 💻 CS 472:</strong> DP II</strong> due by next week Tuesday. */}
           <CanvasAssignments viewMode={viewMode}>
-          </CanvasAssignments>
+
+            </CanvasAssignments>
           </Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="1">

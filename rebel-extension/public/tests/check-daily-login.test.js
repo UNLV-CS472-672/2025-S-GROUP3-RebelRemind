@@ -14,12 +14,16 @@ beforeAll(() => {
   };
 });
 
+// Mock Date globally
+const fixedDate = new Date("2025-04-21T00:00:00Z"); // Example fixed date
+jest.spyOn(global, "Date").mockImplementation(() => fixedDate);
+
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
 // Helper to get today's date string
-const today = new Date().toISOString().split("T")[0];
+const today = fixedDate.toLocaleDateString("en-CA");
 
 test("No log in today", async () => {
   mockGet.mockImplementation((_keys, callback) => {
