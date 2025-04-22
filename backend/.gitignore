@@ -72,6 +72,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# init files
+__init__.py/
+
 # Database
 *.db
 
