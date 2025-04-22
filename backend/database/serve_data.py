@@ -7,6 +7,9 @@ from flask_restful import Api, Resource, reqparse, abort, fields, marshal_with
 from http import HTTPStatus
 from datetime import datetime, timedelta
 from sqlalchemy import func, and_
+import sys
+sys.path.append("/home/frank/webscrapers")
+import academic_calendar, involvement_center, rebel_coverage, unlv_calendar # , organizations
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -14,7 +17,76 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 api = Api(app)
 db = SQLAlchemy(app)
 
+def format_time(base_time):
+    if not base_time:
+        exit()
+    formatted_time = ""
+    colon_pos = 0
+    am_pm_pos = 0
+    base_time = base_time.upper()
+
+    # for (All Day), TBA, or non time
+    all_char = True
+    for i in range(len(base_time)):
+        if base_time[i].isnumeric():
+            all_char = False
+    if all_char:
+        return base_time
+    
+    colon_pos = base_time.find(":")
+
+    # for 8:30 pm and 17:15:00 military time formats
+    if colon_pos > 0:
+        # for military format
+        if base_time[colon_pos + 2:].find(":") > 0:
+            if int(base_time[:colon_pos]) < 12:
+                formatted_time = base_time[:colon_pos + 3] + " AM"
+                # midnight
+                if formatted_time[:2] == "00":
+                    formatted_time = "12" + formatted_time[2:]
+            else:
+                if int(base_time[:colon_pos]) > 12:
+                    pm_time = str(int(base_time[:colon_pos]) % 12)
+                else:
+                    pm_time = "12"
+                formatted_time = pm_time + base_time[colon_pos:colon_pos + 3]
+                formatted_time = formatted_time + " PM"
+            colon_pos = formatted_time.find(":")
+            formatted_time = str(int(formatted_time[:colon_pos])) + formatted_time[colon_pos:]
+            return formatted_time
+        # for 8:30 pm format
+        formatted_time = base_time[:colon_pos + 3]
+        am_pm_pos = base_time.find("A")
+        if am_pm_pos > 0:
+            formatted_time = formatted_time + " AM"
+        am_pm_pos = base_time.find("P")
+        if am_pm_pos > 0:
+            formatted_time = formatted_time + " PM"
+        colon_pos = formatted_time.find(":")
+        formatted_time = str(int(formatted_time[:colon_pos])) + formatted_time[colon_pos:]
+        return formatted_time
+    
+    # for 11 am format
+    if colon_pos == -1:
+        for i in range(len(base_time)):
+            if not base_time[i].isnumeric():
+                formatted_time = base_time[:i] + ":00"
+                break   
+        for i in range(len(base_time)):
+            is_alpha = base_time[i].isalpha()
+            if is_alpha:
+                if base_time[i] == "A":
+                    formatted_time = formatted_time + " AM"
+                if base_time[i] == "P":
+                    formatted_time = formatted_time + " PM"
+                break
+        colon_pos = formatted_time.find(":")
+        formatted_time = str(int(formatted_time[:colon_pos])) + formatted_time[colon_pos:]
+        return formatted_time
+
 def DupCheck(table, date, name, time = ''):
+    if time:
+        time = format_time(time)
     # Academic Calendar
     if table == AcademicCalendar:
         # Format date from string into date object
@@ -103,6 +175,7 @@ class InvolvementCenter(db.Model):
                     f"location = {self.location}," +
                     f"organization = {self.organization}," +
                     f"link = {self.link})")
+    
 # Create Rebel Coverage table for database
 class RebelCoverage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -110,17 +183,17 @@ class RebelCoverage(db.Model):
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.String(100))
     location = db.Column(db.String(100))
-    organization = db.Column(db.String(100))
+    sport = db.Column(db.String(100))
     link = db.Column(db.String(100))
 
     def __repr__(self):
         return ("RebelCoverage(" +
-                    f"id = {self.id},"
-                    f"name = {self.name}," +
-                    f"date = {self.date}," +
-                    f"time = {self.time}," +
-                    f"location = {self.location}," +
-                    f"organization = {self.organization}," +
+					f"id = {self.id},"
+					f"name = {self.name}," +
+					f"date = {self.date}," +
+					f"time = {self.time}," +
+					f"location = {self.location}," +
+					f"sport = {self.sport}," +
                     f"link = {self.link})")
 
 # Create UNLV Calendar table for database
@@ -169,6 +242,15 @@ event_put_args.add_argument("organization", type=str, help="Event organization c
 event_put_args.add_argument("category", type=str, help="Event category can be null (UNLV Calendar)", required=False) # Added category
 event_put_args.add_argument("link", type=str, help="Event link can be null", required=False)
 
+# Parser for Rebel Coverage table
+rebel_put_args = reqparse.RequestParser()
+rebel_put_args.add_argument("name", type=str, help="Event name is required", required=True)
+rebel_put_args.add_argument("date", type=str, help="Event date is required", required=True)
+rebel_put_args.add_argument("time", type=str, help="Event time can be null", required=False)
+rebel_put_args.add_argument("location", type=str, help="Event location can be null", required=False)
+rebel_put_args.add_argument("sport", type=str, help="Sport can be null", required=False)
+rebel_put_args.add_argument("link", type=str, help="Event link can be null", required=False)
+
 # Parser for Organization table
 organization_put_args = reqparse.RequestParser()
 organization_put_args.add_argument("name", type=str, help="Organization name is required", required=True)
@@ -190,6 +272,17 @@ event_fields = {
     'location': fields.String,
     'organization': fields.String, # Keep for other models
     'category': fields.String,     # Add for UNLV Calendar
+    'link' : fields.String
+}
+
+# Resource fields for Rebel Coverage model
+rebel_fields = {
+	'id': fields.Integer,
+	'name': fields.String,
+	'date': fields.String,
+	'time': fields.String,
+	'location': fields.String,
+	'sport': fields.String,
     'link' : fields.String
 }
 
@@ -281,13 +374,13 @@ class AcademicCalendar_Add(Resource):
 class AcademicCalendar_Delete_Past(Resource):
     # DELETE past items from Academic Calendar table
     # @marshal_with(event_fields) # Less suitable for bulk delete confirmation
-    def delete(self):
+    def get(self):
         delete_count = db.session.query(AcademicCalendar).filter(AcademicCalendar.date < (datetime.now().date())).delete()
         db.session.commit()
-        if not delete_count:
+        # if not delete_count:
             # abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
-            return jsonify(message="No past Academic Calendar events found to delete."), HTTPStatus.OK
-        return jsonify(message=f"Deleted {delete_count} past Academic Calendar events."), HTTPStatus.OK
+            # return jsonify(message="No past Academic Calendar events found to delete."), HTTPStatus.OK
+        # return jsonify(message=f"Deleted {delete_count} past Academic Calendar events."), HTTPStatus.OK
 
 class AcademicCalendar_Delete_All(Resource):
     # DELETE all items from Academic Calendar table
@@ -323,7 +416,7 @@ class InvolvementCenter_Add(Resource):
         event = InvolvementCenter(
             name=args['name'],
             date=date_object,
-            time=args['time'], # Assuming time is required based on DupCheck usage
+            time=format_time(args['time']), # Assuming time is required based on DupCheck usage
             location=args.get('location'),
             organization=args.get('organization'),
             link=args.get('link')
@@ -335,13 +428,13 @@ class InvolvementCenter_Add(Resource):
 class InvolvementCenter_Delete_Past(Resource):
     # DELETE past items from Involvement Center table
     # @marshal_with(event_fields) # Less suitable for bulk delete confirmation
-    def delete(self):
+    def get(self):
         delete_count = db.session.query(InvolvementCenter).filter(InvolvementCenter.date < (datetime.now().date())).delete()
         db.session.commit()
-        if not delete_count:
+        # if not delete_count:
             # abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
-            return jsonify(message="No past Involvement Center events found to delete."), HTTPStatus.OK
-        return jsonify(message=f"Deleted {delete_count} past Involvement Center events."), HTTPStatus.OK
+            # return jsonify(message="No past Involvement Center events found to delete."), HTTPStatus.OK
+        # return jsonify(message=f"Deleted {delete_count} past Involvement Center events."), HTTPStatus.OK
 
 class InvolvementCenter_Delete_All(Resource):
     # DELETE all items from Involvement Center table
@@ -357,56 +450,55 @@ class InvolvementCenter_Delete_All(Resource):
 
 # Commands for Rebel Coverage table
 class RebelCoverage_Info(Resource):
-    # GET items from Rebel Coverage table
-    @marshal_with(event_fields)
-    def get(self, event_id):
-        result = RebelCoverage.query.filter_by(id=event_id).first()
-        if not result:
-            abort(HTTPStatus.NOT_FOUND, message="Could not find event with that id")
-        return result
+	# GET items from Rebel Coverage table
+	@marshal_with(rebel_fields)
+	def get(self, event_id):
+		result = RebelCoverage.query.filter_by(id=event_id).first()
+		if not result:
+			abort(HTTPStatus.NOT_FOUND, message="Could not find event with that id")
+		return result
 
 class RebelCoverage_Add(Resource):
-    # PUT items into Rebel Coverage table
-    @marshal_with(event_fields)
-    def put(self):
-        args = event_put_args.parse_args()
-        date_object = DupCheck(RebelCoverage, args['date'], args['name'], args['time'])
-        if not date_object:
-            abort(HTTPStatus.CONFLICT, message="Event already exists...")
+	# PUT items into Rebel Coverage table
+	@marshal_with(rebel_fields)
+	def put(self):
+		args = rebel_put_args.parse_args()
+		#print(args)
+		date_object = DupCheck(RebelCoverage, args['date'], args['name'], args['time'])
+		if not date_object:
+			abort(HTTPStatus.CONFLICT, message="Event already exists...")
 
-        event = RebelCoverage(
-            name=args['name'],
-            date=date_object,
-            time=args.get('time'),
-            location=args.get('location'),
-            organization=args.get('organization'),
+		event = RebelCoverage(
+			name=args['name'],
+			date=date_object,
+			time=format_time(args.get('time')),
+			location=args.get('location'),
+			sport=args.get('sport'),
             link=args.get('link')
-        )
-        db.session.add(event)
-        db.session.commit()
-        return event, HTTPStatus.CREATED
+		)
+		db.session.add(event)
+		db.session.commit()
+		return event, HTTPStatus.CREATED
 
 class RebelCoverage_Delete_Past(Resource):
-    # DELETE past items from Rebel Coverage table
-    # @marshal_with(event_fields) # Less suitable for bulk delete confirmation
-    def delete(self):
-        delete_count = db.session.query(RebelCoverage).filter(RebelCoverage.date < (datetime.now().date())).delete()
-        db.session.commit()
-        if not delete_count:
-            # abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
-            return jsonify(message="No past Rebel Coverage events found to delete."), HTTPStatus.OK
-        return jsonify(message=f"Deleted {delete_count} past Rebel Coverage events."), HTTPStatus.OK
+	# GET items from Rebel Coverage table
+	@marshal_with(rebel_fields)
+	def get(self):
+		result = db.session.query(RebelCoverage).filter(RebelCoverage.date < (datetime.now().date())).delete()
+		db.session.commit()
+		# if not result:
+			# abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
+		# return result
 
 class RebelCoverage_Delete_All(Resource):
-    # DELETE all items from Rebel Coverage table
-    # @marshal_with(event_fields) # Less suitable for bulk delete confirmation
-    def delete(self):
-        delete_count = RebelCoverage.query.delete()
-        db.session.commit()
-        if not delete_count:
-            # abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
-            return jsonify(message="Rebel Coverage table already empty or deletion failed."), HTTPStatus.OK
-        return jsonify(message=f"Deleted {delete_count} Rebel Coverage events."), HTTPStatus.OK
+	# GET items from Rebel Coverage table
+	@marshal_with(rebel_fields)
+	def delete(self):
+		result = RebelCoverage.query.delete()
+		db.session.commit()
+		if not result:
+			abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
+		return result
 
 # Commands for UNLV Calendar table
 class UNLVCalendar_Info(Resource):
@@ -430,7 +522,7 @@ class UNLVCalendar_Add(Resource):
         event = UNLVCalendar(
             name=args['name'],
             date=date_object,
-            time=args.get('time'),
+            time=format_time(args.get('time')),
             location=args.get('location'),
             category=args.get('category'), # Use category from args
             link=args.get('link')
@@ -442,13 +534,13 @@ class UNLVCalendar_Add(Resource):
 class UNLVCalendar_Delete_Past(Resource):
     # DELETE past items from UNLV Calendar table
     # @marshal_with(event_fields) # Less suitable for bulk delete confirmation
-    def delete(self):
+    def get(self):
         delete_count = db.session.query(UNLVCalendar).filter(UNLVCalendar.date < (datetime.now().date())).delete()
         db.session.commit()
-        if not delete_count:
+        # if not delete_count:
             # abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
-            return jsonify(message="No past UNLV Calendar events found to delete."), HTTPStatus.OK
-        return jsonify(message=f"Deleted {delete_count} past UNLV Calendar events."), HTTPStatus.OK
+            # return jsonify(message="No past UNLV Calendar events found to delete."), HTTPStatus.OK
+        # return jsonify(message=f"Deleted {delete_count} past UNLV Calendar events."), HTTPStatus.OK
 
 class UNLVCalendar_Delete_All(Resource):
     # DELETE all items from UNLV Calendar table
@@ -517,12 +609,12 @@ class InvolvementCenter_List(Resource):
 
 # List all items in Rebel Coverage table
 class RebelCoverage_List(Resource):
-    @marshal_with(event_fields)
-    def get(self):
-        result = RebelCoverage.query.order_by(RebelCoverage.date.asc()).all()
-        if not result:
-            abort(HTTPStatus.NOT_FOUND, message="Rebel Coverage table is empty")
-        return result
+	@marshal_with(rebel_fields)
+	def get(self):
+		result = RebelCoverage.query.order_by(RebelCoverage.date.asc()).all()
+		if not result:
+			abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+		return result
 
 # List all items in UNLV Calendar table
 class UNLVCalendar_List(Resource):
@@ -629,19 +721,15 @@ class InvolvementCenter_Monthly(Resource):
 
 # List daily items in Rebel Coverage table
 class RebelCoverage_Daily(Resource):
-    @marshal_with(event_fields)
-    def get(self, date):
-        try:
-            target_date = datetime.strptime(date, "%Y-%m-%d").date()
-        except ValueError:
-            abort(HTTPStatus.BAD_REQUEST, message="Invalid date format. Please use YYYY-MM-DD.")
-        result = RebelCoverage.query.filter_by(date=target_date).order_by(RebelCoverage.date.asc()).all()
-        if not result:
-            abort(HTTPStatus.NOT_FOUND, message=f"No Rebel Coverage events found for date {date}")
-        return result
+	@marshal_with(rebel_fields)
+	def get(self, date):
+		result = RebelCoverage.query.filter_by(date = date).order_by(RebelCoverage.date.asc()).all()
+		if not result:
+			abort(HTTPStatus.NOT_FOUND, message="Table is empty")
+		return result
 
 class RebelCoverage_Weekly(Resource):
-    @marshal_with(event_fields)
+    @marshal_with(rebel_fields)
     def get(self, date):
         try:
             start_date = datetime.strptime(date, "%Y-%m-%d").date()
@@ -657,7 +745,7 @@ class RebelCoverage_Weekly(Resource):
         return result
 
 class RebelCoverage_Monthly(Resource):
-    @marshal_with(event_fields)
+    @marshal_with(rebel_fields)
     def get(self, month):
         try:
             datetime.strptime(month, "%Y-%m")
@@ -708,6 +796,30 @@ class UNLVCalendar_Monthly(Resource):
         if not result:
             abort(HTTPStatus.NOT_FOUND, message=f"No UNLV Calendar events found for month {month}")
         return result
+    
+# Clear ALL data
+class Database_Delete_All(Resource):
+	# DELETE ALL DATA FROM DATABASE
+	def get(self):
+		User.query.delete()
+		AcademicCalendar.query.delete()
+		InvolvementCenter.query.delete()
+		RebelCoverage.query.delete()
+		UNLVCalendar.query.delete()
+		Organization.query.delete()
+		db.session.commit()
+		return HTTPStatus.OK
+
+# Scrape All Sites
+class Scrape_All(Resource):
+	# SCRAPE ALL SITES
+	def get(self):
+		academic_calendar.default()
+		involvement_center.default()
+		rebel_coverage.default()
+		# unlv_calendar.default() # this has AI that costs money per scrape so leaving out
+		# organizations.default()
+		return HTTPStatus.OK
 
 # API resources for PUT commands
 api.add_resource(User_Add, "/user_add")
@@ -762,6 +874,12 @@ api.add_resource(AcademicCalendar_Monthly, "/academiccalendar_monthly/<string:mo
 api.add_resource(InvolvementCenter_Monthly, "/involvementcenter_monthly/<string:month>")
 api.add_resource(RebelCoverage_Monthly, "/rebelcoverage_monthly/<string:month>")
 api.add_resource(UNLVCalendar_Monthly, "/unlvcalendar_monthly/<string:month>")
+
+# API resource for DELETE ALL DATA
+api.add_resource(Database_Delete_All, "/database_delete_all")
+
+# API resource for SCRAPE ALL
+api.add_resource(Scrape_All, "/scrape_all")
 
 # default function to run API
 def default():
