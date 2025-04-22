@@ -21,7 +21,7 @@
 import React from "react";
 import NotificationHistory from "../components/NotificationHistory";
 import "./css/NotificationsPage.css";
-import "bootstrap/dist/css/bootstrap.min.css";
+// import "bootstrap/dist/css/bootstrap.min.css";
 
 const Notifications = () => {
   return (

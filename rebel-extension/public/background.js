@@ -88,7 +88,7 @@ async function handleDailyTask(isStartup = false) {
     const currentHour = new Date().getHours();
 
     // Only run if the task hasn't already run, and it's after 9AM (if startup fallback)
-    if (!shouldRun && (!isStartup || currentHour >= 9)) {
+    if (shouldRun && (isStartup || currentHour >= 9)) {
       console.log("Triggering daily task");
 
       const fetchAssignments = async () => {
