@@ -34,12 +34,13 @@
    ./webscrape.sh
 ```
 
-- Output events stored in database
-```sh
-   test_database
-```
+- Show events stored in database
+http://localhost:5050/academiccalendar_list
+http://localhost:5050/involvementcenter_list
+http://localhost:5050/rebelcoverage_list
+http://localhost:5050/unlvcalendar_list
 
 - Run pytest to test files
 ```sh
-   python3 -m pytest --cov=webscraping --cov=database --cov=app
+   python3 -m pytest --cov=webscraping --cov=database
 ```
