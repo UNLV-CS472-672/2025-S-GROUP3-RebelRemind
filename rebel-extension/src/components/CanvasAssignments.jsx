@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Check, Undo2 } from "lucide-react";
+import GroupByWeek from './GroupByWeek';
 
 /**
  * CanvasAssignments Component
@@ -10,7 +11,7 @@ import { Check, Undo2 } from "lucide-react";
  * Authored by: Gunnar Dalton
  */
 
-function CanvasAssignments() {
+function CanvasAssignments({ viewMode }) {
     const [assignments, setAssignments] = useState([]);
     const [completedAssignments, setCompletedAssignments] = useState([]);
     const [showCompleted, setShowCompleted] = useState(false);
@@ -30,16 +31,25 @@ function CanvasAssignments() {
         const fetchAssignments = async () => {
             chrome.storage.local.get(["Canvas_Assignments", "completedAssignments"], (data) => {
                 if (data.Canvas_Assignments) { 
-                    // ai-gen start (ChatGPT-4o, 1)
                     const assignmentList = data.Canvas_Assignments;
-                    const upcomingAssignments = assignmentList.filter((a) => { // filter out past due assignments or ones without a due date
-                        return a.due_at && new Date(a.due_at) >= new Date();
+                    const now = new Date();
+                    const end = new Date();
+                    
+                    if (viewMode === "weekly") {
+                      end.setDate(now.getDate() + 7);
+                    } else {
+                      end.setDate(now.getDate() + 1);
+                    }
+                    
+                    const upcomingAssignments = assignmentList.filter((a) => {
+                      const dueDate = new Date(a.due_at);
+                      return a.due_at && dueDate >= now && dueDate < end;
                     });
+                    
 
                     upcomingAssignments.sort((a, b) => new Date(a.due_at) - new Date(b.due_at)); // sort dates in order
-                    
+
                     let completed = data.completedAssignments || []; // get completed assignments if there is any, if not an empty array
-                    const now = new Date();
                     completed = completed.filter(item => new Date(item.due_at) > now); // delete any old completed assignments
                     upcomingAssignments.forEach((assignment) =>  { // check Canvas submission status of assignments
                         const alreadyCompleted = completed.some(item => item.id === assignment.id);
@@ -47,9 +57,8 @@ function CanvasAssignments() {
                         if (isSubmitted && !alreadyCompleted) {
                             completed.push({ id: assignment.id, due_at: assignment.due_at }); // add to completed list
                         }
-                    })
+                    });
                     chrome.storage.local.set({ completedAssignments: completed}); // store new list into storage
-                    // ai-gen end
 
                     setAssignments(upcomingAssignments);
                     setCompletedAssignments(completed);
@@ -109,7 +118,7 @@ function CanvasAssignments() {
 
         chrome.runtime.onMessage.addListener(handleMessage);
         return () => chrome.runtime.onMessage.removeListener(handleMessage);
-    }, []);
+    }, [viewMode]);
 
     /**
      * Effect Hook: Resets justCompleted when showCompleted is toggled off
@@ -147,11 +156,23 @@ function CanvasAssignments() {
     /**
     * Lists all assignments that should be displayed in the accordion menu based on the current showCompleted state.
     */
-    // ai-gen start (ChatGPT-4o, 0)
     const assignmentsToDisplay = [...assignments]
         .sort((a, b) => new Date(a.due_at) - new Date(b.due_at))
         .filter(a => showCompleted || !isComplete(a.id) || justCompleted.includes(a.id));
-    // ai-gen end
+        const hasAssignments = assignments.length > 0;
+        const hasVisibleAssignments = assignmentsToDisplay.length > 0;
+
+        const now = new Date();
+        const end = new Date();
+        end.setDate(now.getDate() + (viewMode === "weekly" ? 7 : 1));
+
+        const visibleCompletedAssignments = completedAssignments.filter(item => {
+        const dueDate = new Date(item.due_at);
+        return dueDate >= now && dueDate < end;
+        });
+
+        const hasCompletedAssignments = visibleCompletedAssignments.length > 0;
+
 
     if (!CanvasIntegrationPreference) { // Canvas integration is disabled
         return <p>Canvas integration is disabled! Please check your preferences to enable this feature.</p>
@@ -170,74 +191,65 @@ function CanvasAssignments() {
         }
     }
 
-    if (assignments.length === 0) { // handles no assignments listed case
-        return <p>No assignments found.</p>;
-    }
-
-    if (assignmentsToDisplay.length === 0 && !showCompleted) { // handles all assignments are completed case
+    if (!hasVisibleAssignments && !showCompleted) {
+        const message = hasAssignments
+          ? (viewMode === "daily"
+              ? "All assignments due today are completed! 🎉"
+              : "All assignments due this week are completed! 🎉")
+          : (viewMode === "daily"
+              ? "No assignments due today."
+              : "No assignments due this week.");
+      
         return (
-            <div>
-                <p>All upcoming assignments are completed!</p>
-                <div className="mt-2">
-                    {/* Show Completed checkbox */}
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="checkbox"
-                            checked={showCompleted}
-                            onChange={() => setShowCompleted(!showCompleted)}
-                        />
-                        <span> Show Completed</span>
-                    </label>
-                </div>
-            </div>
-        )
-    }
+          <div>
+            <p>{message}</p>
+            {hasCompletedAssignments && (
+              <div className="mt-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={showCompleted}
+                    onChange={() => setShowCompleted(!showCompleted)}
+                  />
+                  <span>{showCompleted ? 'Hide Completed' : 'Show Completed'}</span>
+                </label>
+              </div>
+            )}
+          </div>
+        );
+      }
+      
+      
+      
+
+    const groupedAssignments = {};
+    assignmentsToDisplay.forEach((assignment) => {
+        const date = new Date(assignment.due_at);
+        const weekday = date.toLocaleDateString("en-US", { weekday: "long" });
+        if (!groupedAssignments[weekday]) groupedAssignments[weekday] = [];
+        groupedAssignments[weekday].push({
+            ...assignment,
+            label: isComplete(assignment.id)
+                ? getDueDateLabel(assignment.due_at)
+                : formatDueDateLabel(getDueDateLabel(assignment.due_at)),
+            link: assignment.html_url
+        });
+    });
 
     return (
-        // ai-gen start (ChatGPT-4o, 2)
         <div>
-            <ul className="m-0 p-0">
-                {assignmentsToDisplay.map((assignment) => (
-                    <li
-                        key={assignment.id}
-                        className="flex justify-between items-start gap-2 w-full p-2 relative pl-0"
-                        style={{ display: "flex" }}
-                    >
-                        {/* Display assignment item */}
-                        <span className="absolute left-0 top-2 text-xl">•</span> 
-                        <div
-                            className="break-words"
-                            style={{ width: "312px", flexShrink: 0, flexGrow: 0, 
-                                color: isComplete(assignment.id) ? "gray" : "inherit", 
-                                textDecoration: isComplete(assignment.id) ? "line-through" : "none" }}
-                        >
-                            <span style={{ fontWeight: "bold" }}>{assignment.context_name}</span>:{" "}
-                            {assignment.title} {isComplete(assignment.id) ? getDueDateLabel(assignment.due_at): formatDueDateLabel(getDueDateLabel(assignment.due_at))}
-                        </div>
-                        { isComplete(assignment.id) ? (
-                            // Assignment is complete
-                            <button
-                                onClick={() => undoComplete(assignment.id)}
-                                className="rounded flex items-center justify-center"
-                                style={{ alignSelf: "center", height: "fit-content", padding: "0px 2px 3px 2px" }}
-                                title="Undo Completed"
-                            >
-                                <Undo2 size={18} strokeWidth={2.5} />
-                            </button>
-                        ) : (
-                            // Assignment is not complete
-                            <button
-                            onClick={() => markComplete(assignment)}
-                            className="rounded flex items-center justify-center"
-                            style={{ alignSelf: "center", height: "fit-content", padding: "0px 2px 3px 2px" }}
-                            title="Assignment Completed"
-                            >
-                                <Check size={18} strokeWidth={2.5} />
-                            </button>
-                        )}
-                    </li>
-                ))}
-            </ul>
+        <GroupByWeek
+            groupedItems={groupedAssignments}
+            isComplete={isComplete}
+            markComplete={markComplete}
+            undoComplete={undoComplete}
+            isCanvas={true}
+            showCompleted={showCompleted}
+            setShowCompleted={setShowCompleted}
+            allCompleted={!hasVisibleAssignments && hasAssignments}
+            hasCompletedAssignments={hasCompletedAssignments}
+        />
+
             <div className="mt-2">
                 {/* Show Completed checkbox */}
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -246,11 +258,10 @@ function CanvasAssignments() {
                         checked={showCompleted}
                         onChange={() => setShowCompleted(!showCompleted)}
                     />
-                    <span> Show Completed</span>
+                    <span>{showCompleted ? 'Hide Completed' : 'Show Completed'}</span>
                 </label>
             </div>
         </div>
-        // ai-gen end
     );
 }
 
@@ -259,7 +270,6 @@ export default CanvasAssignments;
 /**
  * Processes the specified due date to determine if it is today or tomorrow or neither and returns the proper string to be displayed.
  */
-// ai-gen start (ChatGPT-4o, 1)
 function getDueDateLabel(dueDate) {
     const due_at = new Date(dueDate); // hold actual due date
     const today = new Date(); // date of today
@@ -306,4 +316,3 @@ const formatDueDateLabel = (label) => {
         }
     });
 }
-// ai-gen end

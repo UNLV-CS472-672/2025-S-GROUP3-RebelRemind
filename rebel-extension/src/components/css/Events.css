@@ -1,0 +1,105 @@
+
+.no-events {
+    text-align: center;
+    color: #888;
+    font-style: italic;
+    margin: 0.5rem 0;
+  }
+  
+  .weekday-title {
+    font-weight: bold;
+    color: #8b0000;
+    margin-bottom: 0.25rem;
+  }
+  
+  .weekday-divider {
+    border-top: 1px solid #ccc;
+    margin-bottom: 0.75rem;
+  }
+  
+  .event-list {
+    padding-left: 1.25rem;
+    margin-bottom: 1rem;
+    padding-left: 32px !important;  /* to match canvas assn */
+  }
+  
+  .event-item {
+    margin-bottom: 0.5rem;
+    list-style-type: disc;
+    font-size: 16px;
+    font-family: "Lato", "Helvetica", "Arial", sans-serif;
+    color: #212529;    
+    :hover {
+        color: #1f1f1f88 !important ;
+    }
+  }
+  
+  .event-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+    text-decoration: none;       
+    color: inherit;
+
+  }
+  
+  .event-name {
+    flex: 1;
+    white-space: normal;
+    word-break: break-word;
+  }
+  
+  .event-org {
+    font-weight: 600;
+  }
+  
+  .event-time {
+    min-width: 80px;
+    text-align: right;
+    font-weight: 600;
+    font-family: "Lato", "Helvetica", "Arial", sans-serif;
+    display: flex;
+    justify-content: right;
+  }
+
+  input[type="checkbox"] {
+    visibility: hidden;
+  }
+  
+  .checkboxOverride {
+    position: relative;
+    width: 25px;
+    height: 25px;
+  }
+  
+  .checkboxOverride input[type="checkbox"]:checked + label:after {
+    opacity: 1;
+  }
+  
+  .checkboxOverride label {
+    background: #EEEEEE;
+    border: 1px solid #DDDDDD;
+    cursor: pointer;
+    height: 25px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 25px;
+    cursor: pointer !important;
+
+  }
+  
+  .checkboxOverride label:after {
+    border-style: none none solid solid;
+    content: "";
+    height: 5px;
+    left: 6px;
+    opacity: 0;
+    position: absolute;
+    top: 7px;
+    transform: rotate(-45deg);
+    width: 10px;
+  }
+  
