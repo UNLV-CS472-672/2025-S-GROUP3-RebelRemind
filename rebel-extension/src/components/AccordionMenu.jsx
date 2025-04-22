@@ -69,7 +69,7 @@ import Toggle from "./Toggle";
   return (
     <div className="accordion-scroll-wrapper">
         <div className="accordion-header" style={{ 
-        paddingTop: "0.9rem",
+        paddingTop: "0.6rem",
         display: "flex", 
         justifyContent: "space-between", 
         alignItems: "center", 
