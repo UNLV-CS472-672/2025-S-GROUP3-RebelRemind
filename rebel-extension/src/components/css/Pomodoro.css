@@ -1,3 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+
+.pomodoro-title {
+  font-family: 'Lobster', cursive;
+  font-size: 3rem;
+  color: white;
+  text-shadow: 3px 3px 0 #000; /* for bold shadow effect */
+  margin-bottom: 1rem;
+}
 
 /* Pomodoro Styling from here: */
 .pomodoro-container {
@@ -16,15 +25,15 @@
     background-size: cover; /* Ensures the image covers the container */
     background-position: center; /* Centers the background image */
     background-repeat: no-repeat;  /* Prevents the image from repeating */
-    position: relative; /* Add this to ensure ::before is positioned correctly */
+    position: relative; /* Add this to ensure, before is positioned correctly */
   }
   
   /* Add the Rebel Mascot as a background image */
   .pomodoro-container::before {
     content: ""; /* Necessary for pseudo-elements */
     position: absolute;
-    left: 25px; /* Adjust the position */
-    top: 25px;  /* Adjust the top position */
+    left: 15px; /* Adjust the position */
+    top: 100px;  /* Adjust the top position */
     width: 80px;  /* Increased size of the logo */
     height: 80px; /* Adjusted height to maintain a square aspect */
     background-image: url('../../assets/rebelmascot.png'); /* Path to your Rebel mascot image */
@@ -75,7 +84,7 @@
     align-items: center;
     justify-content: center;
     border: 2px solid #007bff;
-    margin-top: -2px; /* Negative value moves it higher */
+    margin-top: -15px; /* Negative value moves it higher */
     margin-bottom: 12px; /* Keep the bottom margin as is */
   }
   
@@ -165,5 +174,57 @@
   .break-options button:focus {
     outline: none;
   }
+  
+  /* New volume button emote for better visualization and all styling */
+  .volume-button {
+    width: 42px;
+    height: 42px;
+    background-color: white;
+    border: 2px solid #007bff;
+    border-radius: 50%;
+    font-size: 22px;
+    display: inline-flex;    
+    align-items: center;              /* Center vertically */
+    justify-content: center;          /* Center horizontally */
+    line-height: 1;                   /* Prevent font baseline spacing */
+    padding: 0;
+    margin: 0;
+    vertical-align: middle;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+  }
+  
+  .volume-button-container {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    height: 42px;     /* match the button */
+    display: flex;
+    align-items: center;
+  }  
+  
+  .volume-button:hover {
+    background-color: #f1f8ff;
+    transform: scale(1.05);
+  }
+  
+  .volume-button:active {
+    transform: scale(0.95);
+  }
+  
+
+/* Better font for the timer is done meassage*/
+  .timer-done-message {
+    font-family: 'Yeseva One', serif;
+    font-size: 1rem;
+    color: black;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    display: inline; /* Makes it inline and prevents block spacing */
+  }
+  
+  
   
   

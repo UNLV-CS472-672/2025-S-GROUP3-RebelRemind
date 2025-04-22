@@ -1,5 +1,4 @@
 import "./css/HomePage.css";
-import CloseButton from "../components/CloseButton";
 import AccordionMenu from "../components/AccordionMenu";
 import SidePanelButton from "../components/SidePanelButton";
 
@@ -92,10 +91,6 @@ function HomePage() {
             </div>
           )}
         </div>
-      </div>
-
-      <div className="accordion-text mt-3">
-        <p>Your Events at a Glance!</p>
       </div>
       <AccordionMenu />
 

@@ -13,9 +13,19 @@ function App() {
   useApplyBackgroundColor();
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [checked, setChecked] = useState(false);
-
+  const [bypass, setBypass] = useState(false);
+  const handleBypass = (bypass) => {
+    if (!bypass)
+      {
+        setBypass(true);
+      }
+  };
+  
   useEffect(() => {
     chrome.storage.local.get(["isRunning"], (result) => {
+      //if (!bypass){
+        //setBypass(true);
+      //}
       if (result.isRunning) {
         setShouldRedirect(true);
       }
@@ -33,8 +43,9 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={shouldRedirect ? <Navigate to="/pomodoro" /> : <HomePage />}
+          element={ ( shouldRedirect && bypass ) ? <Navigate to="/pomodoro" />  : <HomePage /> }
         />
+        {handleBypass}
         <Route path="/welcome" element={<WelcomePage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/pomodoro" element={<PomodoroPage />} />
