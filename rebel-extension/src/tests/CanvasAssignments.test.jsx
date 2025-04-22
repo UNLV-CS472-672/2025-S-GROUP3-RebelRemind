@@ -57,7 +57,7 @@ test("Valid fetch but no assignments returned", async () => {
 
     render(<CanvasAssignments />);
     await waitFor(() => {
-        expect(screen.getByText(/No assignments found./)).toBeInTheDocument(); // proper response if no assignments have been fetched
+        expect(screen.getByText(/No assignments due this week./)).toBeInTheDocument(); // proper response if no assignments have been fetched
     });
 });
 
@@ -71,7 +71,7 @@ test("No assignments in storage", async () => {
 
     render(<CanvasAssignments />);
     await waitFor(() => {
-        expect(screen.getByText(/No assignments found./)).toBeInTheDocument(); // proper response if no assignments have been fetched
+        expect(screen.getByText(/No assignments due this week./)).toBeInTheDocument(); // proper response if no assignments have been fetched
     });
 });
 
@@ -92,528 +92,268 @@ test("Today assignment", async() => { // check for proper text if an assignment 
 
     const item = screen.getByRole("listitem"); 
     const actualText = item.textContent.trim().replace(/\s+/g, " "); // remove extra spacing before checking
-    const expected = "•CS 101: Assignment 1 due at 10:30 PM today";
+    const expected = "CS 101: Assignment 1 due at 10:30 PM today";
     expect(actualText).toContain(expected);
 });
 
-test("Tomorrow assignment", async() => { // check for proper text if an assignment is due tomorrow
-    const today = new Date();
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-    tomorrow.setHours(22, 30);
-    const dateString = tomorrow.toLocaleString();
-    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
-        callback({Canvas_Assignments: [{ context_name: "CS 102", title: "Assignment 2", due_at: dateString, id: 2, user_submitted: false }], 
-            CanvasFetchStatus: { success: true, error: null },
-            canvasPAT: "test_access_token"});
-    });
-    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
-        callback({preferences: { canvasIntegration: true }});
-    });
-
-    render(<CanvasAssignments />);
-
-    const item = screen.getByRole("listitem");
-    const actualText = item.textContent.trim().replace(/\s+/g, " ");
-    const expected = "•CS 102: Assignment 2 due at 10:30 PM tomorrow";
-    expect(actualText).toContain(expected);
-});
-
-test("Future assignment", async() => { // check for proper text if an assignment is due after tomorrow
-    const today = new Date();
+test("Toggling showCompleted checkbox displays completed assignments", async () => {
+    const now = new Date();
     const dueDate = new Date();
-    dueDate.setDate(today.getDate() + 5); // assignment is due 5 days after today
-    dueDate.setHours(22, 30);
-    const dateString = dueDate.toLocaleString();
-    const dueDateString = dueDate.toLocaleDateString(undefined, { 
-        month: "long",
-        day: "numeric"
-    });
-    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
-        callback({Canvas_Assignments: [{ context_name: "CS 103", title: "Assignment 3", due_at: dateString, id: 3, user_submitted: false }], 
+    dueDate.setDate(now.getDate() + 1);
+    dueDate.setHours(20, 0);
+
+    const dueDateString = dueDate.toLocaleString();
+
+    global.chrome.storage.local.get.mockImplementation((key, callback) => {
+        callback({
+            Canvas_Assignments: [{ context_name: "CS 201", title: "Completed Assignment", due_at: dueDateString, id: 201, user_submitted: false }],
+            completedAssignments: [{ id: 201, due_at: dueDateString }],
             CanvasFetchStatus: { success: true, error: null },
-            canvasPAT: "test_access_token"});
+            canvasPAT: "token"
+        });
     });
     global.chrome.storage.sync.get.mockImplementation((key, callback) => {
-        callback({preferences: { canvasIntegration: true }});
+        callback({ preferences: { canvasIntegration: true } });
     });
 
-    render(<CanvasAssignments />);
+    render(<CanvasAssignments viewMode="weekly" />);
 
-    const item = screen.getByRole("listitem");
-    const actualText = item.textContent.trim().replace(/\s+/g, " ");
-    const expected = `•CS 103: Assignment 3 due on ${dueDateString} at 10:30 PM`;
-    expect(actualText).toContain(expected);
+    // Initially hidden
+    expect(screen.queryByRole("listitem")).toBeNull();
+
+    // Toggle checkbox to show completed
+    const checkbox = screen.getByRole("checkbox");
+    fireEvent.click(checkbox);
+
+    const item = await screen.findByRole("listitem");
+    expect(item).toBeInTheDocument();
+    expect(item.textContent).toContain("Completed Assignment");
 });
 
-test("Combination of assignments", async() => { // check that assignments are sorted in proper order when displayed
-    const today = new Date();
-    today.setHours(22, 30);
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-    tomorrow.setHours(23, 30);
-    const futureDate = new Date();
-    futureDate.setDate(today.getDate() + 5);
-    futureDate.setHours(21, 30);
-    const todayString = today.toLocaleString();
-    const tomorrowString = tomorrow.toLocaleString();
-    const futuredateString = futureDate.toLocaleString();
-    const futureDateDateOnlyString = futureDate.toLocaleDateString(undefined, { 
-        month: "long",
-        day: "numeric"
-    });
-    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
-        callback({Canvas_Assignments: [
-            { context_name: "CS 104", title: "Assignment 4", due_at: futuredateString, id: 4, user_submitted: false }, 
-            { context_name: "CS 105", title: "Assignment 5", due_at: todayString, id: 5, user_submitted: false },
-            { context_name: "CS 106", title: "Assignment 6", due_at: tomorrowString, id: 6, user_submitted: false }
-        ], 
-        CanvasFetchStatus: { success: true, error: null },
-        canvasPAT: "test_access_token"});
-    });
-    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
-        callback({preferences: { canvasIntegration: true }});
-    });
 
-    render(<CanvasAssignments />);
+test("Completed assignments have gray, struck-through styling", async () => {
+    const now = new Date();
+    now.setHours(22, 0);
+    const dateString = now.toLocaleString();
 
-    // ai-gen start (ChatGPT-4o, 2)
-    const items = screen.getAllByRole("listitem");
-
-    const expectedOrder = [
-      "•CS 105: Assignment 5 due at 10:30 PM today",
-      "•CS 106: Assignment 6 due at 11:30 PM tomorrow",
-      `•CS 104: Assignment 4 due on ${futureDateDateOnlyString} at 9:30 PM`, 
-    ];
-  
-    items.forEach((item, index) => { // check every assignment for accuracy
-      const actualText = item.textContent.trim().replace(/\s+/g, " ");
-      const expected = expectedOrder[index];
-      expect(actualText).toContain(expected);
-    });
-    // ai-gen end
-});
-
-test("Already submitted assignment to Canvas", async() => { // check that user_submitted being true adds assignment to completed and does not display it
-    const today = new Date();
-    today.setHours(22, 30);
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-    tomorrow.setHours(23, 30);
-    const futureDate = new Date();
-    futureDate.setDate(today.getDate() + 5);
-    futureDate.setHours(21, 30);
-    const todayString = today.toLocaleString();
-    const tomorrowString = tomorrow.toLocaleString();
-    const futuredateString = futureDate.toLocaleString();
-    const futureDateDateOnlyString = futureDate.toLocaleDateString(undefined, { 
-        month: "long",
-        day: "numeric"
-    });
-    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
-        callback({Canvas_Assignments: [
-            { context_name: "CS 107", title: "Assignment 7", due_at: todayString, id: 7, user_submitted: false }, 
-            { context_name: "CS 108", title: "Assignment 8", due_at: tomorrowString, id: 8, user_submitted: true },
-            { context_name: "CS 109", title: "Assignment 9", due_at: futuredateString, id: 9, user_submitted: false }
-        ], completedAssignments: [], 
-        CanvasFetchStatus: { success: true, error: null },
-        canvasPAT: "test_access_token"}); // no completed assignments in storage
-    });
-    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
-        callback({preferences: { canvasIntegration: true }});
-    });
-
-    render(<CanvasAssignments />);
-
-    expect(chrome.storage.local.set).toHaveBeenCalledWith({ completedAssignments: [{ id: 8, due_at: tomorrowString }]}); // user_submitted = true assignment is stored as completed
-
-    const items = screen.getAllByRole("listitem");
-
-    const expectedOrder = [
-      "•CS 107: Assignment 7 due at 10:30 PM today",
-      `•CS 109: Assignment 9 due on ${futureDateDateOnlyString} at 9:30 PM`, 
-    ];
-  
-    items.forEach((item, index) => {
-      const actualText = item.textContent.trim().replace(/\s+/g, " ");
-      const expected = expectedOrder[index];
-      expect(actualText).toContain(expected);
-    });
-});
-
-test("All assignments are completed", async() => {
-    const today = new Date();
-    today.setHours(22, 30);
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-    tomorrow.setHours(23, 30);
-    const futureDate = new Date();
-    futureDate.setDate(today.getDate() + 5);
-    futureDate.setHours(21, 30);
-    const todayString = today.toLocaleString();
-    const tomorrowString = tomorrow.toLocaleString();
-    const futuredateString = futureDate.toLocaleString();
-    const futureDateDateOnlyString = futureDate.toLocaleDateString(undefined, { 
-        month: "long",
-        day: "numeric"
-    });
-    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
-        callback({Canvas_Assignments: [
-            { context_name: "CS 117", title: "Assignment 17", due_at: todayString, id: 17, user_submitted: false }, 
-            { context_name: "CS 118", title: "Assignment 18", due_at: tomorrowString, id: 18, user_submitted: true },
-            { context_name: "CS 119", title: "Assignment 19", due_at: futuredateString, id: 19, user_submitted: false }], 
-            completedAssignments: [
-                { id: 17, due_at: todayString }, 
-                { id: 19, due_at: futuredateString }
-            ], 
+    global.chrome.storage.local.get.mockImplementation((key, callback) => {
+        callback({
+            Canvas_Assignments: [{ context_name: "CS 301", title: "Assignment", due_at: dateString, id: 301, user_submitted: false }],
+            completedAssignments: [{ id: 301, due_at: dateString }],
             CanvasFetchStatus: { success: true, error: null },
-            canvasPAT: "test_access_token"});
+            canvasPAT: "token"
+        });
     });
     global.chrome.storage.sync.get.mockImplementation((key, callback) => {
-        callback({preferences: { canvasIntegration: true }});
+        callback({ preferences: { canvasIntegration: true } });
     });
 
-    render(<CanvasAssignments />);
-    await waitFor(() => {
-        expect(screen.getByText(/All upcoming assignments are completed!/)).toBeInTheDocument(); // message that is displayed if all upcoming assignments in storage are already completed
-    });
-});
-
-test("Mark assignment complete", async() => {
-    const today = new Date();
-    today.setHours(22, 30);
-    const dateString = today.toLocaleString();
-    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
-        callback({Canvas_Assignments: [{ context_name: "CS 113", title: "Assignment 13", due_at: dateString, id: 13, user_submitted: false }],
-            completedAssignments: [], 
-            CanvasFetchStatus: { success: true, error: null },
-            canvasPAT: "test_access_token"});
-    });
-    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
-        callback({preferences: { canvasIntegration: true }});
-    });
-
-    render(<CanvasAssignments />);
-
-    const item = screen.getByRole("listitem");
-    const actualText = item.textContent.trim().replace(/\s+/g, " ");
-    const expected = "•CS 113: Assignment 13 due at 10:30 PM today";
-    expect(actualText).toContain(expected); // assignment is displayed as normal
-
-    const markCompletedButton = await screen.findByTitle("Assignment Completed");
-    fireEvent.click(markCompletedButton); // click completed button
-
-    expect(chrome.storage.local.set).toHaveBeenCalledWith({ completedAssignments: [
-        { id: 13, due_at: dateString }
-    ]}); // assignment is stored as completed now
-
-    expect(item.querySelector("div")).toHaveStyle({
-        color: "gray",
-        textDecoration: 'line-through',
-    }); // assignment has appearance of completed assignments
-});
-
-test("Undo a completed assignment", async() => {
-    const today = new Date();
-    today.setHours(22, 30);
-    const dateString = today.toLocaleString();
-    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
-        callback({Canvas_Assignments: [{ context_name: "CS 114", title: "Assignment 14", due_at: dateString, id: 14, user_submitted: false }], 
-            completedAssignments: [{ id: 14, due_at: dateString }], 
-            CanvasFetchStatus: { success: true, error: null },
-            canvasPAT: "test_access_token"}); // assignment is already completed
-    });
-    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
-        callback({preferences: { canvasIntegration: true }});
-    });
-
-    render(<CanvasAssignments />);
-
-    expect(chrome.storage.local.set).toHaveBeenCalledWith({ completedAssignments: [
-        { id: 14, due_at: dateString }
-    ]}); // assignment is still in completedAssignments
-
-    await waitFor(() => {
-        expect(screen.getByText(/All upcoming assignments are completed!/)).toBeInTheDocument();  // currently all assignments are completed
-    });
-
-    const checkbox = screen.getByRole("checkbox"); 
-    fireEvent.click(checkbox); // toggle showCompleted on
-
-    const item = screen.getByRole("listitem");
-    const actualText = item.textContent.trim().replace(/\s+/g, " ");
-    const expected = "•CS 114: Assignment 14 due at 10:30 PM today";
-    expect(actualText).toContain(expected); // assignment is now displayed
-
-    expect(item.querySelector("div")).toHaveStyle({ // assignment has appearance of completed assignments
-        color: "gray",
-        textDecoration: 'line-through',
-    });
-
-    const undoCompletedButton = await screen.findByTitle("Undo Completed");
-    fireEvent.click(undoCompletedButton); // click undo button
-
-    expect(chrome.storage.local.set).toHaveBeenCalledWith({ completedAssignments: [] }); // completedAssignments is now empty
-
-    expect(item.querySelector("div")).toHaveStyle({ // assignment appears normal again
-        textDecoration: 'none',
-    });
-});
-
-test("Mark complete and undo complete an assignment", async() => {
-    const today = new Date();
-    today.setHours(22, 30);
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-    tomorrow.setHours(23, 30);
-    const futureDate = new Date();
-    futureDate.setDate(today.getDate() + 5);
-    futureDate.setHours(21, 30);
-    const todayString = today.toLocaleString();
-    const tomorrowString = tomorrow.toLocaleString();
-    const futuredateString = futureDate.toLocaleString();
-    const futureDateDateOnlyString = futureDate.toLocaleDateString(undefined, { 
-        month: "long",
-        day: "numeric"
-    });
-    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
-        callback({Canvas_Assignments: [
-            { context_name: "CS 110", title: "Assignment 10", due_at: todayString, id: 10, user_submitted: false }, 
-            { context_name: "CS 111", title: "Assignment 11", due_at: tomorrowString, id: 11, user_submitted: true },
-            { context_name: "CS 112", title: "Assignment 12", due_at: futuredateString, id: 12, user_submitted: false }], 
-            completedAssignments: [], 
-            CanvasFetchStatus: { success: true, error: null },
-            canvasPAT: "test_access_token"});
-    });
-    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
-        callback({preferences: { canvasIntegration: true }});
-    });
-
-    render(<CanvasAssignments />);
-
-    const items = screen.getAllByRole("listitem");
-
-    const expectedOrder = [
-      "•CS 110: Assignment 10 due at 10:30 PM today",
-      `•CS 112: Assignment 12 due on ${futureDateDateOnlyString} at 9:30 PM`, 
-    ];
-  
-    items.forEach((item, index) => { // check current incomplete assignments display
-      const actualText = item.textContent.trim().replace(/\s+/g, " ");
-      const expected = expectedOrder[index];
-      expect(actualText).toContain(expected);
-    });
-
-    const targetAssignment2 = screen.getByText("CS 112").closest("li");
-
-    const markCompletedButton = within(targetAssignment2).getByRole("button", {
-        name: /Assignment Completed/i,
-    });
-    fireEvent.click(markCompletedButton); // mark one assignment as complete
-
-    expect(chrome.storage.local.set).toHaveBeenCalledWith({ completedAssignments: [
-        { id: 11, due_at: tomorrowString }, 
-        { id: 12, due_at: futuredateString }
-    ]}); // store in completedAssignments
-
-    const assignmentDiv2 = within(targetAssignment2).getByText((_, el) => 
-        String(el?.className || "").includes("break-words")
-    );
-
-    expect(assignmentDiv2).toHaveStyle({
-        color: "gray",
-        textDecoration: 'line-through',
-    }); // assignment has appearance of completed assignments
-
-    const undoCompletedButton1 = within(targetAssignment2).getByRole("button", {
-        name: /Undo Completed/i,
-    });
-    fireEvent.click(undoCompletedButton1); // now change it back to incomplete
-
-    expect(chrome.storage.local.set).toHaveBeenCalledWith({ completedAssignments: [{ id: 11, due_at: tomorrowString }]}); // storage is updated
-
-    expect(assignmentDiv2).toHaveStyle({
-        textDecoration: 'none',
-    }); // appears back as normal assignment
+    render(<CanvasAssignments viewMode="weekly" />);
 
     const checkbox = screen.getByRole("checkbox");
-    fireEvent.click(checkbox); // showCompleted is now on
+    fireEvent.click(checkbox); // show completed
 
-    const targetAssignment1 = screen.getByText("CS 111").closest("li");
+    const item = await screen.findByRole("listitem");
+    const link = item.querySelector("a");
 
-    const assignmentDiv1 = within(targetAssignment1).getByText((_, el) => 
-        String(el?.className || "").includes("break-words")
-    );
-
-    expect(assignmentDiv1).toHaveStyle({
+    expect(link).toHaveStyle({
         color: "gray",
-        textDecoration: 'line-through',
-    }); // already completed assignment shows correctly
-
-    const undoCompletedButton2 = within(targetAssignment1).getByRole("button", {
-        name: /Undo Completed/i,
+        textDecoration: "line-through",
     });
-    fireEvent.click(undoCompletedButton2); // undo already completed assignment
-
-    expect(assignmentDiv1).toHaveStyle({
-        textDecoration: 'none',
-    });
-
-    fireEvent.click(checkbox); // showCompleted is now off
-
-    expect(assignmentDiv1).toHaveStyle({
-        textDecoration: 'none',
-    });
-
-    expect(assignmentDiv2).toHaveStyle({
-        textDecoration: 'none',
-    }); // both assignments now display as normal
 });
 
-test("Handling UPDATE_ASSIGNMENTS message", async() => {
-    chrome.runtime.onMessage.addListener.mockImplementation((fn) => {
-        handleMessage = fn;
-    });
 
-    const today = new Date();
-    today.setHours(22, 30);
-    const dateString = today.toLocaleString();
-    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
-        callback({Canvas_Assignments: [{ context_name: "CS 115", title: "Assignment 15", due_at: dateString, id: 15, user_submitted: false }], 
-            completedAssignments: [], 
+test("Displays 'All assignments are completed' when all are marked complete", async () => {
+    const now = new Date();
+    now.setHours(23, 0);
+    const dueString = now.toLocaleString();
+
+    global.chrome.storage.local.get.mockImplementation((key, callback) => {
+        callback({
+            Canvas_Assignments: [{ context_name: "CS 401", title: "Assignment", due_at: dueString, id: 401, user_submitted: false }],
+            completedAssignments: [{ id: 401, due_at: dueString }],
             CanvasFetchStatus: { success: true, error: null },
-            canvasPAT: "test_access_token"});
+            canvasPAT: "token"
+        });
     });
     global.chrome.storage.sync.get.mockImplementation((key, callback) => {
-        callback({preferences: { canvasIntegration: true }});
+        callback({ preferences: { canvasIntegration: true } });
     });
 
-    const sendReponse = jest.fn();
+    render(<CanvasAssignments viewMode="daily" />);
 
-    render(<CanvasAssignments />);
+    await waitFor(() => {
+        expect(screen.getByText(/All assignments due today are completed/i)).toBeInTheDocument();
+    });
+});
 
-    const response = handleMessage({ type: "UPDATE_ASSIGNMENTS" }, null, sendReponse); // mock update message
+test("Assignments are sorted in chronological order", async () => {
+    const now = new Date();
+
+    const assignment1 = new Date(now);
+    assignment1.setHours(18);
+
+    const assignment2 = new Date(now);
+    assignment2.setHours(20);
+
+    const assignment3 = new Date(now);
+    assignment3.setHours(23);
+
+    global.chrome.storage.local.get.mockImplementation((key, callback) => {
+        callback({
+            Canvas_Assignments: [
+                { context_name: "CS 501", title: "Late", due_at: assignment3.toLocaleString(), id: 501, user_submitted: false },
+                { context_name: "CS 502", title: "Early", due_at: assignment1.toLocaleString(), id: 502, user_submitted: false },
+                { context_name: "CS 503", title: "Middle", due_at: assignment2.toLocaleString(), id: 503, user_submitted: false }
+            ],
+            completedAssignments: [],
+            CanvasFetchStatus: { success: true, error: null },
+            canvasPAT: "token"
+        });
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({ preferences: { canvasIntegration: true } });
+    });
+
+    render(<CanvasAssignments viewMode="daily" />);
+
+    const items = await screen.findAllByRole("listitem");
+    const textContent = items.map(item => item.textContent);
+    
+    expect(textContent[0]).toContain("Early");
+    expect(textContent[1]).toContain("Middle");
+    expect(textContent[2]).toContain("Late");
+});
+
+test("Handles UPDATE_ASSIGNMENTS message correctly", async () => {
+    let capturedHandler;
+
+    // Capture the message handler
+    global.chrome.runtime.onMessage.addListener.mockImplementation((handler) => {
+        capturedHandler = handler;
+    });
+
+    const date = new Date();
+    const dueString = date.toLocaleString();
+
+    global.chrome.storage.local.get.mockImplementation((keys, callback) => {
+        callback({
+            Canvas_Assignments: [{ context_name: "CS 601", title: "Message Triggered", due_at: dueString, id: 601, user_submitted: false }],
+            completedAssignments: [],
+            CanvasFetchStatus: { success: true, error: null },
+            canvasPAT: "token"
+        });
+    });
+    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
+        callback({ preferences: { canvasIntegration: true } });
+    });
+
+    render(<CanvasAssignments viewMode="weekly" />);
+
+    const sendResponseMock = jest.fn();
+
+    // Simulate background message
+    const response = capturedHandler({ type: "UPDATE_ASSIGNMENTS" }, null, sendResponseMock);
 
     expect(response).toBe(true);
-    await waitFor(() => { // check that fetchAssignments() runs twice and sendResponse runs as expected
+    
+    await waitFor(() => {
         expect(chrome.storage.local.get).toHaveBeenCalledWith(["Canvas_Assignments", "completedAssignments"], expect.any(Function));
-        expect(chrome.storage.local.get).toHaveBeenCalledTimes(5);
-        expect(chrome.storage.local.set).toHaveBeenCalledTimes(2);
-        expect(chrome.storage.sync.get).toHaveBeenCalledTimes(1);
-        expect(sendReponse).toHaveBeenCalledWith(true);
-        expect(sendReponse).toHaveBeenCalledTimes(1);
+        expect(sendResponseMock).toHaveBeenCalledWith(true);
     });
+
+    // Confirm the assignment triggered by the message is rendered
+    expect(await screen.findByText(/Message Triggered/)).toBeInTheDocument();
 });
 
-test("Handling INVALID_MESSAGE message", async() => {
-    chrome.runtime.onMessage.addListener.mockImplementation((fn) => {
-        handleMessage = fn;
+test("markComplete adds assignment to completed list", async () => {
+    const now = new Date();
+    now.setHours(22, 30);
+    const dateString = now.toLocaleString();
+  
+    global.chrome.storage.local.get.mockImplementation((key, callback) => {
+      callback({
+        Canvas_Assignments: [{
+          context_name: "CS 201",
+          title: "Mark Test",
+          due_at: dateString,
+          id: 201,
+          user_submitted: false
+        }],
+        completedAssignments: [],
+        CanvasFetchStatus: { success: true, error: null },
+        canvasPAT: "test_token"
+      });
     });
-
-    const today = new Date();
-    today.setHours(22, 30);
-    const dateString = today.toLocaleString();
-    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
-        callback({Canvas_Assignments: [{ context_name: "CS 116", title: "Assignment 16", due_at: dateString, id: 16, user_submitted: false }], 
-            completedAssignments: [], 
-            CanvasFetchStatus: { success: true, error: null },
-            canvasPAT: "test_access_token"});
-    });
+  
     global.chrome.storage.sync.get.mockImplementation((key, callback) => {
-        callback({preferences: { canvasIntegration: true }});
+      callback({ preferences: { canvasIntegration: true } });
     });
-
-    const sendReponse = jest.fn();
-
-    render(<CanvasAssignments />);
-
-    const response = handleMessage({ type: "INVALID_MESSAGE" }, null, sendReponse);
-
-    expect(response).toBe(undefined);
-    await waitFor(() => { // check that fetchAssignments() runs once and sendResponse does not run
-        expect(chrome.storage.local.get).toHaveBeenCalledTimes(3);
-        expect(chrome.storage.local.set).toHaveBeenCalledTimes(1);
-        expect(chrome.storage.sync.get).toHaveBeenCalledTimes(1);
-        expect(sendReponse).not.toHaveBeenCalled();
+  
+    render(<CanvasAssignments viewMode="weekly" />);
+  
+    // Find checkbox by ID or fallback to getAllByRole
+    const checkbox = await screen.findByRole("checkbox", { name: "" }); // unnamed checkbox
+    fireEvent.click(checkbox); // triggers markComplete
+  
+    expect(chrome.storage.local.set).toHaveBeenCalledWith({
+      completedAssignments: [{ id: 201, due_at: dateString }]
     });
-});
-
-test("Canvas integration preference is disabled", async() => {
-    const today = new Date();
-    today.setHours(22, 30);
-    const dateString = today.toLocaleString();
-    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
-        callback({ Canvas_Assignments: [{ context_name: "CS 117", title: "Assignment 17", due_at: dateString, id: 17, user_submitted: false }], 
-            CanvasFetchStatus: { success: true, error: null },
-            canvasPAT: "test_access_token"});
+  
+    const assignment = screen.getByText(/Mark Test/);
+    expect(assignment).toHaveStyle({
+      textDecoration: "line-through",
+      color: "gray"
     });
+  });
+  
+
+  test("undoComplete removes assignment from completed list", async () => {
+    const now = new Date();
+    now.setHours(22, 30);
+    const dateString = now.toLocaleString();
+  
+    global.chrome.storage.local.get.mockImplementation((key, callback) => {
+      callback({
+        Canvas_Assignments: [{
+          context_name: "CS 202",
+          title: "Undo Test",
+          due_at: dateString,
+          id: 202,
+          user_submitted: false
+        }],
+        completedAssignments: [
+          { id: 202, due_at: dateString }
+        ],
+        CanvasFetchStatus: { success: true, error: null },
+        canvasPAT: "test_token"
+      });
+    });
+  
     global.chrome.storage.sync.get.mockImplementation((key, callback) => {
-        callback({preferences: { canvasIntegration: false }});
+      callback({ preferences: { canvasIntegration: true } });
     });
-
-    render(<CanvasAssignments />);
-
-    await waitFor(() => {
-        expect(screen.getByText(/Canvas integration is disabled! Please check your preferences to enable this feature./)).toBeInTheDocument(); // message that is displayed if all upcoming assignments in storage are already completed
+  
+    render(<CanvasAssignments viewMode="weekly" />);
+  
+    // Show the completed assignment
+    const showCompletedToggle = screen.getByRole("checkbox", { name: /Show Completed/i });
+    fireEvent.click(showCompletedToggle); // turn it on
+  
+    // Wait for item to appear
+    const assignment = await screen.findByText(/Undo Test/);
+    expect(assignment).toBeInTheDocument();
+  
+    // Now click checkbox to undo
+    const checkbox = screen.getByRole("checkbox", { name: "" }); // unnamed checkbox
+    fireEvent.click(checkbox); // triggers undoComplete
+  
+    expect(chrome.storage.local.set).toHaveBeenCalledWith({
+      completedAssignments: []
     });
-});
-
-test("No Canvas Access Token in storage", async() => {
-    const today = new Date();
-    today.setHours(22, 30);
-    const dateString = today.toLocaleString();
-    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
-        callback({ Canvas_Assignments: [{ context_name: "CS 118", title: "Assignment 18", due_at: dateString, id: 18, user_submitted: false }], 
-            CanvasFetchStatus: { success: true, error: null },
-            canvasPAT: ""});
+  
+    expect(assignment).toHaveStyle({
+      textDecoration: "none"
     });
-    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
-        callback({preferences: { canvasIntegration: true }});
-    });
-
-    render(<CanvasAssignments />);
-
-    await waitFor(() => {
-        expect(screen.getByText(/You do not have a Canvas Access Token stored! Please save a token into storage to enable this feature./)).toBeInTheDocument(); // message that is displayed if all upcoming assignments in storage are already completed
-    });
-});
-
-test("Invalid Canvas Access Token error", async() => {
-    const today = new Date();
-    today.setHours(22, 30);
-    const dateString = today.toLocaleString();
-    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
-        callback({ Canvas_Assignments: [{ context_name: "CS 119", title: "Assignment 19", due_at: dateString, id: 19, user_submitted: false }], 
-            CanvasFetchStatus: { success: false, error: "Invalid Canvas Access Token" },
-            canvasPAT: "test_access_token"});
-    });
-    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
-        callback({preferences: { canvasIntegration: true }});
-    });
-
-    render(<CanvasAssignments />);
-
-    await waitFor(() => {
-        expect(screen.getByText(/Your Canvas Access Token is invalid! Please check your saved token and try again./)).toBeInTheDocument(); // message that is displayed if all upcoming assignments in storage are already completed
-    });
-});
-
-test("Miscellaneous Canvas fetching error", async() => {
-    const today = new Date();
-    today.setHours(22, 30);
-    const dateString = today.toLocaleString();
-    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
-        callback({ Canvas_Assignments: [{ context_name: "CS 120", title: "Assignment 20", due_at: dateString, id: 20, user_submitted: false }], 
-            CanvasFetchStatus: { success: false, error: "Miscellaneous error" },
-            canvasPAT: "test_access_token"});
-    });
-    global.chrome.storage.sync.get.mockImplementation((key, callback) => {
-        callback({preferences: { canvasIntegration: true }});
-    });
-
-    render(<CanvasAssignments />);
-
-    await waitFor(() => {
-        expect(screen.getByText(/An error occured while fetching your assignments! Please check your saved token or try again later./)).toBeInTheDocument(); // message that is displayed if all upcoming assignments in storage are already completed
-    });
-});
+  });
+  

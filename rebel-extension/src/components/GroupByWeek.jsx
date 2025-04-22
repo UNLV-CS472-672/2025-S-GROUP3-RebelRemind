@@ -44,7 +44,7 @@ function GroupByWeek({
                       {item.title || item.name} {item.label}
                     </a>
 
-                    {isCanvas && hasCompletedAssignments && (
+                    {isCanvas && (
                       <span className="event-time">
                         <div className="checkboxOverride">
                           <input
