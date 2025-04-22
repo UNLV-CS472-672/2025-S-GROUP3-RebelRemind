@@ -42,26 +42,32 @@ import Toggle from "./Toggle";
     chrome.storage.sync.set({ viewMode });
   }, [viewMode]);
 
+  // HOTFIX: Billy's PR 4 didn't account for the {viewMode} toggle in Kamila's PR 5
   useEffect(() => {
-    const getEvents = async () => {
-      const [data1, data2, data3, data4] = await fetchEvents(today);
-  
-      if (data1 && !data1.hasOwnProperty("message")) {
-        setACEvents(data1);
-      }
-      if (data2 && !data2.hasOwnProperty("message")) {
-        setICEvents(data2);
-      }
-      if (data3 && !data3.hasOwnProperty("message")) {
-        setRCEvents(data3);
-      }
-      if (data4 && !data4.hasOwnProperty("message")) {
-        setUCEvents(data4);
+    const fetchEvents = async () => {
+      try {
+        const [res1, res2, res3, res4] = await Promise.all([
+          fetch(`http://franklopez.tech:5050/academiccalendar_${viewMode}/${today}`),
+          fetch(`http://franklopez.tech:5050/involvementcenter_${viewMode}/${today}`),
+          fetch(`http://franklopez.tech:5050/rebelcoverage_${viewMode}/${today}`),
+          fetch(`http://franklopez.tech:5050/unlvcalendar_${viewMode}/${today}`)
+        ]);
+
+        const [data1, data2, data3, data4] = await Promise.all([
+          res1.json(), res2.json(), res3.json(), res4.json()
+        ]);
+        setACEvents(!data1.message ? data1 : []);
+        setICEvents(!data2.message ? data2 : []);
+        setRCEvents(!data3.message ? data3 : []);
+        setUCEvents(!data4.message ? data4 : []);
+      } catch (err) {
+        console.error('Error fetching events:', err);
       }
     };
-    getEvents();
-  }, []);
-  
+
+    fetchEvents();
+  }, [viewMode]);
+
   return (
     <div className="accordion-scroll-wrapper">
         <div className="accordion-header" style={{ 
