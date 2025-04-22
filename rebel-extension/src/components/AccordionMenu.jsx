@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { fetchEvents } from "../../public/scripts/fetch-events.js";
 
 import Accordion from 'react-bootstrap/Accordion';
 import CanvasAssignments from "./CanvasAssignments";
@@ -41,6 +42,7 @@ import Toggle from "./Toggle";
     chrome.storage.sync.set({ viewMode });
   }, [viewMode]);
 
+  // HOTFIX: Billy's PR 4 didn't account for the {viewMode} toggle in Kamila's PR 5
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -87,11 +89,13 @@ import Toggle from "./Toggle";
       <Accordion defaultActiveKey={["0", "1", "2"]} alwaysOpen>
       	<Accordion.Item eventKey="0">
       	<Accordion.Header>📚 Upcoming Assignments</Accordion.Header>
+
           <Accordion.Body className="accordion-panel-scroll">
           {/* • <strong> 🗺️ History 405:</strong> Homework 3 due by this Sunday <strong> <br />
           • <strong> 💻 CS 472:</strong> DP II</strong> due by next week Tuesday. */}
           <CanvasAssignments viewMode={viewMode}>
-          </CanvasAssignments>
+
+            </CanvasAssignments>
           </Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="1">
