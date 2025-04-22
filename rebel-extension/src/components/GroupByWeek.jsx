@@ -10,8 +10,10 @@ function GroupByWeek({
     isCanvas = false, 
     hasCompletedAssignments 
   }) {
-    const orderedWeekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
+    const weekdayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const todayIndex = new Date().getDay();
+    const orderedWeekdays = [...weekdayNames.slice(todayIndex), ...weekdayNames.slice(0, todayIndex)];
+    
   return (
     <div>
       {orderedWeekdays.map(day => {

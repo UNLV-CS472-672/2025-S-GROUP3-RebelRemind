@@ -20,8 +20,10 @@ function Events({ events, viewMode }) {
       grouped[weekday].push(event);
     });
 
-    const orderedWeekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
+    const weekdayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const todayIndex = new Date().getDay();
+    const orderedWeekdays = [...weekdayNames.slice(todayIndex), ...weekdayNames.slice(0, todayIndex)];
+    
     return orderedWeekdays
       .filter(day => grouped[day])
       .map(day => (
