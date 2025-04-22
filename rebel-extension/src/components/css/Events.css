@@ -69,6 +69,10 @@
     display: flex;
     justify-content: right;
   }
+  
+  .button{
+    background-color: transparent;
+  }
 
   .showCompletedCheckbox {
     visibility: hidden;

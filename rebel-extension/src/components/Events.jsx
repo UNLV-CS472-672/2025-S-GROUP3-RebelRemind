@@ -1,4 +1,5 @@
 import './css/Events.css';
+import addcalendarIcon from "../assets/addcalendarIcon.png";
 
 function Events({ events, viewMode }) {
  if (!events || events.length === 0) {
@@ -37,8 +38,14 @@ function Events({ events, viewMode }) {
                   <span className="event-name">
                     <span className="event-org">{event.organization}{event.organization?':':''} </span>{event.name}
                   </span>
-                  <span className="event-time">{event.time}</span>
-                </a>
+                </a> 
+                  <span className="event-time">{event.time}
+		              <div>
+		              <button style={{background: 'transparent'}}>
+		              	<img src="../assets/addcalendarIcon.png" height="25px" width="25px" />
+		              </button>
+		              </div>
+                  </span>   
               </li>
             ))}
           </ul>
@@ -54,8 +61,14 @@ function Events({ events, viewMode }) {
             <span className="event-name">
                 <span className="event-org">{event.organization}{event.organization?':':''} </span>{event.name}
             </span>
-            <span className="event-time">{event.time}</span>
-          </a>
+          </a>  
+            <span className="event-time">{event.time}
+		        <div>
+		        <button style={{background: 'transparent'}}>
+		        	<img src="../assets/addcalendarIcon.png" height="25px" width="25px"/>
+		        </button>
+		      	</div>
+            </span>
         </li>
       ))}
     </ul>
