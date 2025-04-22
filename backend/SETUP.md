@@ -35,10 +35,10 @@
 ```
 
 - Show events stored in database
-http://localhost:5050/academiccalendar_list
-http://localhost:5050/involvementcenter_list
-http://localhost:5050/rebelcoverage_list
-http://localhost:5050/unlvcalendar_list
+  - http://localhost:5050/academiccalendar_list
+  - http://localhost:5050/involvementcenter_list
+  - http://localhost:5050/rebelcoverage_list
+  - http://localhost:5050/unlvcalendar_list
 
 - Run pytest to test files
 ```sh
