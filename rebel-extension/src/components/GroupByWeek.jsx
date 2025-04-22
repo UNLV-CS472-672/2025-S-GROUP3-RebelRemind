@@ -8,7 +8,7 @@ function GroupByWeek({
     markComplete, 
     undoComplete, 
     isCanvas = false, 
-    hasCompletedAssignments 
+    viewMode 
   }) {
     const weekdayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const todayIndex = new Date().getDay();
@@ -23,8 +23,7 @@ function GroupByWeek({
         return (
           <div key={day} className="weekday-section">
             <div className="weekday-title">{day}</div>
-            <ul className="event-list">
-              {items.map(item => (
+            <ul className={`event-list ${viewMode === 'daily' ? 'event-list-daily' : ''}`}>              {items.map(item => (
                 <li key={item.id} className="event-item">
                   <div className="event-link">
                     <a
@@ -47,21 +46,26 @@ function GroupByWeek({
                     </a>
 
                     {isCanvas && (
-                      <span className="event-time">
-                        <div className="checkboxOverride">
-                          <input
-                            type="checkbox"
-                            id={`checkbox-${item.id}`}
-                            checked={isComplete(item.id)}
-                            onChange={() =>
-                              isComplete(item.id)
-                                ? undoComplete(item.id)
-                                : markComplete(item)
-                            }
-                          />
-                          <label htmlFor={`checkbox-${item.id}`}></label>
+                    <span className="event-time">
+                        <div className="checkboxWrapper">
+                            <div className="checkboxTooltip">
+                                {isComplete(item.id) ? "Undo completion" : "Mark as complete"}
+                            </div>
+                            <div className="checkboxOverride">
+                                <input
+                                type="checkbox"
+                                id={`checkbox-${item.id}`}
+                                checked={isComplete(item.id)}
+                                onChange={() =>
+                                    isComplete(item.id)
+                                    ? undoComplete(item.id)
+                                    : markComplete(item)
+                                }
+                                />
+                                <label htmlFor={`checkbox-${item.id}`}></label>
+                            </div>
                         </div>
-                      </span>
+                    </span>
                     )}
                   </div>
                 </li>

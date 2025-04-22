@@ -204,16 +204,14 @@ function CanvasAssignments({ viewMode }) {
           <div>
             <p>{message}</p>
             {hasCompletedAssignments && (
-              <div className="mt-2">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={showCompleted}
-                    onChange={() => setShowCompleted(!showCompleted)}
-                  />
-                  <span>{showCompleted ? 'Hide Completed' : 'Show Completed'}</span>
-                </label>
-              </div>
+                <div className="mt-2">
+                    <div
+                        className="completedText"
+                        onClick={() => setShowCompleted(!showCompleted)}
+                    >
+                        <span>{showCompleted ? 'Hide Completed' : 'Show Completed'}</span>
+                    </div>
+                </div>
             )}
           </div>
         );
@@ -247,19 +245,16 @@ function CanvasAssignments({ viewMode }) {
             showCompleted={showCompleted}
             setShowCompleted={setShowCompleted}
             allCompleted={!hasVisibleAssignments && hasAssignments}
-            hasCompletedAssignments={hasCompletedAssignments}
+            viewMode={viewMode}
         />
 
             <div className="mt-2">
-                {/* Show Completed checkbox */}
-                <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                        type="checkbox"
-                        checked={showCompleted}
-                        onChange={() => setShowCompleted(!showCompleted)}
-                    />
+                <div
+                    className="completedText"
+                    onClick={() => setShowCompleted(!showCompleted)}
+                >
                     <span>{showCompleted ? 'Hide Completed' : 'Show Completed'}</span>
-                </label>
+                </div>
             </div>
         </div>
     );

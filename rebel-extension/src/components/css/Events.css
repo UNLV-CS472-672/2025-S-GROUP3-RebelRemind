@@ -20,10 +20,16 @@
   .event-list {
     padding-left: 1.25rem;
     margin-bottom: 1rem;
-    padding-left: 32px !important;  /* to match canvas assn */
+    padding-left: 32px !important;
   }
-  
-  .event-item {
+  .event-list-daily {
+    list-style: none !important;
+    padding-left: 0 !important;
+    ::marker {
+      content: none;
+    }
+  }
+    .event-item {
     margin-bottom: 0.5rem;
     list-style-type: disc;
     font-size: 16px;
@@ -64,10 +70,17 @@
     justify-content: right;
   }
 
-  input[type="checkbox"] {
+  .showCompletedCheckbox {
     visibility: hidden;
   }
+
+  .completedText {
+    cursor: pointer;
+  }
   
+  .completedText:hover {
+    font-weight: bold;
+  }
   .checkboxOverride {
     position: relative;
     width: 25px;
@@ -101,5 +114,32 @@
     top: 7px;
     transform: rotate(-45deg);
     width: 10px;
+  }
+  .checkboxWrapper {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .checkboxTooltip {
+    position: absolute;
+    top: -30px;
+    right: 0; /* anchor to the right edge of checkbox */
+    transform: translateX(0); /* prevent shifting */
+    background-color: #333;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+    max-width: max-content;
+  }
+  
+  
+  .checkboxWrapper:hover .checkboxTooltip {
+    opacity: 1;
   }
   

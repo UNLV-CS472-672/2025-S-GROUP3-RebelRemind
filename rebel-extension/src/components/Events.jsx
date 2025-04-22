@@ -30,7 +30,7 @@ function Events({ events, viewMode }) {
         <div key={day} className="weekday-section">
           <div className="weekday-title">{day}</div>
           {/* <hr className="weekday-divider" /> */}
-          <ul className="event-list">
+          <ul className={`event-list ${viewMode === 'daily' ? 'event-list-daily' : ''}`}>
             {grouped[day].map(event => (
               <li key={event.id} className="event-item">
                 <a href={event.link} target="_blank" rel="noopener noreferrer" className="event-link">
@@ -47,7 +47,7 @@ function Events({ events, viewMode }) {
   }
 
   return (
-    <ul className="event-list">
+    <ul className={`event-list ${viewMode === 'daily' ? 'event-list-daily' : ''}`}>
       {sortedEvents.map(event => (
         <li key={event.id} className="event-item">
           <a href={event.link} target="_blank" rel="noopener noreferrer" className="event-link">
