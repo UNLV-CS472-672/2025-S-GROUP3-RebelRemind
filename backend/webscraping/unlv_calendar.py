@@ -94,7 +94,7 @@ def default():
             event_data["category"] = category
             # Send event data to Flask API
             #api_response = requests.put(BASE + f"unlvcalendar_id/{event_id}", json=event_data)
-            api_response = requests.put(BASE + f"unlvcalendar_add", json=event_data)
+            api_response = requests.put(BASE + "unlvcalendar_add", json=event_data)
             # if api_response.status_code == 201:
             #     pass
 

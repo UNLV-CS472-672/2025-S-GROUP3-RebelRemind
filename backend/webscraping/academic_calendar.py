@@ -52,7 +52,7 @@ def default():
                 "startDate": event['Date'],
                 "endDate": event['Date']
             }
-            requests.put(BASE + f"academiccalendar_add", json=put_data) # Use json= for the request body
+            requests.put(BASE + "academiccalendar_add", json=put_data) # Use json= for the request body
 
     else:
         print(f"Failed to access the page. Status code: {response.status_code}")

@@ -13,7 +13,6 @@ except ImportError as e:
 
 # --- Test Class ---
 class TestAcademicScraperAPI(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         """Optional: Run once before all tests in the class."""
@@ -32,7 +31,6 @@ class TestAcademicScraperAPI(unittest.TestCase):
             # Stop tests if API isn't running
             raise ConnectionError(f"API Server at {BASE} not reachable.") from e
 
-
     def setUp(self):
         """Run before each test method."""
         # Clean the specific table before each test to ensure independence
@@ -43,7 +41,6 @@ class TestAcademicScraperAPI(unittest.TestCase):
                       f"Failed to clear previous Academic Calendar events: {delete_response.text}")
         print("Previous Academic Calendar events cleared (or table was empty).")
         time.sleep(0.5) # Give server a tiny bit of time
-
 
     def test_scrape_and_add_events(self):
         """
@@ -79,10 +76,10 @@ class TestAcademicScraperAPI(unittest.TestCase):
         print(f"Verifying structure of first event: {first_event.get('name')}")
         self.assertIn("id", first_event)
         self.assertIn("name", first_event)
-        self.assertIn("date", first_event) # API returns date as string
-        self.assertIn("time", first_event) # Can be None
-        self.assertIn("location", first_event) # Can be None
-
+        self.assertIn("startDate", first_event) # API returns date as string
+        self.assertIn("startTime", first_event) # Can be None
+        self.assertIn("endDate", first_event) # API returns date as string
+        self.assertIn("endTime", first_event) # Can be None
         
         event_id_to_get = first_event['id']
         print(f"Attempting to retrieve event ID {event_id_to_get} specifically...")
@@ -93,7 +90,6 @@ class TestAcademicScraperAPI(unittest.TestCase):
         self.assertEqual(indiv_data['name'], first_event['name']) # Check name matches
 
         print(f"✅ Scraped Academic Calendar events successfully added and verified via API.")
-
 
     def test_get_events_after_adding(self):
         """
@@ -121,20 +117,17 @@ class TestAcademicScraperAPI(unittest.TestCase):
         # Verify structure again for an item in the list
         event = retrieved_data[0]
         self.assertIn("name", event)
-        self.assertIn("date", event)
-        self.assertIn("time", event)
-        self.assertIn("location", event)
+        self.assertIn("startDate", event)
+        self.assertIn("startTime", event)
+        self.assertIn("endDate", event)
+        self.assertIn("endTime", event)
         print("✅ Event structure in list verified.")
-
 
     @classmethod
     def tearDownClass(cls):
         """Optional: Run once after all tests in the class."""
         print("\n--- Finished Academic Calendar Scraper API Tests ---")
-        
-
 
 if __name__ == '__main__':
     # Ensure the script using this test class is run directly
     unittest.main()
-

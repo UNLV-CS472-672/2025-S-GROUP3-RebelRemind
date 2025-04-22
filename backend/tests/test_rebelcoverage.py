@@ -35,9 +35,12 @@ class TestFlaskAPI(unittest.TestCase):
 
             # Verify the expected fields are returned
             self.assertIn("name", event_data)
-            self.assertIn("date", event_data)
-            self.assertIn("time", event_data)
-            self.assertIn("location", event_data)
+            self.assertIn("startDate", event_data)
+            self.assertIn("startTime", event_data)
+            self.assertIn("endDate", event_data)
+            self.assertIn("endTime", event_data)
+            self.assertIn("sport", event_data)
+            self.assertIn("link", event_data)
 
             print(f"✅ Event {event_id} successfully added and retrieved!")
             event_id += 1  # Increment event ID for next loop
@@ -62,9 +65,12 @@ class TestFlaskAPI(unittest.TestCase):
         # Optionally, verify event details (you could compare this with your own expected structure if needed)
         for event in retrieved_data:
             self.assertIn("name", event)
-            self.assertIn("date", event)
-            self.assertIn("time", event)
-            self.assertIn("location", event)
+            self.assertIn("startDate", event)
+            self.assertIn("startTime", event)
+            self.assertIn("endDate", event)
+            self.assertIn("endTime", event)
+            self.assertIn("sport", event)
+            self.assertIn("link", event)
 
         print("✅ All events retrieved successfully!")
 

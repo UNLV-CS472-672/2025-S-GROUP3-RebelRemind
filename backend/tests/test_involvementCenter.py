@@ -4,12 +4,11 @@ from webscraping.involvement_center import default
 from database import BASE
 
 class TestFlaskAPI(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         pass
 
-    def test_add_events(self):
+    def test_add_event(self):
         """
         Test adding events to the API via PUT request from the scraper.
         """
@@ -17,7 +16,7 @@ class TestFlaskAPI(unittest.TestCase):
         default()  # This will scrape and add events to the Flask API
 
         # Try to retrieve the event from the API
-        response = requests.get(BASE + f"involvementcenter_id/1")
+        response = requests.get(BASE + "involvementcenter_id/1")
         
         # Check if event is successfully added
         self.assertEqual(response.status_code, 200, f"Failed to get event 1: {response.text}")
@@ -25,10 +24,13 @@ class TestFlaskAPI(unittest.TestCase):
 
         # Verify the expected fields are returned
         self.assertIn("name", event_data)
-        self.assertIn("date", event_data)
-        self.assertIn("time", event_data)
+        self.assertIn("startDate", event_data)
+        self.assertIn("startTime", event_data)
+        self.assertIn("endDate", event_data)
+        self.assertIn("endTime", event_data)
         self.assertIn("location", event_data)
         self.assertIn("organization", event_data)
+        self.assertIn("link", event_data)
 
         print(f"✅ Event successfully retrieved!")
 

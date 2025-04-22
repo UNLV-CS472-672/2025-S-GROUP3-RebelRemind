@@ -25,9 +25,12 @@ class TestFlaskAPI(unittest.TestCase):
 
         # Verify the expected fields are returned
         self.assertIn("name", event_data)
-        self.assertIn("date", event_data)
-        self.assertIn("time", event_data)
-        self.assertIn("location", event_data)
+        self.assertIn("startDate", event_data)
+        self.assertIn("startTime", event_data)
+        self.assertIn("endDate", event_data)
+        self.assertIn("endTime", event_data)
+        self.assertIn("category", event_data)
+        self.assertIn("link", event_data)
 
         print(f"✅ Events successfully added and retrieved!")
 

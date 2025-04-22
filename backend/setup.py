@@ -18,7 +18,8 @@ setup(
             'serve_data = database.serve_data:default',
             'test_academicCalendar = tests.test_academicCalendar:default',
             'test_involvementCenter = tests.test_involvementCenter:default',
-            'test_rebelCoverage = tests.test_involvementCenter:default',
+            'test_organizations = tests.test_organizations:default',
+            'test_rebelCoverage = tests.test_rebelCoverage:default',
             'test_serveData = tests.test_serveData:default',
             'test_unlvCalendar = tests.test_unlvCalendar:default'
         ]

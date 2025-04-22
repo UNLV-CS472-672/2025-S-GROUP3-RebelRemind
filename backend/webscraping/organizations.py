@@ -6,7 +6,6 @@ from database import BASE
 URL = "https://involvementcenter.unlv.edu/api/discovery/search/organizations?"
 QUERY = "orderBy%5B0%5D=UpperName%20asc&top=9999&filter=&query=&skip=0"
 
-print("Running webscraping.organizations...")
 def default():
     response = requests.get(URL+QUERY)
     json_data = response.json()
