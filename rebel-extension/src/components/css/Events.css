@@ -60,5 +60,46 @@
     text-align: right;
     font-weight: 600;
     font-family: "Lato", "Helvetica", "Arial", sans-serif;
+    display: flex;
+    justify-content: right;
+  }
+
+  input[type="checkbox"] {
+    visibility: hidden;
+  }
+  
+  .checkboxOverride {
+    position: relative;
+    width: 25px;
+    height: 25px;
+  }
+  
+  .checkboxOverride input[type="checkbox"]:checked + label:after {
+    opacity: 1;
+  }
+  
+  .checkboxOverride label {
+    background: #EEEEEE;
+    border: 1px solid #DDDDDD;
+    cursor: pointer;
+    height: 25px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 25px;
+    cursor: pointer !important;
 
   }
+  
+  .checkboxOverride label:after {
+    border-style: none none solid solid;
+    content: "";
+    height: 5px;
+    left: 6px;
+    opacity: 0;
+    position: absolute;
+    top: 7px;
+    transform: rotate(-45deg);
+    width: 10px;
+  }
+  

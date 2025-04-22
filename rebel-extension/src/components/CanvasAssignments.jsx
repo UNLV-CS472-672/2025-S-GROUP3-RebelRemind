@@ -11,7 +11,7 @@ import GroupByWeek from './groupByWeek';
  * Authored by: Gunnar Dalton
  */
 
-function CanvasAssignments() {
+function CanvasAssignments({ viewMode }) {
     const [assignments, setAssignments] = useState([]);
     const [completedAssignments, setCompletedAssignments] = useState([]);
     const [showCompleted, setShowCompleted] = useState(false);
@@ -33,13 +33,19 @@ function CanvasAssignments() {
                 if (data.Canvas_Assignments) { 
                     const assignmentList = data.Canvas_Assignments;
                     const now = new Date();
-                    const weekFromNow = new Date();
-                    weekFromNow.setDate(now.getDate() + 7);
-
-                    const upcomingAssignments = assignmentList.filter((a) => { // filter out past due assignments or ones without a due date
-                        const dueDate = new Date(a.due_at);
-                        return a.due_at && dueDate >= now && dueDate <= weekFromNow;
+                    const end = new Date();
+                    
+                    if (viewMode === "weekly") {
+                      end.setDate(now.getDate() + 7);
+                    } else {
+                      end.setDate(now.getDate() + 1);
+                    }
+                    
+                    const upcomingAssignments = assignmentList.filter((a) => {
+                      const dueDate = new Date(a.due_at);
+                      return a.due_at && dueDate >= now && dueDate < end;
                     });
+                    
 
                     upcomingAssignments.sort((a, b) => new Date(a.due_at) - new Date(b.due_at)); // sort dates in order
 
@@ -112,7 +118,7 @@ function CanvasAssignments() {
 
         chrome.runtime.onMessage.addListener(handleMessage);
         return () => chrome.runtime.onMessage.removeListener(handleMessage);
-    }, []);
+    }, [viewMode]);
 
     /**
      * Effect Hook: Resets justCompleted when showCompleted is toggled off
@@ -153,6 +159,20 @@ function CanvasAssignments() {
     const assignmentsToDisplay = [...assignments]
         .sort((a, b) => new Date(a.due_at) - new Date(b.due_at))
         .filter(a => showCompleted || !isComplete(a.id) || justCompleted.includes(a.id));
+        const hasAssignments = assignments.length > 0;
+        const hasVisibleAssignments = assignmentsToDisplay.length > 0;
+
+        const now = new Date();
+        const end = new Date();
+        end.setDate(now.getDate() + (viewMode === "weekly" ? 7 : 1));
+
+        const visibleCompletedAssignments = completedAssignments.filter(item => {
+        const dueDate = new Date(item.due_at);
+        return dueDate >= now && dueDate < end;
+        });
+
+        const hasCompletedAssignments = visibleCompletedAssignments.length > 0;
+
 
     if (!CanvasIntegrationPreference) { // Canvas integration is disabled
         return <p>Canvas integration is disabled! Please check your preferences to enable this feature.</p>
@@ -171,28 +191,36 @@ function CanvasAssignments() {
         }
     }
 
-    if (assignments.length === 0) { // handles no assignments listed case
-        return <p>No assignments found.</p>;
-    }
-
-    if (assignmentsToDisplay.length === 0 && !showCompleted) { // handles all assignments are completed case
+    if (!hasVisibleAssignments && !showCompleted) {
+        const message = hasAssignments
+          ? (viewMode === "daily"
+              ? "All assignments due today are completed! 🎉"
+              : "All assignments due this week are completed! 🎉")
+          : (viewMode === "daily"
+              ? "No assignments due today."
+              : "No assignments due this week.");
+      
         return (
-            <div>
-                <p>All upcoming assignments are completed!</p>
-                <div className="mt-2">
-                    {/* Show Completed checkbox */}
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="checkbox"
-                            checked={showCompleted}
-                            onChange={() => setShowCompleted(!showCompleted)}
-                        />
-                        <span> Show Completed</span>
-                    </label>
-                </div>
-            </div>
-        )
-    }
+          <div>
+            <p>{message}</p>
+            {hasCompletedAssignments && (
+              <div className="mt-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={showCompleted}
+                    onChange={() => setShowCompleted(!showCompleted)}
+                  />
+                  <span>{showCompleted ? 'Hide Completed' : 'Show Completed'}</span>
+                </label>
+              </div>
+            )}
+          </div>
+        );
+      }
+      
+      
+      
 
     const groupedAssignments = {};
     assignmentsToDisplay.forEach((assignment) => {
@@ -203,19 +231,25 @@ function CanvasAssignments() {
             ...assignment,
             label: isComplete(assignment.id)
                 ? getDueDateLabel(assignment.due_at)
-                : formatDueDateLabel(getDueDateLabel(assignment.due_at))
+                : formatDueDateLabel(getDueDateLabel(assignment.due_at)),
+            link: assignment.html_url
         });
     });
 
     return (
         <div>
-            <GroupByWeek
-                groupedItems={groupedAssignments}
-                isComplete={isComplete}
-                markComplete={markComplete}
-                undoComplete={undoComplete}
-                isCanvas={true}
-            />
+        <GroupByWeek
+            groupedItems={groupedAssignments}
+            isComplete={isComplete}
+            markComplete={markComplete}
+            undoComplete={undoComplete}
+            isCanvas={true}
+            showCompleted={showCompleted}
+            setShowCompleted={setShowCompleted}
+            allCompleted={!hasVisibleAssignments && hasAssignments}
+            hasCompletedAssignments={hasCompletedAssignments}
+        />
+
             <div className="mt-2">
                 {/* Show Completed checkbox */}
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -224,7 +258,7 @@ function CanvasAssignments() {
                         checked={showCompleted}
                         onChange={() => setShowCompleted(!showCompleted)}
                     />
-                    <span> Show Completed</span>
+                    <span>{showCompleted ? 'Hide Completed' : 'Show Completed'}</span>
                 </label>
             </div>
         </div>

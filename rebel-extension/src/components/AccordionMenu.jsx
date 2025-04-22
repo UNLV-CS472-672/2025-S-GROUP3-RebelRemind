@@ -69,11 +69,11 @@ import Toggle from "./Toggle";
   return (
     <div className="accordion-scroll-wrapper">
         <div className="accordion-header" style={{ 
-        paddingTop: "1rem",
+        paddingTop: "0.9rem",
         display: "flex", 
         justifyContent: "space-between", 
         alignItems: "center", 
-        marginBottom: "1rem", 
+        marginBottom: "0.5rem", 
         paddingRight: "1rem",
       }}>
         <p className="accordion-text" style={{ margin: 0, fontSize: "1rem", fontWeight: 600 }}>
@@ -90,7 +90,7 @@ import Toggle from "./Toggle";
           <Accordion.Body className="accordion-panel-scroll">
           {/* • <strong> 🗺️ History 405:</strong> Homework 3 due by this Sunday <strong> <br />
           • <strong> 💻 CS 472:</strong> DP II</strong> due by next week Tuesday. */}
-          <CanvasAssignments>
+          <CanvasAssignments viewMode={viewMode}>
           </CanvasAssignments>
           </Accordion.Body>
         </Accordion.Item>
