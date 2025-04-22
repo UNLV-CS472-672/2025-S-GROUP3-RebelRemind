@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Check, Undo2 } from "lucide-react";
-import GroupByWeek from './groupByWeek';
+import GroupByWeek from './GroupByWeek';
 
 /**
  * CanvasAssignments Component
