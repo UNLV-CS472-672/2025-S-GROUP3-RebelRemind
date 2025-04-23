@@ -72,11 +72,6 @@
     display: flex;
     justify-content: right;
   }
-  
-  .button{
-    background-color: transparent;
-    padding: 0 !important;
-  }
 
   .showCompletedCheckbox {
     visibility: hidden;

@@ -1,5 +1,28 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Events from '../components/Events';
+
+beforeAll(() => {
+  global.chrome = {
+      storage: {
+        local: {
+          get: jest.fn((key, callback) => {
+            // Simulate data being fetched
+            callback({ UNLVEvents: [] });  // Return an empty array as default
+          }),
+          set: jest.fn((data, callback) => {
+            // Simulate saving to local storage and call the callback
+            callback();  // Simulate successful save
+          }),
+        },
+      },
+      runtime: {
+        sendMessage: jest.fn(),
+      },
+    };
+  global.alert = jest.fn();
+});
+
+
 
 describe('Events component', () => {
   const mockDailyEvents = [
@@ -44,5 +67,27 @@ describe('Events component', () => {
     expect(screen.getByText('Monday')).toBeInTheDocument();
     expect(screen.getByText(/Weekly Event Sunday/i)).toBeInTheDocument();
     expect(screen.getByText(/Weekly Event Monday/i)).toBeInTheDocument();
+  });
+  
+  it('ensures the functionality of the add event button', async () => {
+    render(<Events events={mockDailyEvents} viewMode="daily" />);
+    expect(screen.getByText(/Event A/i)).toBeInTheDocument();
+    expect(screen.getByText(/Event B/i)).toBeInTheDocument();
+    expect(screen.getAllByRole('link')).toHaveLength(2);
+    
+    /*
+    const button = screen.getByRole('button',(/add to calendar/i));
+    
+	fireEvent.click(button);
+	expect(window.alert).toHaveBeenCalledWith('Event saved to calendar.');
+	*/
+	
+	const eventStart = screen.getByText(/10:00 AM/i);
+	const closestButton = eventStart.closest('span').querySelector('button[aria-label="add to calendar"]');
+	expect(closestButton).toBeInTheDocument();
+	fireEvent.click(closestButton);
+	//expect(global.alert).toHaveBeenCalledWith('Event saved to calendar.');
+	await waitFor(() => expect(global.alert).toHaveBeenCalledWith('Event saved to calendar.'));
+    
   });
 });

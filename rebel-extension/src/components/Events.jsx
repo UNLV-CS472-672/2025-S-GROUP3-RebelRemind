@@ -54,8 +54,10 @@ function Events({ events, viewMode }) {
                 </a> 
                   <span className="event-time">{event.time}
 		              <div>
-		              <button style={{background: 'transparent', paddingRight: '0px', paddingTop: '0px'}} onClick={() => handleAddEvent(event)}>
-		              	<img src="../assets/addcalendarIcon.png" height="25px" width="25px" />
+		              <button style={{background: 'transparent', paddingRight: '0px', paddingTop: '0px'}} 
+		              		onClick={() => handleAddEvent(event)}
+		              		aria-label="add to calendar">
+		              	<img src={addcalendarIcon} height="25px" width="25px" />
 		              </button>
 		              </div>
                   </span>   
@@ -77,8 +79,10 @@ function Events({ events, viewMode }) {
           </a>  
             <span className="event-time">{event.time}
 		        <div>
-		        <button style={{background: 'transparent', paddingRight: '0px', paddingTop: '0px'}} onClick={() => handleAddEvent(event)}>
-		        	<img src="../assets/addcalendarIcon.png" height="25px" width="25px"/>
+		        <button style={{background: 'transparent', paddingRight: '0px', paddingTop: '0px'}} 
+		        	onClick={() => handleAddEvent(event)}
+		        	aria-label="add to calendar">
+		        		<img src={addcalendarIcon} height="25px" width="25px"/>
 		        </button>
 		      	</div>
             </span>

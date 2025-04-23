@@ -52,6 +52,7 @@
       "^.+\\.jsx?$": "babel-jest"
     },
     "moduleNameMapper": {
+      "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg)$": "<rootDir>/__mocks__/buttonImgMock.js",
       "\\.(css|less|scss|sass)$": "identity-obj-proxy",
       "\\.(mp3)$": "<rootDir>/__mocks__/mp3Mock.js"
     },
