@@ -231,3 +231,39 @@
     color: var(--user-events-text);
   }
   
+  .back-button-container {
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+  }
+  
+  .back-button {
+    background: var(--containerbg, rgba(0, 0, 0, 0.28));
+    color: var(--app-text-color, white);
+    padding: 10px 16px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .back-button:hover {
+    background: var(--containerbg, rgba(255, 255, 255, 0.08)) !important;
+    color: var(--app-text-color, white) !important;
+    transform: scale(1.08);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+  }
+  
+  .back-button:active {
+    background: var(--containerbg, rgba(255, 255, 255, 0.12)) !important;
+    color: var(--app-text-color, white) !important;
+    transform: scale(1.04);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  .back-button-spacer {
+    height: 32px; /* or however much vertical push you want */
+  }

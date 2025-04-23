@@ -295,7 +295,7 @@ const UserEventList = () => {
     };
 
     return (
-        <div className="mx-auto bg-white rounded shadow-md text-left" style={{ padding: "10px", marginTop: "20px" }}>
+        <div className="mx-auto bg-white rounded shadow-md text-left" style={{ padding: "10px", marginTop: "10px" }}>
             <h3 className="text-xl font-semibold mb-2" style={{ marginTop: "10px" }}>Your Custom Events</h3>
 
             {/* Tab Switcher */}
