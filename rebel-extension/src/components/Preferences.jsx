@@ -59,7 +59,7 @@ const Preferences = ({ setupMode = false }) => {
     // Sports and interests state
     const mensSports = ["Baseball", "Basketball", "Football", "Golf", "Soccer", "Swim & Dive", "Tennis"];
     const womensSports = ["Basketball", "Cross Country", "Golf", "Soccer", "Softball", "Swim & Dive", "Tennis", "Track & Field", "Volleyball"];
-    const allInterests = ["Arts", "Academics", "Career", "Culture", "Diversity", "Health", "Social", "Sports", "Tech", "Family"];
+    const allInterests = ["Arts", "Academics", "Career", "Culture", "Diversity", "Health", "Social", "Sports", "Tech", "Community"];
 
     const [selectedMenSports, setSelectedMenSports] = useState([]);
     const [selectedWomenSports, setSelectedWomenSports] = useState([]);

@@ -59,15 +59,44 @@ import Toggle from "./Toggle";
         setACEvents(!data1.message ? data1 : []);
         setICEvents(!data2.message ? data2 : []);
         setRCEvents(!data3.message ? data3 : []);
-        setUCEvents(!data4.message ? data4 : []);
+        // filter UC events
+        chrome.storage.sync.get(["selectedInterests"], (storageData) => {
+          const selected = storageData.selectedInterests || [];
+
+          const filteredUNLVEvents = (!data4.message ? data4 : []).filter(event =>
+            selected.includes(event.category)
+          );
+          setUCEvents(filteredUNLVEvents);
+        })
+        //setUCEvents(!data4.message ? data4 : []);
       } catch (err) {
         console.error('Error fetching events:', err);
       }
     };
 
     fetchEvents();
+    
+
   }, [viewMode]);
 
+  useEffect(() => {
+    function handleStorageChange(changes, area) {
+      if (area === "sync" && changes.selectedInterests) {
+        chrome.storage.sync.get(["selectedInterests"], (storageData) => {
+          const selected = storageData.selectedInterests || [];
+          setUCEvents(prevUC =>
+            prevUC.filter(event => selected.includes(event.category))
+          );
+        });
+      }
+    }
+
+    chrome.storage.onChanged.addListener(handleStorageChange);
+    return () => {
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+    };
+  }, []);
+  
   return (
     <div className="accordion-scroll-wrapper">
         <div className="accordion-header" style={{ 
