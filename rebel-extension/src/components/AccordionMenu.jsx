@@ -39,15 +39,10 @@ import Toggle from "./Toggle";
  * @returns {JSX.Element} The AccordionMenu component UI.
  */
 function AccordionMenu() {
-  const [rawAcEvents, setRawAcEvents] = useState([]);
-  const [rawIcEvents, setRawIcEvents] = useState([]);
-  const [rawRcEvents, setRawRcEvents] = useState([]);
-  const [rawUcEvents, setRawUcEvents] = useState([]);
-
-  const [filteredAcEvents, setFilteredAcEvents] = useState([]);
-  const [filteredIcEvents, setFilteredIcEvents] = useState([]);
-  const [filteredRcEvents, setFilteredRcEvents] = useState([]);
-  const [filteredUcEvents, setFilteredUcEvents] = useState([]);
+  const [filteredAC, setFilteredAcEvents] = useState([]);
+  const [filteredIC, setFilteredIcEvents] = useState([]);
+  const [filteredRC, setFilteredRcEvents] = useState([]);
+  const [filteredUC, setFilteredUcEvents] = useState([]);
 
   const [user_events, setUserEvents] = useState([]);
   const [normalizedUserEvents, setNormUserEvents] = useState([]);
@@ -67,107 +62,32 @@ function AccordionMenu() {
     chrome.storage.sync.set({ viewMode });
   }, [viewMode]);
 
-/***  LOAD EVENTS  ***/
+/***  LOAD EVENTS and FILTER ***/
 
   const today = new Date().toLocaleDateString('en-CA');
   useEffect(() => {
     const loadEvents = async () => {
-      const [data1, data2, data3, data4] = await fetchEvents(today, viewMode);
-      // reset data before fetching
-      setRawAcEvents([]);
-      setRawIcEvents([]);
-      setRawRcEvents([]);
-      setRawUcEvents([]);
+      const [filteredAC, filteredIC, filteredRC, filteredUC] = await filterEvents(today, viewMode);
+      
+      setFilteredAcEvents(filteredAC);
+      setFilteredIcEvents(filteredIC);
+      setFilteredRcEvents(filteredRC);
+      setFilteredUcEvents(filteredUC);
 
-      // reset filtered states 
-      setFilteredIcEvents([]);
-      setFilteredAcEvents([]);
-      setFilteredRcEvents([]);
-      setFilteredUcEvents([]);
-      try{
-        const [dataAC, dataIC, dataRC, dataUC] = await fetchEvents(today, viewMode);
-
-     //   console.log("Fetched Data:", { dataAC, dataIC, dataRC, dataUC });
-
-        // Update RAW event states
-        if (dataAC && !dataAC.message) setRawAcEvents(dataAC);
-        if (dataIC && !dataIC.message) setRawIcEvents(dataIC);
-        if (dataRC && !dataRC.message) setRawRcEvents(dataRC);
-        if (dataUC && !dataUC.message) setRawUcEvents(dataUC);
-      }catch (error) {
-        setRawAcEvents([]);
-        setRawIcEvents([]);
-        setRawRcEvents([]);
-        setRawUcEvents([]);
-      }
-     
+      chrome.storage.local.set({
+        filteredAC: filteredAC,
+        filteredIC: filteredIC,
+        filteredRC: filteredRC,
+        filteredUC: filteredUC,
+      });
     };
+      
 
     loadEvents();
   }, [viewMode, today]);
 
-/***  END LOAD EVENTS  ***/
+/***  END LOAD and FILTER EVENTS  ***/
 
-/***  FILTER EVENTS  ***/
-
-useEffect(() => {
-  const applyFiltersAndStore = async () => {
-  
-    // Pass the RAW event data to the filter function
-    const [filteredAC, filteredIC, filteredRC, filteredUC] = await filterEvents(rawAcEvents, rawIcEvents, rawRcEvents, rawUcEvents);
-
-   
-
-    // Update filtered state and save to local storage
-    if (filteredAC && !filteredAC.message){
-      setFilteredAcEvents(filteredAC);
-      chrome.storage.local.set({ filteredAC });
-    }else{
-      setFilteredAcEvents([]);
-      chrome.storage.local.remove('filteredAC');
-    }
-    if (filteredIC && !filteredIC.message) {
-      setFilteredIcEvents(filteredIC);
-      chrome.storage.local.set({ filteredIC });
-    } else {
-      setFilteredIcEvents([]); // Ensure it's an empty array if filtering fails or returns nothing
-       chrome.storage.local.remove('filteredIC'); // Clear storage if no valid data
-    }
-
-    if (filteredRC && !filteredRC.message) {
-      setFilteredRcEvents(filteredRC);
-      chrome.storage.local.set({ filteredRC });
-    } else {
-      setFilteredRcEvents([]);
-      chrome.storage.local.remove('filteredRC');
-    }
-
-    if (filteredUC && !filteredUC.message) {
-      setFilteredUcEvents(filteredUC);
-      chrome.storage.local.set({ filteredUC });
-    } else {
-      setFilteredUcEvents([]);
-      chrome.storage.local.remove('filteredUC');
-    }
-  };
-
-  // Apply filters only if there's raw data to process
-  // This check prevents running filterEvents with initial empty arrays unnecessarily
-  if (rawAcEvents.length > 0 || rawIcEvents.length > 0 || rawRcEvents.length > 0 || rawUcEvents.length > 0) {
-     applyFiltersAndStore();
-  } else {
-     // If raw data is empty, ensure filtered data is also empty
-     setFilteredAcEvents([]);
-     setFilteredIcEvents([]);
-     setFilteredRcEvents([]);
-     setFilteredUcEvents([]);
-     // Optionally clear storage as well if raw data becomes empty after a fetch
-     chrome.storage.local.remove(['filteredIC', 'filteredRC', 'filteredUC']);
-  }
-
-// Depend ONLY on the RAW event data states
-}, [rawAcEvents,rawIcEvents, rawRcEvents, rawUcEvents]);
-/***  END FILTER EVENTS  ***/
 
 /***  USER EVENTS  ***/
 
@@ -275,8 +195,8 @@ useEffect(() => {
                   >
 
                     {index === 0 && <CanvasAssignments viewMode={viewMode} />}
-                    {index === 1 && <Events events={[...filteredIcEvents, ...normalizedUserEvents]} viewMode={viewMode} setActiveEventPopup={setActiveEventPopup} />}
-                    {index === 2 && <Events events={[...filteredUcEvents, ...filteredAcEvents, ...filteredRcEvents]} viewMode={viewMode} />}
+                    {index === 1 && <Events events={[...filteredIC, ...normalizedUserEvents]} viewMode={viewMode} setActiveEventPopup={setActiveEventPopup} />}
+                    {index === 2 && <Events events={[...filteredUC, ...filteredAC, ...filteredRC]} viewMode={viewMode} />}
                   </Accordion.Body>
                 </Accordion.Item>
               );
