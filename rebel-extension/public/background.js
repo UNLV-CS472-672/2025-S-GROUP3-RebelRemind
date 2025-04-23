@@ -80,8 +80,30 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
     // Utility to calculate the next 9:00 AM time
     notificationState = changes.notificationsEnabled.newValue;
     if (notificationState){
+      chrome.alarms.get("dailyCheck", (alarm) => {
+        if (!alarm) {
+          // Alarm doesn't exist, so create it
+          chrome.alarms.create("dailyCheck", {
+            when: getNextNineAM(),
+            periodInMinutes: 1440 // 24 hours
+          });
+          console.log("Alarm created.");
+        } else {
+          console.log("Alarm already exists:", alarm);
+        }
+      });
       console.log("Notify from changed preferences")
       handleDailyTask();
+    }
+    else {
+      chrome.alarms.clear("dailyCheck", (wasCleared) =>{
+        if (wasCleared){
+          console.log("Alarm should not be on");
+        }
+        else{
+          console.log("Somethingn went wrong clearing the alarm");
+        }
+      })
     }
   }
 });
@@ -91,7 +113,7 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 chrome.runtime.onStartup.addListener(() => {
   const currentHour = new Date().getHours();
   console.log("Chrome started at", currentHour);
-  if (currentHour >= 9) {
+  if (currentHour >= 9 && notificationState) {
     console.log("Notify from chrome startup")
     handleDailyTask(true); // after 9am is true
   }
@@ -100,8 +122,20 @@ chrome.runtime.onStartup.addListener(() => {
 // Respond to the daily alarm
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === "dailyCheck") {
-    console.log("Notify daily 9am")
-    handleDailyTask();
+    if (notificationState){
+      console.log("Notify daily 9am")
+      handleDailyTask();
+    }
+    else{
+      chrome.alarms.clear("dailyCheck", (wasCleared) =>{
+        if (wasCleared){
+          console.log("Alarm should not be on");
+        }
+        else{
+          console.log("Somethingn went wrong clearing the alarm");
+        }
+      })
+    }
   }
 });
 
