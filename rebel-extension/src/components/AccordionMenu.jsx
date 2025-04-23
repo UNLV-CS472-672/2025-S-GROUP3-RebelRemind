@@ -85,41 +85,24 @@ useEffect(() => {
   const filtEvents = async () => {
     const [filteredIC, filteredRC, filteredUC] = await filterEvents(ic_events, rc_events, uc_events);
 
-    if (filteredIC && !filteredIC.message) setICEvents(filteredIC);
-    if (filteredRC && !filteredRC.message) setRCEvents(filteredRC);
-    if (filteredUC && !filteredUC.message) setUCEvents(filteredUC);
+    if (filteredIC && !filteredIC.message) {
+      setICEvents(filteredIC);
+      chrome.storage.local.set({ filteredIC }); // save to Chrome storage for notifications
+    }
+
+    if (filteredRC && !filteredRC.message) {
+      setRCEvents(filteredRC);
+      chrome.storage.local.set({ filteredRC });
+    }
+
+    if (filteredUC && !filteredUC.message) {
+      setUCEvents(filteredUC);
+      chrome.storage.local.set({ filteredUC });
+    }
   };
 
   filtEvents();
 }, [ic_events, rc_events, uc_events]); // run only when these change
-
-  /* SAVE FILTERED EVENTS TO STORAGE FOR NOTIFICATIONS */
-
-  useEffect(() => {
-    const filtEvents = async () => {
-      const [filteredIC, filteredRC, filteredUC] = await filterEvents(ic_events, rc_events, uc_events);
-  
-      if (filteredIC && !filteredIC.message) {
-        setICEvents(filteredIC);
-        chrome.storage.local.set({ filteredIC });
-      }
-  
-      if (filteredRC && !filteredRC.message) {
-        setRCEvents(filteredRC);
-        chrome.storage.local.set({ filteredRC });
-      }
-  
-      if (filteredUC && !filteredUC.message) {
-        setUCEvents(filteredUC);
-        chrome.storage.local.set({ filteredUC });
-      }
-    };
-  
-    filtEvents();
-  }, [ic_events, rc_events, uc_events]);
-  
-
-/***  END FILTER EVENTS  ***/
 
 /***  USER EVENTS  ***/
 
