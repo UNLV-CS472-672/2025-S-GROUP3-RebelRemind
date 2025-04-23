@@ -27,13 +27,18 @@ import Toggle from "./Toggle";
   const [rc_events, setRCEvents] = useState([]);
   const [uc_events, setUCEvents] = useState([]);
   const [viewMode, setViewMode] = useState("daily");
+  const [preferences, setPreferences] = useState({ RebelCoverage: false });
 
   const today = new Date().toLocaleDateString('en-CA');
   // save state 
   useEffect(() => {
-    chrome.storage.sync.get("viewMode", (result) => {
+    // chrome.storage.sync.get("viewMode", (result) => {
+    chrome.storage.sync.get(["viewMode", "preferences"], (result) => {
       if (result.viewMode) {
         setViewMode(result.viewMode);
+      }
+      if (result.preferences){
+        setPreferences(result.preferences);
       }
     });
   }, []);
@@ -58,7 +63,16 @@ import Toggle from "./Toggle";
         ]);
         setACEvents(!data1.message ? data1 : []);
         setICEvents(!data2.message ? data2 : []);
-        setRCEvents(!data3.message ? data3 : []);
+        // setRCEvents(!data3.message ? data3 : []);
+        // filter RC events
+        chrome.storage.sync.get(["selectedSports"], (storageData) => {
+          const selected = storageData.selectedSports || [];
+
+          const filteredRebelCoverageEvents = (!data3.message ? data3 : []).filter(event =>
+            selected.includes(event.sport)
+          );
+          setRCEvents(filteredRebelCoverageEvents);
+        })
         setUCEvents(!data4.message ? data4 : []);
       } catch (err) {
         console.error('Error fetching events:', err);
@@ -67,6 +81,28 @@ import Toggle from "./Toggle";
 
     fetchEvents();
   }, [viewMode]);
+
+  useEffect(() => {
+    function handleStorageChange(changes, area) {
+      if (area === "sync" && changes.selectedSports) {
+        chrome.storage.sync.get(["selectedSports"], (storageData) => {
+          const selected = storageData.selectedSports || [];
+          setRCEvents(prevRC =>
+            prevRC.filter(event => selected.includes(event.sport))
+          );
+        });
+      }
+      if (changes.preferences){
+        setPreferences(changes.preferences.newValue || {});
+      }
+    }
+
+    chrome.storage.onChanged.addListener(handleStorageChange);
+    return () => {
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+    };
+  }, []);
+  const filteredRebelCoverageEvents = preferences.RebelCoverage ? rc_events : [];
 
   return (
     <div className="accordion-scroll-wrapper">
@@ -115,7 +151,8 @@ import Toggle from "./Toggle";
                   -UNLV cal
                   - academic cal 
                   -  rebel cov */}
-            <Events events={[...uc_events, ...ac_events, ...rc_events]} viewMode={viewMode} />
+            <Events events={[...uc_events, ...ac_events, ...filteredRebelCoverageEvents]} viewMode={viewMode} />
+            // <Events events={[...uc_events, ...ac_events, ...rc_events]} viewMode={viewMode} />
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
