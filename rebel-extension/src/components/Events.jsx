@@ -33,7 +33,7 @@ function Events({ events, viewMode, setActiveEventPopup}) {
           <ul className={`event-list ${viewMode === 'daily' ? 'event-list-daily' : ''}`}>
             {grouped[day].map(event => (
               <li key={event.id} className="event-item">
-                {event.link === "ignore" ? ( // Custom Events
+                {event.link === "customEvent" ? ( // Custom Events
                   <>
                     <a
                       className="event-link"
