@@ -202,7 +202,7 @@ export default function SettingsPage() {
         <>
             {/* Navigation Back Button */}
             <div className="back-button-container">
-                <button className="back-button" onClick={() => navigate("/")}>⬅️</button>
+                <button className="back-button" onClick={() => navigate("/")}>⇐</button>
             </div>
 
             <div className="settings-page-wrapper">
