@@ -27,13 +27,17 @@ import Toggle from "./Toggle";
   const [rc_events, setRCEvents] = useState([]);
   const [uc_events, setUCEvents] = useState([]);
   const [viewMode, setViewMode] = useState("daily");
+  const [preferences, setPreferences] = useState({ UNLVCalendar: false });
 
   const today = new Date().toLocaleDateString('en-CA');
   // save state 
   useEffect(() => {
-    chrome.storage.sync.get("viewMode", (result) => {
+    chrome.storage.sync.get(["viewMode", "preferences"], (result) => {
       if (result.viewMode) {
         setViewMode(result.viewMode);
+      }
+      if (result.preferences){
+        setPreferences(result.preferences);
       }
     });
   }, []);
@@ -89,6 +93,9 @@ import Toggle from "./Toggle";
           );
         });
       }
+      if (changes.preferences){
+        setPreferences(changes.preferences.newValue || {});
+      }
     }
 
     chrome.storage.onChanged.addListener(handleStorageChange);
@@ -96,7 +103,7 @@ import Toggle from "./Toggle";
       chrome.storage.onChanged.removeListener(handleStorageChange);
     };
   }, []);
-  
+  const filteredUNLVEvents = preferences.UNLVCalendar ? uc_events : [];
   return (
     <div className="accordion-scroll-wrapper">
         <div className="accordion-header" style={{ 
@@ -144,7 +151,7 @@ import Toggle from "./Toggle";
                   -UNLV cal
                   - academic cal 
                   -  rebel cov */}
-            <Events events={[...uc_events, ...ac_events, ...rc_events]} viewMode={viewMode} />
+            <Events events={[...filteredUNLVEvents, ...ac_events, ...rc_events]} viewMode={viewMode} />
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
