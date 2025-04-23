@@ -1,6 +1,6 @@
 import './css/Events.css';
 
-function Events({ events, viewMode, setActiveEventPopup}) {
+function Events({ events, viewMode, setActiveEventPopup }) {
   if (!events || events.length === 0) {
     return <div className="no-events"> No events found for this view.</div>;
   }
@@ -82,12 +82,43 @@ function Events({ events, viewMode, setActiveEventPopup}) {
     <ul className={`event-list ${viewMode === 'daily' ? 'event-list-daily' : ''}`}>
       {sortedEvents.map(event => (
         <li key={event.id} className="event-item">
-          <a href={event.link} target="_blank" rel="noopener noreferrer" className="event-link">
-            <span className="event-name">
-              <span className="event-org">{event.organization}{event.organization ? ':' : ''} </span>{event.name}
-            </span>
-            <span className="event-time">{event.time}</span>
-          </a>
+          {event.link === "customEvent" ? ( // Custom Events
+            <>
+              <a
+                className="event-link"
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveEventPopup(event);
+                }}
+              >
+                <span className="event-name">
+                  <span className="event-org">
+                    {event.organization}
+                    {event.organization ? ':' : ''}{" "}
+                  </span>
+                  {event.name}
+                </span>
+                <span className="event-time">{event.time}</span>
+              </a>
+            </>
+          ) : (
+            <a
+              href={event.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="event-link"
+            >
+              <span className="event-name">
+                <span className="event-org">
+                  {event.organization}
+                  {event.organization ? ':' : ''}{" "}
+                </span>
+                {event.name}
+              </span>
+              <span className="event-time">{event.time}</span>
+            </a>
+          )}
         </li>
       ))}
     </ul>
