@@ -1,7 +1,7 @@
 import './css/Events.css';
 
-function Events({ events, viewMode }) {
- if (!events || events.length === 0) {
+function Events({ events, viewMode, setActiveEventPopup}) {
+  if (!events || events.length === 0) {
     return <div className="no-events"> No events found for this view.</div>;
   }
   const sortedEvents = [...events].sort((a, b) => {
@@ -15,7 +15,7 @@ function Events({ events, viewMode }) {
     sortedEvents.forEach(event => {
       const [year, month, day] = event.date.split('-');
       const date = new Date(year, month - 1, day);
-            const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
+      const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
       if (!grouped[weekday]) grouped[weekday] = [];
       grouped[weekday].push(event);
     });
@@ -23,7 +23,7 @@ function Events({ events, viewMode }) {
     const weekdayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const todayIndex = new Date().getDay();
     const orderedWeekdays = [...weekdayNames.slice(todayIndex), ...weekdayNames.slice(0, todayIndex)];
-    
+
     return orderedWeekdays
       .filter(day => grouped[day])
       .map(day => (
@@ -33,13 +33,45 @@ function Events({ events, viewMode }) {
           <ul className={`event-list ${viewMode === 'daily' ? 'event-list-daily' : ''}`}>
             {grouped[day].map(event => (
               <li key={event.id} className="event-item">
-                <a href={event.link} target="_blank" rel="noopener noreferrer" className="event-link">
-                  <span className="event-name">
-                    <span className="event-org">{event.organization}{event.organization?':':''} </span>{event.name}
-                  </span>
-                  <span className="event-time">{event.time}</span>
-                </a>
+                {event.link === "ignore" ? ( // Custom Events
+                  <>
+                    <a
+                      className="event-link"
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setActiveEventPopup(event);
+                      }}
+                    >
+                      <span className="event-name">
+                        <span className="event-org">
+                          {event.organization}
+                          {event.organization ? ':' : ''}{" "}
+                        </span>
+                        {event.name}
+                      </span>
+                      <span className="event-time">{event.time}</span>
+                    </a>
+                  </>
+                ) : (
+                  <a
+                    href={event.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="event-link"
+                  >
+                    <span className="event-name">
+                      <span className="event-org">
+                        {event.organization}
+                        {event.organization ? ':' : ''}{" "}
+                      </span>
+                      {event.name}
+                    </span>
+                    <span className="event-time">{event.time}</span>
+                  </a>
+                )}
               </li>
+
             ))}
           </ul>
         </div>
@@ -52,7 +84,7 @@ function Events({ events, viewMode }) {
         <li key={event.id} className="event-item">
           <a href={event.link} target="_blank" rel="noopener noreferrer" className="event-link">
             <span className="event-name">
-                <span className="event-org">{event.organization}{event.organization?':':''} </span>{event.name}
+              <span className="event-org">{event.organization}{event.organization ? ':' : ''} </span>{event.name}
             </span>
             <span className="event-time">{event.time}</span>
           </a>
