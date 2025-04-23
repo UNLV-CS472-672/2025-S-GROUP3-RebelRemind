@@ -10,6 +10,19 @@ function Events({ events, viewMode }) {
     const bDate = new Date(`${b.date} ${b.time}`);
     return aDate - bDate; // soonest to latest
   });
+  
+  const handleAddEvent = (event) => {  
+        chrome.storage.local.get("UNLVEvents", (data) => {
+            const existing = Array.isArray(data["UNLVEvents"]) ? data["UNLVEvents"] : [];
+            const updatedEvents = [...existing, event];
+
+            chrome.storage.local.set({ "UNLVEvents": updatedEvents }, () => {
+                alert("Event saved to calendar.");
+
+                chrome.runtime.sendMessage({ type: "EVENT_UPDATED" });
+            });
+        });
+   };
 
   if (viewMode === "weekly") {
     const grouped = {};
@@ -41,7 +54,7 @@ function Events({ events, viewMode }) {
                 </a> 
                   <span className="event-time">{event.time}
 		              <div>
-		              <button style={{background: 'transparent'}}>
+		              <button style={{background: 'transparent', paddingRight: '0px', paddingTop: '0px'}} onClick={() => handleAddEvent(event)}>
 		              	<img src="../assets/addcalendarIcon.png" height="25px" width="25px" />
 		              </button>
 		              </div>
@@ -64,7 +77,7 @@ function Events({ events, viewMode }) {
           </a>  
             <span className="event-time">{event.time}
 		        <div>
-		        <button style={{background: 'transparent'}}>
+		        <button style={{background: 'transparent', paddingRight: '0px', paddingTop: '0px'}} onClick={() => handleAddEvent(event)}>
 		        	<img src="../assets/addcalendarIcon.png" height="25px" width="25px"/>
 		        </button>
 		      	</div>
