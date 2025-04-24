@@ -3,7 +3,7 @@ import unittest
 from http import HTTPStatus
 import time
 from webscraping.unlv_calendar import default
-from database import BASE
+from tests import BASE
 
 # --- Test Class ---
 class TestFlaskAPI(unittest.TestCase):

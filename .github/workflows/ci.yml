@@ -77,9 +77,6 @@ jobs:
           pip install -e .
         working-directory: backend  # Adjust if your Python project is in a different directory
 
-      - name: Set up Flask server
-        run: serve_data  # Start Flask server to create database
-
       - name: Run pytest
         run: python3 -m pytest --cov=webscraping --cov=database  # Run pytest to execute the tests
         working-directory: backend  # Adjust if your tests are located elsewhere
