@@ -32,7 +32,6 @@ import Toggle from "./Toggle";
   const today = new Date().toLocaleDateString('en-CA');
   // save state 
   useEffect(() => {
-    // chrome.storage.sync.get("viewMode", (result) => {
     chrome.storage.sync.get(["viewMode", "preferences"], (result) => {
       if (result.viewMode) {
         setViewMode(result.viewMode);
@@ -63,7 +62,6 @@ import Toggle from "./Toggle";
         ]);
         setACEvents(!data1.message ? data1 : []);
         setICEvents(!data2.message ? data2 : []);
-        // setRCEvents(!data3.message ? data3 : []);
         // filter RC events
         chrome.storage.sync.get(["selectedSports"], (storageData) => {
           const selected = storageData.selectedSports || [];
@@ -88,7 +86,7 @@ import Toggle from "./Toggle";
         chrome.storage.sync.get(["selectedSports"], (storageData) => {
           const selected = storageData.selectedSports || [];
           setRCEvents(prevRC =>
-            prevRC.filter(event => selected.includes(event.sport))
+            prevRC.filter(Event => selected.includes(event.sport))
           );
         });
       }
@@ -102,7 +100,7 @@ import Toggle from "./Toggle";
       chrome.storage.onChanged.removeListener(handleStorageChange);
     };
   }, []);
-  const filteredRebelCoverageEvents = preferences.RebelCoverage ? rc_events : [];
+  const filteredRebelCoverageEvents = preferences.RebelCoverage ? filteredRebelCoverageEvents: rc_events;
 
   return (
     <div className="accordion-scroll-wrapper">
@@ -152,7 +150,7 @@ import Toggle from "./Toggle";
                   - academic cal 
                   -  rebel cov */}
             <Events events={[...uc_events, ...ac_events, ...filteredRebelCoverageEvents]} viewMode={viewMode} />
-            // <Events events={[...uc_events, ...ac_events, ...rc_events]} viewMode={viewMode} />
+            {/* <Events events={[...uc_events, ...ac_events, ...rc_events]} viewMode={viewMode} /> */}
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>

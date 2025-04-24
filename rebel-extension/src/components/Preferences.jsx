@@ -57,13 +57,8 @@ const Preferences = ({ setupMode = false }) => {
     const [allClubs, setAllClubs] = useState([]);
 
     // Sports and interests state
-    // const mensSports = ["Baseball", "Basketball", "Football", "Golf", "Soccer", "Swim & Dive", "Tennis"];
-    // const womensSports = ["Basketball", "Cross Country", "Golf", "Soccer", "Softball", "Swim & Dive", "Tennis", "Track & Field", "Volleyball"];
     const allSports = ["Baseball", "Men's Basketball", "Football", "Men's Golf", "Men's Soccer", "Swimming & Diving", "Men's Tennis", "Women's Basketball", "Women's Cross Country", "Women's Golf", "Women's Soccer", "Softball", "Women's Tennis", "Women's Track & Field", "Women's Volleyball"];
     const allInterests = ["Arts", "Academics", "Career", "Culture", "Diversity", "Health", "Social", "Sports", "Tech", "Family"];
-
-    // const [selectedMenSports, setSelectedMenSports] = useState([]);
-    // const [selectedWomenSports, setSelectedWomenSports] = useState([]);
     const [selectedSports, setSelectedSports] = useState([]);
     const [selectedInterests, setSelectedInterests] = useState([]);
 
@@ -91,8 +86,6 @@ const Preferences = ({ setupMode = false }) => {
     // Initial values for change detection
     const [initialPreferences, setInitialPreferences] = useState({});
     const [initialClubs, setInitialClubs] = useState([]);
-    // const [initialMenSports, setInitialMenSports] = useState([]);
-    // const [initialWomenSports, setInitialWomenSports] = useState([]);
     const [initialSports, setInitialSports] = useState([]);
     const [initialInterests, setInitialInterests] = useState([]);
 
@@ -121,8 +114,6 @@ const Preferences = ({ setupMode = false }) => {
             "preferences",
             "involvedClubs",
             "rebelSports",
-            // "rebelMenSports",
-            // "rebelWomenSports",
             "selectedInterests"
         ], (data) => {
             setPreferences(data.preferences || defaultPreferences);
@@ -131,14 +122,8 @@ const Preferences = ({ setupMode = false }) => {
             setInvolvedClubs(data.involvedClubs || []);
             setInitialClubs(data.involvedClubs || []);
 
-            // setSelectedMenSports(data.rebelMenSports || []);
-            // setInitialMenSports(data.rebelMenSports || []);
-
             setSelectedSports(data.rebelSports || []);
             setInitialSports(data.rebelSports || []);
-
-            // setSelectedWomenSports(data.rebelWomenSports || []);
-            // setInitialWomenSports(data.rebelWomenSports || []);
 
             setSelectedInterests(data.selectedInterests || []);
             setInitialInterests(data.selectedInterests || []);
@@ -154,8 +139,6 @@ const Preferences = ({ setupMode = false }) => {
         const hasChanges =
             JSON.stringify(preferences) !== JSON.stringify(initialPreferences) ||
             JSON.stringify(involvedClubs) !== JSON.stringify(initialClubs) ||
-            // JSON.stringify(selectedMenSports) !== JSON.stringify(initialMenSports) ||
-            // JSON.stringify(selectedWomenSports) !== JSON.stringify(initialWomenSports) ||
             JSON.stringify(selectedSports) !== JSON.stringify(initialSports) ||
             JSON.stringify(selectedInterests) !== JSON.stringify(initialInterests);
 
@@ -207,16 +190,13 @@ const Preferences = ({ setupMode = false }) => {
             {
                 preferences,
                 involvedClubs,
-                // rebelMenSports: selectedMenSports,
-                // rebelWomenSports: selectedWomenSports,
-                rebelSports: selectedSports,
+                //rebelSports: selectedSports,
+                selectedSports,
                 selectedInterests,
             },
             () => {
                 setInitialPreferences(preferences);
                 setInitialClubs(involvedClubs);
-                // setInitialMenSports(selectedMenSports);
-                // setInitialWomenSports(selectedWomenSports);
                 setInitialSports(selectedSports);
                 setInitialInterests(selectedInterests);
                 setUnsaved(false);
@@ -245,16 +225,6 @@ const Preferences = ({ setupMode = false }) => {
             prev.includes(sport) ? prev.filter((s) => s !== sport) : [...prev, sport]
         );
     };
-    // const toggleMenSport = (sport) => {
-    //     setSelectedMenSports((prev) =>
-    //         prev.includes(sport) ? prev.filter((s) => s !== sport) : [...prev, sport]
-    //     );
-    // };
-    // const toggleWomenSport = (sport) => {
-    //     setSelectedWomenSports((prev) =>
-    //         prev.includes(sport) ? prev.filter((s) => s !== sport) : [...prev, sport]
-    //     );
-    // };
 
     // Filter clubs from remote list (excluding already joined)
     const filteredClubs = allClubs
@@ -411,32 +381,6 @@ const Preferences = ({ setupMode = false }) => {
                                             </label>
                                         ))}
                                     </div>
-                                    {/* <div>
-                                        <p>Men’s Sports</p>
-                                        {mensSports.map((sport) => (
-                                            <label key={sport} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedMenSports.includes(sport)}
-                                                    onChange={() => toggleMenSport(sport)}
-                                                />
-                                                {sport}
-                                            </label>
-                                        ))}
-                                    </div> */}
-                                    {/* <div>
-                                        <p>Women’s Sports</p>
-                                        {womensSports.map((sport) => (
-                                            <label key={sport} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedWomenSports.includes(sport)}
-                                                    onChange={() => toggleWomenSport(sport)}
-                                                />
-                                                {sport}
-                                            </label>
-                                        ))}
-                                    </div> */}
                                 </div>
                             )}
                         </div>
@@ -451,19 +395,14 @@ const Preferences = ({ setupMode = false }) => {
 
                             chrome.storage.sync.remove([
                                 "preferences", "involvedClubs", "rebelSports", "selectedInterests"
-                                // "preferences", "involvedClubs", "rebelMenSports", "rebelWomenSports", "selectedInterests"
                             ], () => {
                                 setPreferences(defaultPreferences);
                                 setInvolvedClubs([]);
-                                // setSelectedMenSports([]);
-                                // setSelectedWomenSports([]);
                                 setSelectedSports([]);
                                 setSelectedInterests([]);
 
                                 setInitialPreferences(defaultPreferences);
                                 setInitialClubs([]);
-                                // setInitialMenSports([]);
-                                // setInitialWomenSports([]);
                                 setInitialSports([]);
                                 setInitialInterests([]);
 
@@ -769,32 +708,6 @@ const Preferences = ({ setupMode = false }) => {
                                         </label>
                                     ))}
                                 </div>
-                                {/* <div>
-                                    <p style={{ fontWeight: "bold" }}>Men’s Sports</p>
-                                    {mensSports.map((sport) => (
-                                        <label key={sport} style={{ display: "flex", marginTop: "0.5rem", alignItems: "center", gap: "0.5rem" }}>
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedMenSports.includes(sport)}
-                                                onChange={() => toggleMenSport(sport)}
-                                            />
-                                            {sport}
-                                        </label>
-                                    ))}
-                                </div> */}
-                                {/* <div>
-                                    <p style={{ fontWeight: "bold" }}>Women’s Sports</p>
-                                    {womensSports.map((sport) => (
-                                        <label key={sport} style={{ display: "flex", marginTop: "0.5rem", alignItems: "center", gap: "0.5rem" }}>
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedWomenSports.includes(sport)}
-                                                onChange={() => toggleWomenSport(sport)}
-                                            />
-                                            {sport}
-                                        </label>
-                                    ))}
-                                </div> */}
                             </div>
                         </div>
                     </div>
@@ -808,19 +721,14 @@ const Preferences = ({ setupMode = false }) => {
 
                                 chrome.storage.sync.remove([
                                     "preferences", "involvedClubs", "rebelSports", "selectedInterests"
-                                    // "preferences", "involvedClubs", "rebelMenSports", "rebelWomenSports", "selectedInterests"
                                 ], () => {
                                     setPreferences(defaultPreferences);
                                     setInvolvedClubs([]);
-                                    // setSelectedMenSports([]);
-                                    // setSelectedWomenSports([]);
                                     setSelectedSports([]);
                                     setSelectedInterests([]);
 
                                     setInitialPreferences(defaultPreferences);
                                     setInitialClubs([]);
-                                    // setInitialMenSports([]);
-                                    // setInitialWomenSports([]);
                                     setInitialSports([]);
                                     setInitialInterests([]);
 
