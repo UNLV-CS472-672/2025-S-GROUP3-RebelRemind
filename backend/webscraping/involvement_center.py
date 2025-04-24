@@ -7,7 +7,7 @@ from database import BASE
 URL = "https://involvementcenter.unlv.edu/api/discovery/event/search?"
 QUERY = f"endsAfter={datetime.today()}&orderByField=endsOn&orderByDirection=ascending&status=Approved&take=9999"
 
-def default():
+def scrape():
     response = requests.get(URL+QUERY)
     json_data = response.json()
     events = json_data['value']
@@ -20,6 +20,13 @@ def default():
     
     # with open('scraped_InvolvementCenter.json', 'w', encoding='utf-8') as f:
     #     json.dump(results, f, indent=4)
+    return results
+
+def default():
+    results = scrape()
+    # PUT events into database
+    for event in results:
+        requests.put(BASE + "involvementcenter_add", json=event)
 
 def map_event(event_json):
     start = event_json['startsOn']

@@ -1,8 +1,9 @@
 import pytest
 from datetime import datetime
 from http import HTTPStatus
+from tests import flask_app, db
 from database.serve_data import (
-    app as flask_app, db, AcademicCalendar, InvolvementCenter, RebelCoverage,
+    AcademicCalendar, InvolvementCenter, RebelCoverage,
     UNLVCalendar, DupCheck
 )
 

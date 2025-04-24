@@ -2,34 +2,47 @@ import unittest
 import requests
 from http import HTTPStatus
 import time
-from webscraping.academic_calendar import default
-from tests import BASE
+from webscraping.academic_calendar import scrape
+from tests import flask_app, db
 
 # --- Test Class ---
 class TestAcademicScraperAPI(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        """Optional: Run once before all tests in the class."""
+        """Run once before all tests in the class."""
         print("--- Starting Academic Calendar Scraper API Tests ---")
+        # Configure and initialize the Flask app
+        flask_app.config['TESTING'] = True
+        flask_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+
+        cls.app = flask_app
+        cls.app_context = cls.app.app_context()
+        cls.app_context.push() # Push the app context
+
+        db.drop_all()
+        db.create_all()
+
+        cls.client = cls.app.test_client() # Set up the test client
+        
         # Check if the API server is running
         try:
             # Use a known endpoint like the list endpoint, or just the base
-            response = requests.get(BASE + "academiccalendar_list", timeout=3)
+            response = cls.client.get("academiccalendar_list", timeout=3)
             # Allow 404 if list is just empty, but not server errors (5xx) or connection errors
             if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
                  raise ConnectionError(f"API Server returned status {response.status_code}")
             print(f"API Server connection check status: {response.status_code}")
         except requests.exceptions.RequestException as e:
-            print(f"\nFATAL: Cannot connect to API Server at {BASE}. Ensure it's running.")
+            print(f"\nFATAL: Cannot connect to API Server at {cls.client}. Ensure it's running.")
             print(f"Error details: {e}")
             # Stop tests if API isn't running
-            raise ConnectionError(f"API Server at {BASE} not reachable.") from e
+            raise ConnectionError(f"API Server at {cls.client} not reachable.") from e
 
     def setUp(self):
         """Run before each test method."""
         # Clean the specific table before each test to ensure independence
         print("\nClearing Academic Calendar events before test...")
-        delete_response = requests.delete(BASE + "academiccalendar_delete_all") # Use correct endpoint
+        delete_response = self.client.delete("academiccalendar_delete_all") # Use correct endpoint
         # Check if deletion worked or if the table was already empty (200 OK)
         self.assertEqual(delete_response.status_code, HTTPStatus.OK,
                       f"Failed to clear previous Academic Calendar events: {delete_response.text}")
@@ -43,17 +56,20 @@ class TestAcademicScraperAPI(unittest.TestCase):
         """
         print("Running Academic Calendar scraper and adding to database via API...")
         try:
-            default()
+            results = scrape()
+            # PUT Academic Calendar events into the database
+            for event in results:
+                self.client.put("academiccalendar_add", json=event)
             print("Scraping and PUT requests completed.")
         except Exception as e:
             # If the scraper itself throws an error during the test
-            self.fail(f"Scraping function 'academic_calendar.default()' failed with an exception: {e}")
+            self.fail(f"Scraping function 'academic_calendar.scrape()' failed with an exception: {e}")
 
         time.sleep(1) # Give server time to process database commits
 
         # Now check if events were added by retrieving the list
         print("Retrieving event list from API to verify additions...")
-        response = requests.get(BASE + "academiccalendar_list") # Use correct endpoint
+        response = self.client.get("academiccalendar_list") # Use correct endpoint
 
         self.assertEqual(response.status_code, HTTPStatus.OK,
                          f"Failed to get Academic Calendar list after scraping: {response.text}")
@@ -77,7 +93,7 @@ class TestAcademicScraperAPI(unittest.TestCase):
         
         event_id_to_get = first_event['id']
         print(f"Attempting to retrieve event ID {event_id_to_get} specifically...")
-        indiv_response = requests.get(BASE + f"academiccalendar_id/{event_id_to_get}") # Use correct endpoint
+        indiv_response = self.client.get(f"academiccalendar_id/{event_id_to_get}") # Use correct endpoint
         self.assertEqual(indiv_response.status_code, HTTPStatus.OK,
                          f"Failed to get Academic Calendar event ID {event_id_to_get}: {indiv_response.text}")
         indiv_data = indiv_response.json()
@@ -93,13 +109,16 @@ class TestAcademicScraperAPI(unittest.TestCase):
         # Add data first by running the scraper
         print("Pre-populating Academic Calendar data for GET list test...")
         try:
-            default()
+            results = scrape()
+            # PUT Academic Calendar events into the database
+            for event in results:
+                self.client.put("academiccalendar_add", json=event)
         except Exception as e:
              self.fail(f"Scraping function failed during setup for GET list test: {e}")
         time.sleep(0.5)
 
         print("Retrieving full Academic Calendar list...")
-        response = requests.get(BASE + "academiccalendar_list") # Use correct endpoint
+        response = self.client.get("academiccalendar_list") # Use correct endpoint
 
         self.assertEqual(response.status_code, HTTPStatus.OK, f"Failed to get Academic Calendar event list: {response.text}")
 
