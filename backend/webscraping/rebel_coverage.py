@@ -5,7 +5,7 @@ from database import BASE
 
 URL = 'https://unlvrebels.com/coverage'
 
-def default():
+def scrape():
     response = requests.get(URL)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "html.parser")
@@ -49,14 +49,17 @@ def default():
                     "link": link
                 })
 
-        for event in data_table:
-            response = requests.put(BASE + "rebelcoverage_add", json=event)
-
         # with open('scraped_RebelCoverage.json', 'w') as json_file:
         #     json.dump(data_table, json_file, indent=4)
-
+        return data_table
     else:
         print(f"Failed to access the page. Status code: {response.status_code}")
+
+def default():
+    results = scrape()
+    # PUT events into database
+    for event in results:
+        requests.put(BASE + "rebelcoverage_add", json=event)
 
 if __name__ == '__main__':
     default()

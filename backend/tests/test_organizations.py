@@ -1,35 +1,48 @@
-import requests
 import unittest
+import requests
 from http import HTTPStatus
 import time
-from webscraping.organizations import default
-from tests import BASE
+from webscraping.organizations import scrape
+from database.serve_data import app as flask_app, db
 
 # --- Test Class ---
-class TestFlaskAPI(unittest.TestCase):
+class TestOrgScraperAPI(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Optional: Run once before all tests in the class."""
         print("--- Starting Organizations Scraper API Tests ---")
+        # Configure and initialize the Flask app
+        flask_app.config['TESTING'] = True
+        flask_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+
+        cls.app = flask_app
+        cls.app_context = cls.app.app_context()
+        cls.app_context.push() # Push the app context
+
+        db.drop_all()
+        db.create_all()
+
+        cls.client = cls.app.test_client() # Set up the test client
+        
         # Check if the API server is running
         try:
             # Use a known endpoint like the list endpoint, or just the base
-            response = requests.get(BASE + "organizations_list", timeout=3)
+            response = cls.client.get("organizations_list")
             # Allow 404 if list is just empty, but not server errors (5xx) or connection errors
             if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
                  raise ConnectionError(f"API Server returned status {response.status_code}")
             print(f"API Server connection check status: {response.status_code}")
         except requests.exceptions.RequestException as e:
-            print(f"\nFATAL: Cannot connect to API Server at {BASE}. Ensure it's running.")
+            print(f"\nFATAL: Cannot connect to API Server at {cls.client}. Ensure it's running.")
             print(f"Error details: {e}")
             # Stop tests if API isn't running
-            raise ConnectionError(f"API Server at {BASE} not reachable.") from e
+            raise ConnectionError(f"API Server at {cls.client} not reachable.") from e
 
     def setUp(self):
         """Run before each test method."""
         # Clean the specific table before each test to ensure independence
         print("\nClearing organizations before test...")
-        delete_response = requests.delete(BASE + "organizations_delete_all") # Use correct endpoint
+        delete_response = self.client.delete("organizations_delete_all") # Use correct endpoint
         # Check if deletion worked or if the table was already empty (200 OK)
         self.assertEqual(delete_response.status_code, HTTPStatus.OK,
                       f"Failed to clear previous organizations: {delete_response.text}")
@@ -43,17 +56,20 @@ class TestFlaskAPI(unittest.TestCase):
         """
         print("Running organizations scraper and adding to database via API...")
         try:
-            default()
+            results = scrape()
+            # PUT organizations into the database
+            for org in results:
+                self.client.put("involvementcenter_add", json=org)
             print("Scraping and PUT requests completed.")
         except Exception as e:
             # If the scraper itself throws an error during the test
-            self.fail(f"Scraping function 'organizations.default()' failed with an exception: {e}")
+            self.fail(f"Scraping function 'organizations.scrape()' failed with an exception: {e}")
 
         time.sleep(1) # Give server time to process database commits
 
         # Now check if organizations were added by retrieving the list
         print("Retrieving organization list from API to verify additions...")
-        response = requests.get(BASE + "organizations_list") # Use correct endpoint
+        response = self.client.get("organizations_list") # Use correct endpoint
 
         self.assertEqual(response.status_code, HTTPStatus.OK,
                          f"Failed to get organizations list after scraping: {response.text}")
@@ -73,7 +89,7 @@ class TestFlaskAPI(unittest.TestCase):
         
         org_id_to_get = first_org['id']
         print(f"Attempting to retrieve organization ID {org_id_to_get} specifically...")
-        indiv_response = requests.get(BASE + f"organization_id/{org_id_to_get}") # Use correct endpoint
+        indiv_response = self.client.get(f"organization_id/{org_id_to_get}") # Use correct endpoint
         self.assertEqual(indiv_response.status_code, HTTPStatus.OK,
                          f"Failed to get organization ID {org_id_to_get}: {indiv_response.text}")
         indiv_data = indiv_response.json()
@@ -90,13 +106,16 @@ class TestFlaskAPI(unittest.TestCase):
         # Add data first by running the scraper
         print("Pre-populating organization data for GET list test...")
         try:
-            default()
+            results = scrape()
+            # PUT organizations into the database
+            for org in results:
+                self.client.put("involvementcenter_add", json=org)
         except Exception as e:
              self.fail(f"Scraping function failed during setup for GET list test: {e}")
         time.sleep(0.5)
 
         print("Retrieving full organization list...")
-        response = requests.get(BASE + "academiccalendar_list") # Use correct endpoint
+        response = self.client.get("academiccalendar_list") # Use correct endpoint
 
         self.assertEqual(response.status_code, HTTPStatus.OK, f"Failed to get organization list: {response.text}")
 

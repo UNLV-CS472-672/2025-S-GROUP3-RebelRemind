@@ -1,3 +1,2 @@
 # Flask API
-# Tests use persistant web host
-BASE = "http://franklopez.tech:5051/"
+# Tests use Flask app and database

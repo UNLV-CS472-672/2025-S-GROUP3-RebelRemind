@@ -56,7 +56,7 @@ def ai_categorize_event(event_name):
         print(f"[Error] AI categorization failed for '{event_name}': {e}")
         return None
         
-def default():
+def scrape():
     # Make request inside function
     response = requests.get(URL, headers={"User-Agent": "Mozilla/5.0"})
     index = 0
@@ -93,8 +93,8 @@ def default():
             category = ai_categorize_event(title)
             event_data["category"] = category
             # Send event data to Flask API
-            #api_response = requests.put(BASE + f"unlvcalendar_id/{event_id}", json=event_data)
-            api_response = requests.put(BASE + "unlvcalendar_add", json=event_data)
+            # api_response = requests.put(BASE + f"unlvcalendar_id/{event_id}", json=event_data)
+            # api_response = requests.put(BASE + "unlvcalendar_add", json=event_data)
             # if api_response.status_code == 201:
             #     pass
 
@@ -105,9 +105,15 @@ def default():
             
         # with open('scraped_UNLVCalendar.json', 'w') as json_file:
         #     json.dump(events, json_file, indent=4)  # Write events as formatted JSON
-
+        return events
     else:
         print(f"Failed to access the page. Status code: {response.status_code}")
+
+def default():
+    results = scrape()
+    # PUT events into database
+    for event in results:
+        requests.put(BASE + "unlvcalendar_add", json=event)
 
 if __name__ == "__main__":
     default()
