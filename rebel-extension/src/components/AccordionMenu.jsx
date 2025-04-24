@@ -88,7 +88,11 @@ import Toggle from "./Toggle";
       </div>
       <Accordion defaultActiveKey={["0", "1", "2"]} alwaysOpen>
       	<Accordion.Item eventKey="0">
-      	<Accordion.Header>📚 Upcoming Assignments</Accordion.Header>
+      	<Accordion.Header>
+          <img src="/images/canvas_logo.png" className="accordion-icon" />
+          Upcoming Assignments
+        </Accordion.Header>
+
 
           <Accordion.Body className="accordion-panel-scroll">
           {/* • <strong> 🗺️ History 405:</strong> Homework 3 due by this Sunday <strong> <br />
@@ -99,7 +103,10 @@ import Toggle from "./Toggle";
           </Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="1">
-          <Accordion.Header>📅 Your Events</Accordion.Header>
+          <Accordion.Header>
+            <img src="/images/events-logo.png" className="accordion-icon" />
+            Your Events
+          </Accordion.Header>
           <Accordion.Body className="accordion-panel-scroll">
             {/* Additional category filtering
              will go here for 
@@ -108,7 +115,10 @@ import Toggle from "./Toggle";
           </Accordion.Body>
         </Accordion.Item>
         <Accordion.Item eventKey="2">
-          <Accordion.Header>🎉 UNLV Events</Accordion.Header>
+          <Accordion.Header>
+            <img src="/images/unlv-logo.png" className="accordion-icon" />
+            UNLV Events
+          </Accordion.Header>
           <Accordion.Body className="accordion-panel-scroll">
             {/* Additional category filtering
              will go here for 
