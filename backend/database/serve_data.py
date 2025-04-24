@@ -1,13 +1,13 @@
 """
 User and Events API Implementation
 """
-from flask import Flask, jsonify
+from flask import Flask, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api, Resource, reqparse, abort, fields, marshal_with
 from http import HTTPStatus
 from datetime import datetime, timedelta
 from sqlalchemy import func, and_
-from webscraping import academic_calendar, involvement_center, rebel_coverage, unlv_calendar # , organizations
+from webscraping import academic_calendar, involvement_center, rebel_coverage, organizations # , unlv_calendar
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -400,8 +400,12 @@ class User_Delete_All(Resource):
         db.session.commit()
         if not result:
             # abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.") # Or just return success if 0 deleted is ok
-            return jsonify(message="User table already empty or deletion failed."), HTTPStatus.OK
-        return jsonify(message=f"Deleted {result} users."), HTTPStatus.OK
+            return make_response(jsonify(
+                message="User table already empty or deletion failed."
+            ), HTTPStatus.OK)
+        return make_response(jsonify(
+            message=f"Deleted {result} users."
+        ), HTTPStatus.OK)
 
 # Commands for Academic Calendar table
 class AcademicCalendar_Info(Resource):
@@ -452,8 +456,12 @@ class AcademicCalendar_Delete_All(Resource):
         db.session.commit()
         if not delete_count:
             # abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
-            return jsonify(message="Academic Calendar table already empty or deletion failed."), HTTPStatus.OK
-        return jsonify(message=f"Deleted {delete_count} Academic Calendar events."), HTTPStatus.OK
+            return make_response(jsonify(
+                message="Academic Calendar table already empty or deletion failed."
+            ), HTTPStatus.OK)
+        return make_response(jsonify(
+            message=f"Deleted {delete_count} Academic Calendar events."
+        ), HTTPStatus.OK)
 
 
 # Commands for Involvement Center table
@@ -508,8 +516,12 @@ class InvolvementCenter_Delete_All(Resource):
         db.session.commit()
         if not delete_count:
             # abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
-            return jsonify(message="Involvement Center table already empty or deletion failed."), HTTPStatus.OK
-        return jsonify(message=f"Deleted {delete_count} Involvement Center events."), HTTPStatus.OK
+            return make_response(jsonify(
+                message="Involvement Center table already empty or deletion failed."
+            ), HTTPStatus.OK)
+        return make_response(jsonify(
+            message=f"Deleted {delete_count} Involvement Center events."
+        ), HTTPStatus.OK)
 
 
 # Commands for Rebel Coverage table
@@ -558,13 +570,18 @@ class RebelCoverage_Delete_Past(Resource):
 
 class RebelCoverage_Delete_All(Resource):
 	# GET items from Rebel Coverage table
-	@marshal_with(rc_fields)
+    # @marshal_with(rc_fields) # Less suitable for bulk delete confirmation
 	def delete(self):
-		result = RebelCoverage.query.delete()
+		delete_count = RebelCoverage.query.delete()
 		db.session.commit()
-		if not result:
-			abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
-		return result
+		if not delete_count:
+			# abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
+			return make_response(jsonify(
+				message="Rebel Coverage table already empty or deletion failed."
+			), HTTPStatus.OK)
+		return make_response(jsonify(
+			message=f"Deleted {delete_count} Rebel Coverage events."
+		), HTTPStatus.OK)
 
 # Commands for UNLV Calendar table
 class UNLVCalendar_Info(Resource):
@@ -618,8 +635,12 @@ class UNLVCalendar_Delete_All(Resource):
         db.session.commit()
         if not delete_count:
             # abort(HTTPStatus.NOT_FOUND, message="Nothing to delete.")
-            return jsonify(message="UNLV Calendar table already empty or deletion failed."), HTTPStatus.OK
-        return jsonify(message=f"Deleted {delete_count} UNLV Calendar events."), HTTPStatus.OK
+            return make_response(jsonify(
+                message="UNLV Calendar table already empty or deletion failed."
+            ), HTTPStatus.OK)
+        return make_response(jsonify(
+            message=f"Deleted {delete_count} UNLV Calendar events."
+        ), HTTPStatus.OK)
 
 # Commands for Organization table
 class Organization_Add(Resource):
@@ -644,8 +665,12 @@ class Organization_Delete_All(Resource):
         db.session.commit()
         if not delete_count:
             # abort(HTTPStatus.NOT_FOUND, message="Organization table is already empty or deletion failed.")
-            return jsonify(message="Organization table already empty or deletion failed."), HTTPStatus.OK
-        return jsonify(message=f"Deleted {delete_count} organizations."), HTTPStatus.OK
+            return make_response(jsonify(
+                message="Organization table already empty or deletion failed."
+            ), HTTPStatus.OK)
+        return make_response(jsonify(
+            message=f"Deleted {delete_count} organizations."
+        ), HTTPStatus.OK)
 
 # List all items in User model table
 class User_List(Resource):
@@ -886,7 +911,7 @@ class Scrape_All(Resource):
 		involvement_center.default()
 		rebel_coverage.default()
 		# unlv_calendar.default() # this has AI that costs money per scrape so leaving out
-		# organizations.default()
+		organizations.default()
 		return HTTPStatus.OK
 
 # API resources for PUT commands

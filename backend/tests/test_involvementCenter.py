@@ -1,55 +1,133 @@
 import requests
 import unittest
+from http import HTTPStatus
+import time
 from webscraping.involvement_center import default
 from database import BASE
 
+# --- Test Class ---
 class TestFlaskAPI(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        pass
+        """Optional: Run once before all tests in the class."""
+        print("--- Starting Involvement Center Scraper API Tests ---")
+        # Check if the API server is running
+        try:
+            # Use a known endpoint like the list endpoint, or just the base
+            response = requests.get(BASE + "involvementcenter_list", timeout=3)
+            # Allow 404 if list is just empty, but not server errors (5xx) or connection errors
+            if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
+                 raise ConnectionError(f"API Server returned status {response.status_code}")
+            print(f"API Server connection check status: {response.status_code}")
+        except requests.exceptions.RequestException as e:
+            print(f"\nFATAL: Cannot connect to API Server at {BASE}. Ensure it's running.")
+            print(f"Error details: {e}")
+            # Stop tests if API isn't running
+            raise ConnectionError(f"API Server at {BASE} not reachable.") from e
 
-    def test_add_event(self):
+    def setUp(self):
+        """Run before each test method."""
+        # Clean the specific table before each test to ensure independence
+        print("\nClearing Involvement Center events before test...")
+        delete_response = requests.delete(BASE + "involvementcenter_delete_all") # Use correct endpoint
+        # Check if deletion worked or if the table was already empty (200 OK)
+        self.assertEqual(delete_response.status_code, HTTPStatus.OK,
+                      f"Failed to clear previous Involvement Center events: {delete_response.text}")
+        print("Previous Involvement Center events cleared (or table was empty).")
+        time.sleep(0.5) # Give server a tiny bit of time
+
+    def test_scrape_and_add_events(self):
         """
-        Test adding events to the API via PUT request from the scraper.
+        Test scraping Involvement Center and adding events via the API.
+        Verifies events are retrievable afterwards.
         """
-        print("Scraping events and adding to database...")
-        default()  # This will scrape and add events to the Flask API
+        print("Running Involvement Center scraper and adding to database via API...")
+        try:
+            default()
+            print("Scraping and PUT requests completed.")
+        except Exception as e:
+            # If the scraper itself throws an error during the test
+            self.fail(f"Scraping function 'involvement_center.default()' failed with an exception: {e}")
 
-        # Try to retrieve the event from the API
-        response = requests.get(BASE + "involvementcenter_id/1")
-        
-        # Check if event is successfully added
-        self.assertEqual(response.status_code, 200, f"Failed to get event 1: {response.text}")
-        event_data = response.json()
+        time.sleep(1) # Give server time to process database commits
 
-        # Verify the expected fields are returned
-        self.assertIn("name", event_data)
-        self.assertIn("startDate", event_data)
-        self.assertIn("startTime", event_data)
-        self.assertIn("endDate", event_data)
-        self.assertIn("endTime", event_data)
-        self.assertIn("location", event_data)
-        self.assertIn("organization", event_data)
-        self.assertIn("link", event_data)
+        # Now check if events were added by retrieving the list
+        print("Retrieving event list from API to verify additions...")
+        response = requests.get(BASE + "involvementcenter_list") # Use correct endpoint
 
-        print(f"✅ Event successfully retrieved!")
+        self.assertEqual(response.status_code, HTTPStatus.OK,
+                         f"Failed to get Involvement Center list after scraping: {response.text}")
 
-    def test_get_events(self):
-        """
-        Test retrieving all events from the API via GET request.
-        """
-        # Retrieve all events from the API
-        response = requests.get(BASE + "involvementcenter_list")
-        
-        # Ensure the status code is 200 (OK)
-        self.assertEqual(response.status_code, 200, f"Failed to get events: {response.text}")
-        
-        # Get the data from the response
         retrieved_data = response.json()
+        self.assertIsInstance(retrieved_data, list, "API did not return a list for Academic Calendar events.")
+        self.assertGreater(len(retrieved_data), 0,
+                           "Scraping ran, but no Involvement Center events were found in the API list.")
 
-        # Ensure that there are events in the database
-        self.assertGreater(len(retrieved_data), 0, "No events found in the database!")
-        print(f"✅ Retrieved {len(retrieved_data)} events from the API.")
+        print(f"✅ Found {len(retrieved_data)} Involvement Center events in API after scraping.")
+
+        # Verify the structure of the first retrieved event
+        first_event = retrieved_data[0]
+        print(f"Verifying structure of first event: {first_event.get('name')}")
+        self.assertIn("id", first_event)
+        self.assertIn("name", first_event)
+        self.assertIn("startDate", first_event)
+        self.assertIn("startTime", first_event)
+        self.assertIn("endDate", first_event)
+        self.assertIn("endTime", first_event)
+        self.assertIn("location", first_event)
+        self.assertIn("organization", first_event)
+        self.assertIn("link", first_event)
+        
+        event_id_to_get = first_event['id']
+        print(f"Attempting to retrieve event ID {event_id_to_get} specifically...")
+        indiv_response = requests.get(BASE + f"involvementcenter_id/{event_id_to_get}") # Use correct endpoint
+        self.assertEqual(indiv_response.status_code, HTTPStatus.OK,
+                         f"Failed to get Involvement Center event ID {event_id_to_get}: {indiv_response.text}")
+        indiv_data = indiv_response.json()
+        self.assertEqual(indiv_data['name'], first_event['name']) # Check name matches
+
+        print(f"✅ Scraped Involvement Center events successfully added and verified via API.")
+
+    def test_get_events_after_adding(self):
+        """
+        Test retrieving the Involvement Center event list after adding data.
+        Ensures the list endpoint works correctly when data exists.
+        """
+        # Add data first by running the scraper
+        print("Pre-populating Involvement Center data for GET list test...")
+        try:
+            default()
+        except Exception as e:
+             self.fail(f"Scraping function failed during setup for GET list test: {e}")
+        time.sleep(0.5)
+
+        print("Retrieving full Involvement Center list...")
+        response = requests.get(BASE + "involvementcenter_list") # Use correct endpoint
+
+        self.assertEqual(response.status_code, HTTPStatus.OK, f"Failed to get Involvement Center event list: {response.text}")
+
+        retrieved_data = response.json()
+        self.assertIsInstance(retrieved_data, list)
+        self.assertGreater(len(retrieved_data), 0, "Involvement Center list endpoint returned empty after data should have been added.")
+        print(f"✅ Retrieved {len(retrieved_data)} Involvement Center events successfully.")
+
+        # Verify structure again for an item in the list
+        event = retrieved_data[0]
+        self.assertIn("name", event)
+        self.assertIn("startDate", event)
+        self.assertIn("startTime", event)
+        self.assertIn("endDate", event)
+        self.assertIn("endTime", event)
+        self.assertIn("location", event)
+        self.assertIn("organization", event)
+        self.assertIn("link", event)
+        print("✅ Event structure in list verified.")
+
+    @classmethod
+    def tearDownClass(cls):
+        """Optional: Run once after all tests in the class."""
+        print("\n--- Finished Involvement Center Scraper API Tests ---")
 
 if __name__ == '__main__':
+    # Ensure the script using this test class is run directly
     unittest.main()

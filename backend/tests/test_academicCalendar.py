@@ -1,15 +1,9 @@
 import unittest
 import requests
-import sys
+from http import HTTPStatus
 import time
-
-try:
-    from webscraping.academic_calendar import default as scrape_academic_calendar
-    from webscraping.academic_calendar import BASE
-except ImportError as e:
-    print(f"Error importing scraper: {e}")
-    print(f"Please ensure 'academic_calendar.py' exists in webscraping folder")
-    sys.exit(1) # Exit if scraper can't be imported
+from webscraping.academic_calendar import default
+from database import BASE
 
 # --- Test Class ---
 class TestAcademicScraperAPI(unittest.TestCase):
@@ -22,7 +16,7 @@ class TestAcademicScraperAPI(unittest.TestCase):
             # Use a known endpoint like the list endpoint, or just the base
             response = requests.get(BASE + "academiccalendar_list", timeout=3)
             # Allow 404 if list is just empty, but not server errors (5xx) or connection errors
-            if response.status_code >= 500:
+            if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
                  raise ConnectionError(f"API Server returned status {response.status_code}")
             print(f"API Server connection check status: {response.status_code}")
         except requests.exceptions.RequestException as e:
@@ -36,8 +30,8 @@ class TestAcademicScraperAPI(unittest.TestCase):
         # Clean the specific table before each test to ensure independence
         print("\nClearing Academic Calendar events before test...")
         delete_response = requests.delete(BASE + "academiccalendar_delete_all") # Use correct endpoint
-        # Check if deletion worked (200 OK) or if the table was already empty (404 Not Found)
-        self.assertIn(delete_response.status_code, [200, 404],
+        # Check if deletion worked or if the table was already empty (200 OK)
+        self.assertEqual(delete_response.status_code, HTTPStatus.OK,
                       f"Failed to clear previous Academic Calendar events: {delete_response.text}")
         print("Previous Academic Calendar events cleared (or table was empty).")
         time.sleep(0.5) # Give server a tiny bit of time
@@ -49,7 +43,7 @@ class TestAcademicScraperAPI(unittest.TestCase):
         """
         print("Running Academic Calendar scraper and adding to database via API...")
         try:
-            scrape_academic_calendar() # This calls the scraper's default()
+            default()
             print("Scraping and PUT requests completed.")
         except Exception as e:
             # If the scraper itself throws an error during the test
@@ -61,7 +55,7 @@ class TestAcademicScraperAPI(unittest.TestCase):
         print("Retrieving event list from API to verify additions...")
         response = requests.get(BASE + "academiccalendar_list") # Use correct endpoint
 
-        self.assertEqual(response.status_code, 200,
+        self.assertEqual(response.status_code, HTTPStatus.OK,
                          f"Failed to get Academic Calendar list after scraping: {response.text}")
 
         retrieved_data = response.json()
@@ -84,7 +78,7 @@ class TestAcademicScraperAPI(unittest.TestCase):
         event_id_to_get = first_event['id']
         print(f"Attempting to retrieve event ID {event_id_to_get} specifically...")
         indiv_response = requests.get(BASE + f"academiccalendar_id/{event_id_to_get}") # Use correct endpoint
-        self.assertEqual(indiv_response.status_code, 200,
+        self.assertEqual(indiv_response.status_code, HTTPStatus.OK,
                          f"Failed to get Academic Calendar event ID {event_id_to_get}: {indiv_response.text}")
         indiv_data = indiv_response.json()
         self.assertEqual(indiv_data['name'], first_event['name']) # Check name matches
@@ -99,7 +93,7 @@ class TestAcademicScraperAPI(unittest.TestCase):
         # Add data first by running the scraper
         print("Pre-populating Academic Calendar data for GET list test...")
         try:
-            scrape_academic_calendar()
+            default()
         except Exception as e:
              self.fail(f"Scraping function failed during setup for GET list test: {e}")
         time.sleep(0.5)
@@ -107,7 +101,7 @@ class TestAcademicScraperAPI(unittest.TestCase):
         print("Retrieving full Academic Calendar list...")
         response = requests.get(BASE + "academiccalendar_list") # Use correct endpoint
 
-        self.assertEqual(response.status_code, 200, f"Failed to get Academic Calendar event list: {response.text}")
+        self.assertEqual(response.status_code, HTTPStatus.OK, f"Failed to get Academic Calendar event list: {response.text}")
 
         retrieved_data = response.json()
         self.assertIsInstance(retrieved_data, list)
