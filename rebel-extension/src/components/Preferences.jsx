@@ -113,7 +113,7 @@ const Preferences = ({ setupMode = false }) => {
         chrome.storage.sync.get([
             "preferences",
             "involvedClubs",
-            "rebelSports",
+            "selectedSports",
             "selectedInterests"
         ], (data) => {
             setPreferences(data.preferences || defaultPreferences);
@@ -122,8 +122,8 @@ const Preferences = ({ setupMode = false }) => {
             setInvolvedClubs(data.involvedClubs || []);
             setInitialClubs(data.involvedClubs || []);
 
-            setSelectedSports(data.rebelSports || []);
-            setInitialSports(data.rebelSports || []);
+            setSelectedSports(data.selectedSports || []);
+            setInitialSports(data.selectedSports || []);
 
             setSelectedInterests(data.selectedInterests || []);
             setInitialInterests(data.selectedInterests || []);
@@ -144,7 +144,6 @@ const Preferences = ({ setupMode = false }) => {
 
         setUnsaved(hasChanges);
     }, [loaded, preferences, involvedClubs, selectedSports, selectedInterests]);
-    //}, [loaded, preferences, involvedClubs, selectedMenSports, selectedWomenSports, selectedInterests]);
 
     // =================== EFFECT: Close help popups on outside click ===================
 
@@ -190,7 +189,6 @@ const Preferences = ({ setupMode = false }) => {
             {
                 preferences,
                 involvedClubs,
-                //rebelSports: selectedSports,
                 selectedSports,
                 selectedInterests,
             },
@@ -394,7 +392,7 @@ const Preferences = ({ setupMode = false }) => {
                             if (!confirmReset) return;
 
                             chrome.storage.sync.remove([
-                                "preferences", "involvedClubs", "rebelSports", "selectedInterests"
+                                "preferences", "involvedClubs", "selectedSports", "selectedInterests"
                             ], () => {
                                 setPreferences(defaultPreferences);
                                 setInvolvedClubs([]);
@@ -720,7 +718,7 @@ const Preferences = ({ setupMode = false }) => {
                                 if (!confirmReset) return;
 
                                 chrome.storage.sync.remove([
-                                    "preferences", "involvedClubs", "rebelSports", "selectedInterests"
+                                    "preferences", "involvedClubs", "selectedSports", "selectedInterests"
                                 ], () => {
                                     setPreferences(defaultPreferences);
                                     setInvolvedClubs([]);
