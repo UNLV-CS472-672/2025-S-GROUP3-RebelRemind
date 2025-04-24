@@ -13,17 +13,18 @@ function UserEventsPage() {
   const navigate = useNavigate();
 
   return (
-    <>
+    <div className="user-events-page">
       <div className="back-button-container">
         <button className="back-button" onClick={() => navigate("/")}>⇦</button>
       </div>
 
-      <div className="back-button-spacer" />  
+      <div className="back-button-spacer" />
 
       <UserEvent />
       <UserEventList />
-    </>
+    </div>
   );
 }
+
 
 export default UserEventsPage;
