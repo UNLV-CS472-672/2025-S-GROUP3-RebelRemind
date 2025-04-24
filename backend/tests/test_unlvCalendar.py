@@ -69,7 +69,6 @@ class TestUCScraperAPI(unittest.TestCase):
         except Exception as e:
             # If the scraper itself throws an error during the test
             self.fail(f"Scraping function 'unlv_calendar.scrape()' failed with an exception: {e}")
-
         time.sleep(1) # Give server time to process database commits
 
         # Now check if events were added by retrieving the list

@@ -48,7 +48,7 @@ class TestRCScraperAPI(unittest.TestCase):
                       f"Failed to clear previous Rebel Coverage events: {delete_response.text}")
         print("Previous Rebel Coverage events cleared (or table was empty).")
         time.sleep(0.5) # Give server a tiny bit of time
-
+ 
     def test_scrape_and_add_events(self):
         """
         Test scraping Rebel Coverage and adding events via the API.
@@ -64,7 +64,6 @@ class TestRCScraperAPI(unittest.TestCase):
         except Exception as e:
             # If the scraper itself throws an error during the test
             self.fail(f"Scraping function 'rebel_coverage.scrape()' failed with an exception: {e}")
-
         time.sleep(1) # Give server time to process database commits
 
         # Now check if events were added by retrieving the list
