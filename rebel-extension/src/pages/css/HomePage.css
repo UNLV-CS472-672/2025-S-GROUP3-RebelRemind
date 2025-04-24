@@ -147,6 +147,10 @@
   color: #fff !important;
 }
 
+.accordion-body::-webkit-scrollbar {
+  display: none;
+}
+
 /* --- REACT-CALENDAR --- */
 
 .react-calendar {
