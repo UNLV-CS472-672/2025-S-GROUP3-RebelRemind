@@ -5,15 +5,15 @@ function Events({ events, viewMode }) {
     return <div className="no-events"> No events found for this view.</div>;
   }
   const sortedEvents = [...events].sort((a, b) => {
-    const aDate = new Date(`${a.date} ${a.time}`);
-    const bDate = new Date(`${b.date} ${b.time}`);
+    const aDate = new Date(`${a.startDate} ${a.startTime}`);
+    const bDate = new Date(`${b.startDate} ${b.startTime}`);
     return aDate - bDate; // soonest to latest
   });
 
   if (viewMode === "weekly") {
     const grouped = {};
     sortedEvents.forEach(event => {
-      const [year, month, day] = event.date.split('-');
+      const [year, month, day] = event.startDate.split('-');
       const date = new Date(year, month - 1, day);
             const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
       if (!grouped[weekday]) grouped[weekday] = [];
@@ -37,7 +37,7 @@ function Events({ events, viewMode }) {
                   <span className="event-name">
                     <span className="event-org">{event.organization}{event.organization?':':''} </span>{event.name}
                   </span>
-                  <span className="event-time">{event.time}</span>
+                  <span className="event-time">{event.startTime}</span>
                 </a>
               </li>
             ))}
@@ -54,7 +54,7 @@ function Events({ events, viewMode }) {
             <span className="event-name">
                 <span className="event-org">{event.organization}{event.organization?':':''} </span>{event.name}
             </span>
-            <span className="event-time">{event.time}</span>
+            <span className="event-time">{event.startTime}</span>
           </a>
         </li>
       ))}

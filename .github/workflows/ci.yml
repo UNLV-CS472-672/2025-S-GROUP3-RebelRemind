@@ -52,3 +52,31 @@ jobs:
       - name: Run tests
         run: npm test
         working-directory: rebel-extension
+
+  pytest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'  # Adjust to your Python version if needed
+
+      - name: Set up virtual environment
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+        working-directory: backend  # Adjust if your Python project is in a different directory
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install -e .
+        working-directory: backend  # Adjust if your Python project is in a different directory
+
+      - name: Run pytest
+        run: python3 -m pytest --cov=webscraping --cov=database  # Run pytest to execute the tests
+        working-directory: backend  # Adjust if your tests are located elsewhere
