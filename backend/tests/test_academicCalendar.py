@@ -6,7 +6,7 @@ from webscraping.academic_calendar import scrape
 from tests import flask_app, db
 
 # --- Test Class ---
-class TestAcademicScraperAPI(unittest.TestCase):
+class TestACScraperAPI(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Run once before all tests in the class."""
@@ -27,7 +27,7 @@ class TestAcademicScraperAPI(unittest.TestCase):
         # Check if the API server is running
         try:
             # Use a known endpoint like the list endpoint, or just the base
-            response = cls.client.get("academiccalendar_list", timeout=3)
+            response = cls.client.get("academiccalendar_list")
             # Allow 404 if list is just empty, but not server errors (5xx) or connection errors
             if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
                  raise ConnectionError(f"API Server returned status {response.status_code}")

@@ -6,7 +6,7 @@ from webscraping.rebel_coverage import scrape
 from tests import flask_app, db
 
 # --- Test Class ---
-class TestFlaskAPI(unittest.TestCase):
+class TestRCScraperAPI(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Run once before all tests in the class."""
@@ -27,7 +27,7 @@ class TestFlaskAPI(unittest.TestCase):
         # Check if the API server is running
         try:
             # Use a known endpoint like the list endpoint, or just the base
-            response = cls.client.get("rebelcoverage_list", timeout=3)
+            response = cls.client.get("rebelcoverage_list")
             # Allow 404 if list is just empty, but not server errors (5xx) or connection errors
             if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
                  raise ConnectionError(f"API Server returned status {response.status_code}")
