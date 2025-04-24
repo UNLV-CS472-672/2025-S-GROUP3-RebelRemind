@@ -27,11 +27,6 @@
  *     }>
  *   }
  *
- * Example usage:
- * ```jsx
- * <NotificationHistory />
- * ```
- *
  * Note:
  * This component is intended for use inside a Chrome Extension environment
  * where `chrome.storage.local` is available.
@@ -41,7 +36,10 @@
  * Prompted ChatGPT for dynamic UI of notification 
  */
 import React, { useEffect, useState } from "react";
+import Accordion from "react-bootstrap/Accordion";
+import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from "./css/Toast.module.css";
+import Events from "../components/Events";
 import "./css/NotificationHistory.css";
 
 const NotificationHistory = () => {
@@ -60,35 +58,22 @@ const NotificationHistory = () => {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%" }}>
-      {history.map((entry) => (
-        <div className={styles.toast} key={entry.id}>
-          <div className={styles.toastHeader}>
-            <strong className={styles.meAuto}>📅 {entry.date}</strong>
-            <small className={`${styles.textMuted} ${styles.ms1}`}>{entry.summary}</small>
-          </div>
-          <div className={styles.toastBody}>
-            <ul className={styles.ps3}>
-              {entry.events.map((event, i) => (
-                <li key={i}>
-                  <strong>{event.source}:</strong> {event.name || event.title} — {event.time}
-                  {event.link && (
-                    <a
-                      href={event.link}
-                      target="_blank"
-                      rel="noreferrer"
-                      className={styles.ms1}
-                    >
-                      ↗
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+    <Accordion defaultActiveKey="0">
+      {history.map((entry, idx) => (
+        <Accordion.Item eventKey={idx.toString()} key={entry.id}>
+          <Accordion.Header>
+            📅 {entry.date} — {entry.summary}
+          </Accordion.Header>
+          <Accordion.Body className="accordion-panel-scroll">
+            {entry.events && entry.events.length > 0 ? (
+              <Events events={entry.events} viewMode={"daily"} />
+            ) : (
+              <p className={styles.textMuted}>No events for this notification.</p>
+            )}
+          </Accordion.Body>
+        </Accordion.Item>
       ))}
-    </div>
+    </Accordion>
   );
 };
 

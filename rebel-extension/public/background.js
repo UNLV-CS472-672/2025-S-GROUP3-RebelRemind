@@ -228,7 +228,7 @@ async function handleDailyTask(isStartup = false) {
       const dynamicTitle = parts.join(', ');
 
       if (eventsToday){
-        chrome.notifications.create('', {
+        chrome.notifications.create('rebel-remind', {
           type: 'basic',
           iconUrl: chrome.runtime.getURL("images/logo_128x128.png"), // must exist and be declared in manifest.json
           title: "RebelRemind",
@@ -274,9 +274,11 @@ async function handleDailyTask(isStartup = false) {
 }
 
 chrome.notifications.onClicked.addListener((notificationId) => {
-  chrome.tabs.create({
-    url: chrome.runtime.getURL("welcome.html#/notifications")
-  });
+  if (notificationId === 'rebel-remind-daily') {  
+    chrome.tabs.create({
+      url: chrome.runtime.getURL("welcome.html#/notifications")
+    });
+  }
 });
 //endregion
 
