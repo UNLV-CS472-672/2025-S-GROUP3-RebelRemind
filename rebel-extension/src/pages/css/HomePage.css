@@ -147,14 +147,6 @@
   color: #fff !important;
 }
 
-.accordion-icon {
-  width: 50px;
-  margin-right: 8px;
-  vertical-align: middle;
-  object-fit: contain;
-}
-
-
 /* --- REACT-CALENDAR --- */
 
 .react-calendar {
