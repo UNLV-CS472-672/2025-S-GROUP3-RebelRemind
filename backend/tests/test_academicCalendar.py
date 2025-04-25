@@ -36,7 +36,7 @@ class TestACScraperAPI(unittest.TestCase):
             if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
                  raise ConnectionError(f"API Server returned status {response.status_code}")
             print(f"API Server connection check status: {response.status_code}")
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             print(f"\nFATAL: Cannot connect to API Server at {cls.client}. Ensure it's running.")
             print(f"Error details: {e}")
             # Stop tests if API isn't running
@@ -78,15 +78,14 @@ class TestACScraperAPI(unittest.TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK,
                          f"Failed to get Academic Calendar list after scraping: {response.text}")
 
-        retrieved_data = response.json()
-        self.assertIsInstance(retrieved_data, list, "API did not return a list for Academic Calendar events.")
-        self.assertGreater(len(retrieved_data), 0,
+        self.assertIsInstance(response, list, "API did not return a list for Academic Calendar events.")
+        self.assertGreater(len(response), 0,
                            "Scraping ran, but no Academic Calendar events were found in the API list.")
 
-        print(f"✅ Found {len(retrieved_data)} Academic Calendar events in API after scraping.")
+        print(f"✅ Found {len(response)} Academic Calendar events in API after scraping.")
 
         # Verify the structure of the first retrieved event
-        first_event = retrieved_data[0]
+        first_event = response[0]
         print(f"Verifying structure of first event: {first_event.get('name')}")
         self.assertIn("id", first_event)
         self.assertIn("name", first_event)
@@ -126,13 +125,12 @@ class TestACScraperAPI(unittest.TestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.OK, f"Failed to get Academic Calendar event list: {response.text}")
 
-        retrieved_data = response.json()
-        self.assertIsInstance(retrieved_data, list)
-        self.assertGreater(len(retrieved_data), 0, "Academic Calendar list endpoint returned empty after data should have been added.")
-        print(f"✅ Retrieved {len(retrieved_data)} Academic Calendar events successfully.")
+        self.assertIsInstance(response, list)
+        self.assertGreater(len(response), 0, "Academic Calendar list endpoint returned empty after data should have been added.")
+        print(f"✅ Retrieved {len(response)} Academic Calendar events successfully.")
 
         # Verify structure again for an item in the list
-        event = retrieved_data[0]
+        event = response[0]
         self.assertIn("name", event)
         self.assertIn("startDate", event)
         self.assertIn("startTime", event)

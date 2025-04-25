@@ -47,14 +47,9 @@ class TestUCScraperAPI(unittest.TestCase):
         # Clean the specific table before each test to ensure independence
         print("\nClearing UNLV Calendar events before test...")
         delete_response = self.client.delete("unlvcalendar_delete_all") # Use correct endpoint
-        try:
-            json_data = delete_response.json()
-            print("Parsed JSON:", json_data)
-        except Exception as e:
-            print("JSON decoding failed:", str(e))
         # Check if deletion worked or if the table was already empty (200 OK)
         self.assertEqual(delete_response.status_code, HTTPStatus.OK,
-                      f"Failed to clear previous UNLV Calendar events: {delete_response.json()}")
+                      f"Failed to clear previous UNLV Calendar events: {delete_response.text}")
         print("Previous UNLV Calendar events cleared (or table was empty).")
         time.sleep(0.5) # Give server a tiny bit of time
 
@@ -82,15 +77,14 @@ class TestUCScraperAPI(unittest.TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK,
                          f"Failed to get UNLV Calendar list after scraping: {response.text}")
 
-        retrieved_data = response.json()
-        self.assertIsInstance(retrieved_data, list, "API did not return a list for UNLV Calendar events.")
-        self.assertGreater(len(retrieved_data), 0,
+        self.assertIsInstance(response, list, "API did not return a list for UNLV Calendar events.")
+        self.assertGreater(len(response), 0,
                            "Scraping ran, but no UNLV Calendar events were found in the API list.")
 
-        print(f"✅ Found {len(retrieved_data)} UNLV Calendar events in API after scraping.")
+        print(f"✅ Found {len(response)} UNLV Calendar events in API after scraping.")
 
         # Verify the structure of the first retrieved event
-        first_event = retrieved_data[0]
+        first_event = response[0]
         print(f"Verifying structure of first event: {first_event.get('name')}")
         self.assertIn("id", first_event)
         self.assertIn("name", first_event)
@@ -132,13 +126,12 @@ class TestUCScraperAPI(unittest.TestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.OK, f"Failed to get UNLV Calendar event list: {response.text}")
 
-        retrieved_data = response.json()
-        self.assertIsInstance(retrieved_data, list)
-        self.assertGreater(len(retrieved_data), 0, "UNLV Calendar list endpoint returned empty after data should have been added.")
-        print(f"✅ Retrieved {len(retrieved_data)} UNLV Calendar events successfully.")
+        self.assertIsInstance(response, list)
+        self.assertGreater(len(response), 0, "UNLV Calendar list endpoint returned empty after data should have been added.")
+        print(f"✅ Retrieved {len(response)} UNLV Calendar events successfully.")
 
         # Verify structure again for an item in the list
-        event = retrieved_data[0]
+        event = response[0]
         self.assertIn("name", event)
         self.assertIn("startDate", event)
         self.assertIn("startTime", event)
