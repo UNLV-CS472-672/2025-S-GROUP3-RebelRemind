@@ -27,7 +27,6 @@
  * and focus with audible reminders for the timer's completion.
  */
 
-
 import React, { useState, useEffect, useRef } from "react";
 import FinishAlarm from "../assets/FinishAlarm.mp3";
 import "./css/Pomodoro.css";
@@ -85,12 +84,12 @@ useEffect(() => {
   };
 
   chrome.storage.onChanged.addListener(handleStorageChange);
-  return () => chrome.storage.onChanged.removeListener(handleStorageChange);
-}, []); // ← empty dependency array = run only once on mount
+    return () => chrome.storage.onChanged.removeListener(handleStorageChange);
+  }, []); // ← empty dependency array = run only once on mount
 
 
   useEffect(() => {
-    console.log('Timer updated:', minutes, seconds, 'isRunning:', isRunning);
+    // console.log('Timer updated:', minutes, seconds, 'isRunning:', isRunning);
     if (minutes === 0 && seconds === 0 && isRunning) {
       console.log('Timer reached 0:00, triggering alarm...');
       alarmRef.current.play().catch((error) => {
@@ -99,10 +98,8 @@ useEffect(() => {
       setIsRunning(false);
       setIsTimerDone(true);
       setShowEditBoxes(true);
-      logStudySession(); // 🔴 Log the session when timer ends
+      logStudySession(); // Log the session when timer ends
       chrome.storage.local.set({ isRunning: false });
-
-      //chrome.runtime.sendMessage({ action: "timeUpNotification" });
     }
   }, [minutes, seconds, isRunning]);
 
@@ -313,8 +310,10 @@ useEffect(() => {
       </div>
   
 {/*  Log Viewer Section - below timer box */}
-<div className="study-log-container">
-  <h2>Your Study Log</h2>
+<div className="mx-auto bg-white rounded shadow-md text-center" style={{ padding: "10px", marginTop: "20px" }}>
+  <h3 className="text-xl font-semibold" style={{ marginTop: "10px", marginBottom: "10px" }}>
+    Your Study Log
+  </h3>
   <div className="tab-switcher">
   <div
     className={`tab ${activeTab === "daily" ? "active-tab" : "inactive-tab"}`}
@@ -393,24 +392,35 @@ useEffect(() => {
   const isOpen = expandedWeeks[weekStartDateStr];
 
   return (
-    <div className="day-card" key={idx}>
-      <div
-        className="day-header"
-        onClick={() =>
-          setExpandedWeeks((prev) => ({
-            ...prev,
-            [weekStartDateStr]: !prev[weekStartDateStr]
-          }))
-        }
-        style={{ cursor: "pointer" }}
-      >
-      <span>
-        {expandedWeeks[weekStartDateStr] ? "▲" : "▼"} Week of {weekStartDate.toLocaleDateString()}
-      </span>
-        <span className="duration-chip">
-          {Object.values(summary).reduce((a, b) => a + b, 0)} min
-        </span>
-      </div>
+<div
+  className="event-dropdown-header"
+  onClick={() =>
+    setExpandedWeeks((prev) => ({
+      ...prev,
+      [weekStartDateStr]: !prev[weekStartDateStr]
+    }))
+  }
+  style={{
+    cursor: "pointer",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap", // <-- this allows line wrapping
+    gap: "0.5rem"
+  }}
+>
+  <div className="dropdown-title" style={{ fontWeight: "600", fontSize: "1rem", color: "#333" }}>
+    {expandedWeeks[weekStartDateStr] ? "▲" : "▼"} Week of{" "}
+    {weekStartDate.toLocaleDateString(undefined, {
+      month: "numeric",
+      day: "numeric",
+      year: "numeric"
+    })}
+  </div>
+
+  <div className="duration-chip">
+    {formatMinutes(Object.values(summary).reduce((a, b) => a + b, 0))}
+  </div>
 
       {isOpen && (
         <div className="day-body">
