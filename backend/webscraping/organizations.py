@@ -13,8 +13,6 @@ def scrape():
     results = []
     for org in orgs:
         org = map_event(org)
-        # PUT organizations into database
-        response = requests.put(BASE + f"organization_add", json=org)
         results.append(org)
     
     # with open('scraped_Organizations.json', 'w', encoding='utf-8') as f:

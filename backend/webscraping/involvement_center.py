@@ -14,8 +14,6 @@ def scrape():
     results = []
     for event in events:
         event = map_event(event)
-        # PUT events into database
-        response = requests.put(BASE + "involvementcenter_add", json=event)
         results.append(event)
     
     # with open('scraped_InvolvementCenter.json', 'w', encoding='utf-8') as f:

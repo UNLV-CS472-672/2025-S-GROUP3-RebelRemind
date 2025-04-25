@@ -349,7 +349,7 @@ uc_fields = {
 }
 
 # Resource fields for Organization model
-organization_fields = {
+org_fields = {
     'id': fields.Integer,
     'name': fields.String,
 }
@@ -643,9 +643,18 @@ class UNLVCalendar_Delete_All(Resource):
         ), HTTPStatus.OK)
 
 # Commands for Organization table
+class Organization_Info(Resource):
+    # GET items from Organization table
+    @marshal_with(org_fields)
+    def get(self, org_id):
+        result = Organization.query.filter_by(id=org_id).first()
+        if not result:
+            abort(HTTPStatus.NOT_FOUND, message="Could not find organization with that id")
+        return result
+
 class Organization_Add(Resource):
     # PUT item into Organization table
-    @marshal_with(organization_fields)
+    @marshal_with(org_fields)
     def put(self):
         args = organization_put_args.parse_args()
         result = Organization.query.filter_by(name=args['name']).first()
@@ -659,7 +668,7 @@ class Organization_Add(Resource):
         return organization, HTTPStatus.CREATED
 
 class Organization_Delete_All(Resource):
-    # @marshal_with(organization_fields) # Less suitable for bulk delete confirmation
+    # @marshal_with(org_fields) # Less suitable for bulk delete confirmation
     def delete(self):
         delete_count = Organization.query.delete()
         db.session.commit()
@@ -720,7 +729,7 @@ class UNLVCalendar_List(Resource):
 
 # List all items in Organization table
 class Organization_List(Resource):
-    @marshal_with(organization_fields)
+    @marshal_with(org_fields)
     def get(self):
         result = Organization.query.order_by(Organization.name.asc()).all()
         if not result:
@@ -941,6 +950,7 @@ api.add_resource(AcademicCalendar_Info, "/academiccalendar_id/<int:event_id>")
 api.add_resource(InvolvementCenter_Info, "/involvementcenter_id/<int:event_id>")
 api.add_resource(RebelCoverage_Info, "/rebelcoverage_id/<int:event_id>")
 api.add_resource(UNLVCalendar_Info, "/unlvcalendar_id/<int:event_id>")
+api.add_resource(Organization_Info, "/organization_id/<int:org_id>")
 
 # API resources for list commands (all items)
 api.add_resource(User_List, "/user_list")

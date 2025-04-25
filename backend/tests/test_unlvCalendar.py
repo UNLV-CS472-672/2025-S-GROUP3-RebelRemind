@@ -1,5 +1,5 @@
 import unittest
-import requests
+import os
 from http import HTTPStatus
 import time
 from webscraping.unlv_calendar import scrape
@@ -13,7 +13,11 @@ class TestUCScraperAPI(unittest.TestCase):
         print("--- Starting UNLV Calendar Scraper API Tests ---")
         # Configure and initialize the Flask app
         flask_app.config['TESTING'] = True
-        flask_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        flask_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+        flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+        flask_app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+            'connect_args': {'check_same_thread': False}
+        }
 
         cls.app = flask_app
         cls.app_context = cls.app.app_context()
@@ -32,7 +36,7 @@ class TestUCScraperAPI(unittest.TestCase):
             if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
                  raise ConnectionError(f"API Server returned status {response.status_code}")
             print(f"API Server connection check status: {response.status_code}")
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             print(f"\nFATAL: Cannot connect to API Server at {cls.client}. Ensure it's running.")
             print(f"Error details: {e}")
             # Stop tests if API isn't running
@@ -43,14 +47,9 @@ class TestUCScraperAPI(unittest.TestCase):
         # Clean the specific table before each test to ensure independence
         print("\nClearing UNLV Calendar events before test...")
         delete_response = self.client.delete("unlvcalendar_delete_all") # Use correct endpoint
-        try:
-            json_data = delete_response.json()
-            print("Parsed JSON:", json_data)
-        except Exception as e:
-            print("JSON decoding failed:", str(e))
         # Check if deletion worked or if the table was already empty (200 OK)
         self.assertEqual(delete_response.status_code, HTTPStatus.OK,
-                      f"Failed to clear previous UNLV Calendar events: {delete_response.json()}")
+                      f"Failed to clear previous UNLV Calendar events: {delete_response.text}")
         print("Previous UNLV Calendar events cleared (or table was empty).")
         time.sleep(0.5) # Give server a tiny bit of time
 
@@ -69,7 +68,6 @@ class TestUCScraperAPI(unittest.TestCase):
         except Exception as e:
             # If the scraper itself throws an error during the test
             self.fail(f"Scraping function 'unlv_calendar.scrape()' failed with an exception: {e}")
-
         time.sleep(1) # Give server time to process database commits
 
         # Now check if events were added by retrieving the list
@@ -79,7 +77,7 @@ class TestUCScraperAPI(unittest.TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK,
                          f"Failed to get UNLV Calendar list after scraping: {response.text}")
 
-        retrieved_data = response.json()
+        retrieved_data = response.get_json()
         self.assertIsInstance(retrieved_data, list, "API did not return a list for UNLV Calendar events.")
         self.assertGreater(len(retrieved_data), 0,
                            "Scraping ran, but no UNLV Calendar events were found in the API list.")
@@ -103,7 +101,7 @@ class TestUCScraperAPI(unittest.TestCase):
         indiv_response = self.client.get(f"unlvcalendar_id/{event_id_to_get}") # Use correct endpoint
         self.assertEqual(indiv_response.status_code, HTTPStatus.OK,
                          f"Failed to get UNLV Calendar event ID {event_id_to_get}: {indiv_response.text}")
-        indiv_data = indiv_response.json()
+        indiv_data = indiv_response.get_json()
         self.assertEqual(indiv_data['name'], first_event['name']) # Check name matches
 
         print(f"✅ Scraped UNLV Calendar events successfully added and verified via API.")
@@ -129,7 +127,7 @@ class TestUCScraperAPI(unittest.TestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.OK, f"Failed to get UNLV Calendar event list: {response.text}")
 
-        retrieved_data = response.json()
+        retrieved_data = response.get_json()
         self.assertIsInstance(retrieved_data, list)
         self.assertGreater(len(retrieved_data), 0, "UNLV Calendar list endpoint returned empty after data should have been added.")
         print(f"✅ Retrieved {len(retrieved_data)} UNLV Calendar events successfully.")
@@ -147,8 +145,24 @@ class TestUCScraperAPI(unittest.TestCase):
         
     @classmethod
     def tearDownClass(cls):
-        """Optional: Run once after all tests in the class."""
+        """Run once after all tests in the class."""
         print("\n--- Finished UNLV Calendar Scraper API Tests ---")
+
+        # Remove the session and drop all tables
+        db.session.remove()
+        db.drop_all()
+
+        # Pop the Flask app context
+        cls.app_context.pop()
+
+        # Delete the test.db file if it exists
+        db_path = 'test.db'
+        if os.path.exists(db_path):
+            try:
+                os.remove(db_path)
+                print(f"Deleted test database file: {db_path}")
+            except Exception as e:
+                print(f"Could not delete {db_path}: {e}")
 
 if __name__ == '__main__':
     # Ensure the script using this test class is run directly
