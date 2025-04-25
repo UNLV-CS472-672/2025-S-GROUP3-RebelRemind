@@ -78,14 +78,15 @@ class TestOrgScraperAPI(unittest.TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK,
                          f"Failed to get organizations list after scraping: {response.text}")
 
-        self.assertIsInstance(response, list, "API did not return a list for organizations.")
-        self.assertGreater(len(response), 0,
+        retrieved_data = response.get_json()
+        self.assertIsInstance(retrieved_data, list, "API did not return a list for organizations.")
+        self.assertGreater(len(retrieved_data), 0,
                            "Scraping ran, but no organizations were found in the API list.")
 
-        print(f"✅ Found {len(response)} organizations in API after scraping.")
+        print(f"✅ Found {len(retrieved_data)} organizations in API after scraping.")
 
         # Verify the structure of the first retrieved organization
-        first_org = response[0]
+        first_org = retrieved_data[0]
         print(f"Verifying structure of first organization: {first_org.get('name')}")
         self.assertIn("id", first_org)
         self.assertIn("name", first_org)
@@ -95,7 +96,7 @@ class TestOrgScraperAPI(unittest.TestCase):
         indiv_response = self.client.get(f"organization_id/{org_id_to_get}") # Use correct endpoint
         self.assertEqual(indiv_response.status_code, HTTPStatus.OK,
                          f"Failed to get organization ID {org_id_to_get}: {indiv_response.text}")
-        indiv_data = indiv_response.json()
+        indiv_data = indiv_response.get_json()
         self.assertEqual(indiv_data['name'], first_org['name']) # Check name matches
 
         print(f"✅ Scraped organizations successfully added and verified via API.")
@@ -122,12 +123,13 @@ class TestOrgScraperAPI(unittest.TestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.OK, f"Failed to get organization list: {response.text}")
 
-        self.assertIsInstance(response, list)
-        self.assertGreater(len(response), 0, "Organization list endpoint returned empty after data should have been added.")
-        print(f"✅ Retrieved {len(response)} organizations successfully.")
+        retrieved_data = response.get_json()
+        self.assertIsInstance(retrieved_data, list)
+        self.assertGreater(len(retrieved_data), 0, "Organization list endpoint returned empty after data should have been added.")
+        print(f"✅ Retrieved {len(retrieved_data)} organizations successfully.")
 
         # Verify structure again for an item in the list
-        event = response[0]
+        event = retrieved_data[0]
         self.assertIn("name", event)
         self.assertIn("startDate", event)
         self.assertIn("startTime", event)

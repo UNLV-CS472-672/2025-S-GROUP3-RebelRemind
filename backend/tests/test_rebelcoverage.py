@@ -77,14 +77,15 @@ class TestRCScraperAPI(unittest.TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK,
                          f"Failed to get Rebel Coverage list after scraping: {response.text}")
 
-        self.assertIsInstance(response, list, "API did not return a list for Rebel Coverage events.")
-        self.assertGreater(len(response), 0,
+        retrieved_data = response.get_json()
+        self.assertIsInstance(retrieved_data, list, "API did not return a list for Rebel Coverage events.")
+        self.assertGreater(len(retrieved_data), 0,
                            "Scraping ran, but no Rebel Coverage events were found in the API list.")
 
-        print(f"✅ Found {len(response)} Rebel Coverage events in API after scraping.")
+        print(f"✅ Found {len(retrieved_data)} Rebel Coverage events in API after scraping.")
 
         # Verify the structure of the first retrieved event
-        first_event = response[0]
+        first_event = retrieved_data[0]
         print(f"Verifying structure of first event: {first_event.get('name')}")
         self.assertIn("id", first_event)
         self.assertIn("name", first_event)
@@ -100,7 +101,7 @@ class TestRCScraperAPI(unittest.TestCase):
         indiv_response = self.client.get(f"rebelcoverage_id/{event_id_to_get}") # Use correct endpoint
         self.assertEqual(indiv_response.status_code, HTTPStatus.OK,
                          f"Failed to get Rebel Coverage event ID {event_id_to_get}: {indiv_response.text}")
-        indiv_data = indiv_response.json()
+        indiv_data = indiv_response.get_json()
         self.assertEqual(indiv_data['name'], first_event['name']) # Check name matches
 
         print(f"✅ Scraped Rebel Coverage events successfully added and verified via API.")
@@ -126,12 +127,13 @@ class TestRCScraperAPI(unittest.TestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.OK, f"Failed to get Rebel Coverage event list: {response.text}")
 
-        self.assertIsInstance(response, list)
-        self.assertGreater(len(response), 0, "Rebel Coverage list endpoint returned empty after data should have been added.")
-        print(f"✅ Retrieved {len(response)} Rebel Coverage events successfully.")
+        retrieved_data = response.get_json()
+        self.assertIsInstance(retrieved_data, list)
+        self.assertGreater(len(retrieved_data), 0, "Rebel Coverage list endpoint returned empty after data should have been added.")
+        print(f"✅ Retrieved {len(retrieved_data)} Rebel Coverage events successfully.")
 
         # Verify structure again for an item in the list
-        event = response[0]
+        event = retrieved_data[0]
         self.assertIn("name", event)
         self.assertIn("startDate", event)
         self.assertIn("startTime", event)

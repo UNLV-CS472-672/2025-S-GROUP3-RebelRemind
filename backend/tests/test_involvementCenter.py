@@ -77,7 +77,7 @@ class TestICScraperAPI(unittest.TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK,
                          f"Failed to get Involvement Center list after scraping: {response.text}")
 
-        retrieved_data = response.json()
+        retrieved_data = response.get_json()
         self.assertIsInstance(retrieved_data, list, "API did not return a list for Academic Calendar events.")
         self.assertGreater(len(retrieved_data), 0,
                            "Scraping ran, but no Involvement Center events were found in the API list.")
@@ -102,7 +102,7 @@ class TestICScraperAPI(unittest.TestCase):
         indiv_response = self.client.get(f"involvementcenter_id/{event_id_to_get}") # Use correct endpoint
         self.assertEqual(indiv_response.status_code, HTTPStatus.OK,
                          f"Failed to get Involvement Center event ID {event_id_to_get}: {indiv_response.text}")
-        indiv_data = indiv_response.json()
+        indiv_data = indiv_response.get_json()
         self.assertEqual(indiv_data['name'], first_event['name']) # Check name matches
 
         print(f"✅ Scraped Involvement Center events successfully added and verified via API.")
@@ -128,7 +128,7 @@ class TestICScraperAPI(unittest.TestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.OK, f"Failed to get Involvement Center event list: {response.text}")
 
-        retrieved_data = response.json()
+        retrieved_data = response.get_json()
         self.assertIsInstance(retrieved_data, list)
         self.assertGreater(len(retrieved_data), 0, "Involvement Center list endpoint returned empty after data should have been added.")
         print(f"✅ Retrieved {len(retrieved_data)} Involvement Center events successfully.")
