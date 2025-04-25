@@ -63,7 +63,7 @@ class TestOrgScraperAPI(unittest.TestCase):
             results = scrape()
             # PUT organizations into the database
             for org in results:
-                self.client.put("involvementcenter_add", json=org)
+                self.client.put("organization_add", json=org)
             print("Scraping and PUT requests completed.")
         except Exception as e:
             # If the scraper itself throws an error during the test
@@ -73,7 +73,7 @@ class TestOrgScraperAPI(unittest.TestCase):
 
         # Now check if organizations were added by retrieving the list
         print("Retrieving organization list from API to verify additions...")
-        response = self.client.get("organizations_list") # Use correct endpoint
+        response = self.client.get("organization_list") # Use correct endpoint
 
         self.assertEqual(response.status_code, HTTPStatus.OK,
                          f"Failed to get organizations list after scraping: {response.text}")
@@ -113,13 +113,13 @@ class TestOrgScraperAPI(unittest.TestCase):
             results = scrape()
             # PUT organizations into the database
             for org in results:
-                self.client.put("involvementcenter_add", json=org)
+                self.client.put("organization_add", json=org)
         except Exception as e:
              self.fail(f"Scraping function failed during setup for GET list test: {e}")
         time.sleep(0.5)
 
         print("Retrieving full organization list...")
-        response = self.client.get("academiccalendar_list") # Use correct endpoint
+        response = self.client.get("organization_list") # Use correct endpoint
 
         self.assertEqual(response.status_code, HTTPStatus.OK, f"Failed to get organization list: {response.text}")
 
@@ -129,12 +129,8 @@ class TestOrgScraperAPI(unittest.TestCase):
         print(f"✅ Retrieved {len(retrieved_data)} organizations successfully.")
 
         # Verify structure again for an item in the list
-        event = retrieved_data[0]
-        self.assertIn("name", event)
-        self.assertIn("startDate", event)
-        self.assertIn("startTime", event)
-        self.assertIn("endDate", event)
-        self.assertIn("endTime", event)
+        org = retrieved_data[0]
+        self.assertIn("name", org)
         print("✅ Organization structure in list verified.")
         
     @classmethod

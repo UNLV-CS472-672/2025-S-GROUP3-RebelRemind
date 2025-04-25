@@ -60,7 +60,7 @@ def default():
     results = scrape()
     # PUT calendar events into the database
     for event in results:
-        requests.put(BASE + "academiccalendar_add", json=put_data)
+        requests.put(BASE + "academiccalendar_add", json=event)
 
 if __name__ == '__main__':
     default()
