@@ -1,5 +1,5 @@
 import unittest
-import requests
+import os
 from http import HTTPStatus
 import time
 from webscraping.academic_calendar import scrape
@@ -13,7 +13,11 @@ class TestACScraperAPI(unittest.TestCase):
         print("--- Starting Academic Calendar Scraper API Tests ---")
         # Configure and initialize the Flask app
         flask_app.config['TESTING'] = True
-        flask_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        flask_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+        flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+        flask_app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+            'connect_args': {'check_same_thread': False}
+        }
 
         cls.app = flask_app
         cls.app_context = cls.app.app_context()
@@ -138,8 +142,24 @@ class TestACScraperAPI(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        """Optional: Run once after all tests in the class."""
+        """Run once after all tests in the class."""
         print("\n--- Finished Academic Calendar Scraper API Tests ---")
+
+        # Remove the session and drop all tables
+        db.session.remove()
+        db.drop_all()
+
+        # Pop the Flask app context
+        cls.app_context.pop()
+
+        # Delete the test.db file if it exists
+        db_path = 'test.db'
+        if os.path.exists(db_path):
+            try:
+                os.remove(db_path)
+                print(f"Deleted test database file: {db_path}")
+            except Exception as e:
+                print(f"Could not delete {db_path}: {e}")
 
 if __name__ == '__main__':
     # Ensure the script using this test class is run directly
