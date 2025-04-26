@@ -111,10 +111,34 @@ useEffect(() => {
       return unsubscribe;
     }, []);
 
-    useEffect(() => {
-      setNormUserEvents(normalizeUserEvents(user_events));
-    }, [user_events]);
+    // filter User Events by daily or weekly
+    function filterUserEvents(events, viewMode) {
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+    
+      const weekDates = [];
+      for (let i = 0; i < 7; i++) {
+        const tempDate = new Date(today);
+        tempDate.setDate(today.getDate() + i);
+        weekDates.push(tempDate.toISOString().split('T')[0]);
+      }
+    
+      return events.filter(event => {
+        if (viewMode === "daily") {
+          return event.date === todayStr;
+        } else if (viewMode === "weekly") {
+          return weekDates.includes(event.date);
+        }
+        return false;
+      });
+    }    
 
+    useEffect(() => {
+      const normalized = normalizeUserEvents(user_events);
+      const filtered = filterUserEvents(normalized, viewMode);
+      setNormUserEvents(filtered);
+    }, [user_events, viewMode]);
+    
     // if user event is clicked
     useEffect(() => {
       const handleClickOutside = (e) => {
