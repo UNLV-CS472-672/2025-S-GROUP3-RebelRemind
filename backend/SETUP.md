@@ -24,7 +24,7 @@
 
 ## Running Scripts
 
-- Create database and launch Flask API server
+- Create database and launch Flask API server on localhost
 ```sh
    serve_data
 ```
@@ -39,8 +39,9 @@
   - http://localhost:5050/involvementcenter_list
   - http://localhost:5050/rebelcoverage_list
   - http://localhost:5050/unlvcalendar_list
+  - http://localhost:5050/organization_list
 
 - Run pytest to test files
 ```sh
-   python3 -m pytest --cov=webscraping --cov=database
+   pytest
 ```
