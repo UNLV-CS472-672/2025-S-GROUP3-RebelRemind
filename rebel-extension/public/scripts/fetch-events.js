@@ -63,7 +63,7 @@ export function normalizeUserEvents(userEvents) {
     organization: "Your Event",
     time: event.allDay ? "(ALL DAY)" : formatTime(event.startTime),
     date: event.date,
-    link: "ignore",
+    link: "customEvent",
 
     // Full metadata for popup
     allDay: event.allDay,
