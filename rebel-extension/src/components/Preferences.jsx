@@ -415,7 +415,6 @@ const Preferences = ({ setupMode = false }) => {
 
                     {/* Action Buttons */}
                     <div className="mt-3" style={{ display: "flex", justifyContent: "space-between" }}>
-                        <button className="rounded" onClick={savePreferences}>Save Preferences</button>
                         <button className="rounded" onClick={() => {
                             const confirmReset = window.confirm("Are you sure you want to reset all your preferences?");
                             if (!confirmReset) return;
@@ -440,6 +439,7 @@ const Preferences = ({ setupMode = false }) => {
                         }}>
                             Reset Preferences
                         </button>
+                        <button className="rounded" onClick={savePreferences}>Save Preferences</button>
                     </div>
 
                     {/* Unsaved Changes Notification */}
