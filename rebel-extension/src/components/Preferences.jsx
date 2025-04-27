@@ -29,7 +29,7 @@ const Preferences = ({ setupMode = false }) => {
         { key: "involvementCenter", label: "Involvement Center" },
         { key: "canvasIntegration", label: "Canvas Integration" },
         { key: "rebelCoverage", label: "Rebel Sports" },
-        { key: "userEvents", label: "Your Events" },
+        { key: "googleCalendar", label: "Google Calendar" },
     ];
 
     // Tooltip descriptions for each preference
@@ -39,7 +39,7 @@ const Preferences = ({ setupMode = false }) => {
         involvementCenter: "Enables club and organization filters. Select the ones you’re involved in to get updates.",
         canvasIntegration: "Connects your Canvas account so you can view assignments and deadlines inside the extension.",
         rebelCoverage: "Lets you choose Rebel men’s and women’s sports to follow for scores, news, and games.",
-        userEvents: "Lets you create and manage your own custom events within the extension.",
+        googleCalendar: "Lets you connect to your Google Calendar account and show all of your saved events.",
     };
 
     // =================== STATE VARIABLES ===================
@@ -59,7 +59,7 @@ const Preferences = ({ setupMode = false }) => {
     // Sports and interests state
     const mensSports = ["Baseball", "Basketball", "Football", "Golf", "Soccer", "Swim & Dive", "Tennis"];
     const womensSports = ["Basketball", "Cross Country", "Golf", "Soccer", "Softball", "Swim & Dive", "Tennis", "Track & Field", "Volleyball"];
-    const allInterests = ["Arts", "Academics", "Career", "Culture", "Diversity", "Health", "Social", "Sports", "Tech", "Family"];
+    const allInterests = ["Arts", "Academics", "Career", "Culture", "Diversity", "Health", "Social", "Sports", "Tech", "Community"];
 
     const [selectedMenSports, setSelectedMenSports] = useState([]);
     const [selectedWomenSports, setSelectedWomenSports] = useState([]);
@@ -77,7 +77,7 @@ const Preferences = ({ setupMode = false }) => {
         involvementCenter: false,
         canvasIntegration: false,
         rebelCoverage: false,
-        userEvents: false,
+        googleCalendar: false,
     };
 
     const [preferences, setPreferences] = useState(defaultPreferences);

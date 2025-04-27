@@ -76,6 +76,7 @@
 
   .completedText {
     cursor: pointer;
+    width: 135px; 
   }
   
   .completedText:hover {
