@@ -67,18 +67,18 @@ function AccordionMenu() {
   const today = new Date().toLocaleDateString('en-CA');
   useEffect(() => {
     const loadEvents = async () => {
-      const [filteredAC, filteredIC, filteredRC, filteredUC] = await filterEvents(today, viewMode);
+      const [newFilteredAC, newFilteredIC, newFilteredRC, newFilteredUC] = await filterEvents(today, viewMode);
       
-      setFilteredAcEvents(filteredAC);
-      setFilteredIcEvents(filteredIC);
-      setFilteredRcEvents(filteredRC);
-      setFilteredUcEvents(filteredUC);
+      setFilteredAcEvents(newFilteredAC);
+      setFilteredIcEvents(newFilteredIC);
+      setFilteredRcEvents(newFilteredRC);
+      setFilteredUcEvents(newFilteredUC);
 
       chrome.storage.local.set({
-        filteredAC: filteredAC,
-        filteredIC: filteredIC,
-        filteredRC: filteredRC,
-        filteredUC: filteredUC,
+        filteredAC: newFilteredAC,
+        filteredIC: newFilteredIC,
+        filteredRC: newFilteredRC,
+        filteredUC: newFilteredUC,
       });
     };
       
@@ -196,7 +196,9 @@ function AccordionMenu() {
 
                     {index === 0 && <CanvasAssignments viewMode={viewMode} />}
                     {index === 1 && <Events events={[...filteredIC, ...normalizedUserEvents]} viewMode={viewMode} setActiveEventPopup={setActiveEventPopup} />}
-                    {index === 2 && <Events events={[...filteredUC, ...filteredAC, ...filteredRC]} viewMode={viewMode} />}
+                    {index === 2 && <Events events={[ ...(filteredUC || []),...(filteredAC || []),...(filteredRC || [])
+]} viewMode={viewMode} />
+}
                   </Accordion.Body>
                 </Accordion.Item>
               );
