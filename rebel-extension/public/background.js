@@ -335,7 +335,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     * Reloads the calendar in side panel to reflect updated event.
     */
     case "EVENT_UPDATED":
-      chrome.runtime.sendMessage({ type: "EVENT_UPDATED" });
+      chrome.runtime.sendMessage({ type: "EVENT_UPDATED" }, (response) => {
+        if (chrome.runtime.lastError) {
+          // handle receiving end does not exist error
+        }
+      });
       break;
 
     /**
@@ -351,6 +355,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 //endregion
 
 //region CANVAS
+
+chrome.runtime.onInstalled.addListener(() => {
+  const colorList = { UNLVEvents: "#b10202", InvolvementCenter: "#666666", userEvents: "#0000ff", CanvasCourses: {} };
+  chrome.storage.local.set({ colorList: colorList });
+});
 
 /**
 * Fetches all assignments from Canvas and places them into storage.

@@ -58,6 +58,7 @@ function CalendarMenu() {
 	const [show, setShow] = useState(false);
 	const [modalTitle, setmodalTitle] = useState('Modal Title');
 	const [modalBody, setmodalBody] = useState('Modal Body');
+	const [colorList, setColorList] = useState({});
 	
 	const handleClose = () => setShow(false);
   	const handleShow = () => setShow(true);
@@ -120,6 +121,14 @@ function CalendarMenu() {
 			setEvents([ ...canvasAssignments, ...userEvents]);
 		};
 		fetchEvents();
+		
+		const getColors = async () => {
+			chrome.storage.local.get("colorList", (data) => {
+			const colorList = data.colorList || {};
+			setColorList(colorList);
+			});
+		};
+		getColors();
 
 		/**
  		* Listens for messages indicating that a user created event has been created or updated.
@@ -127,6 +136,7 @@ function CalendarMenu() {
 		const handleMessage = (message, sender, sendResponse) => {
             if (message.type === "EVENT_CREATED" || message.type === "EVENT_UPDATED" || message.type === "UPDATE_ASSIGNMENTS") {
                 fetchEvents();
+				getColors();
 				sendResponse(true);
 				return true;
             }
@@ -152,6 +162,24 @@ function CalendarMenu() {
       	  selected = {select}
       	  onSelectEvent = {handleSelect}
       	  style={{ height: 700 }}
+		  // ai-gen start (ChatGPT-4o, 2)
+		  eventPropGetter={(event) => {
+			let backgroundColor = "";
+			if (event.id === 0) {
+				const courseColors = colorList.CanvasCourses;
+				backgroundColor = courseColors[event.courseID].color;
+			}
+			else {
+				backgroundColor = colorList[event.eventType];
+			}
+			return {
+				style: {
+					backgroundColor,
+					color: "black"
+				}
+			};
+		  }}
+		  // ai-gen end   
     	  />
     	  <Modal show={show} onHide={handleClose}>
         	<Modal.Header closeButton closeVariant="black">
@@ -183,6 +211,7 @@ const getCanvasAssignments = async () => {
 					start: new Date(assignment.due_at),
 					end: new Date(assignment.due_at),
 					course: assignment.context_name,
+					courseID: assignment.course_id,
 					id: 0 // set id to 0 for Canvas assignments
 				}));
 				resolve(canvasAssignments);
@@ -208,6 +237,7 @@ const getUserEvents = async () => {
 					allDay: event.allDay,
 					description: event.desc,
 					location: event.location,
+					eventType: "userEvents",
 					id: 1 // set id to 1 for user created events
 				}))
 				resolve(userCalendarEvents);

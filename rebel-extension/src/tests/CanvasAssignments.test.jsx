@@ -37,15 +37,15 @@ beforeAll(() => {
     const now = new Date();
     const fakeTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0);
     jest.useFakeTimers().setSystemTime(fakeTime); // ensure test is ran at same time every time
-  });
+});
 
-  afterAll(() => {
-    jest.useRealTimers();
-  })
-  
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+afterAll(() => {
+  jest.useRealTimers();
+})
+
+beforeEach(() => {
+  jest.clearAllMocks();
+});
 
 test("Valid fetch but no assignments returned", async () => {
     global.chrome.storage.local.get.mockImplementation((key, callback) => { // mock chrome.storage as being empty
