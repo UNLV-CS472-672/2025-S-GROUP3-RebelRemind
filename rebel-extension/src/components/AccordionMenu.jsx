@@ -196,9 +196,12 @@ function AccordionMenu() {
 
                     {index === 0 && <CanvasAssignments viewMode={viewMode} />}
                     {index === 1 && <Events events={[...filteredIC, ...normalizedUserEvents]} viewMode={viewMode} setActiveEventPopup={setActiveEventPopup} />}
-                    {index === 2 && <Events events={[ ...(filteredUC || []),...(filteredAC || []),...(filteredRC || [])
-]} viewMode={viewMode} />
-}
+                    {index === 2 && <Events events={[
+                      ...(Array.isArray(filteredUC) ? filteredUC : []),
+                      ...(Array.isArray(filteredAC) ? filteredAC : []),
+                      ...(Array.isArray(filteredRC) ? filteredRC : [])
+                    ]} viewMode={viewMode} />}
+
                   </Accordion.Body>
                 </Accordion.Item>
               );
