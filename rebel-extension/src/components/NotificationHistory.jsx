@@ -37,7 +37,6 @@
  */
 import React, { useEffect, useState } from "react";
 import Accordion from "react-bootstrap/Accordion";
-import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from "./css/Toast.module.css";
 import Events from "../components/Events";
 import "./css/NotificationHistory.css";
