@@ -281,15 +281,4 @@
   .back-button-spacer {
     height: 32px; /* or however much vertical push you want */
   }
-
-  .user-events-page {
-    height: 100vh;
-    overflow-y: auto;
-    scrollbar-width: none; /* firefox */
-  }
-  
-  /* hide for chrome/safari */
-  .user-events-page::-webkit-scrollbar {
-    display: none;
-  }
   

@@ -129,7 +129,6 @@ Residual CSS from obselete library, keeping for backtracking/testing, remove lat
 
 
 html, body {
-  height: 100%;
   overflow-y: scroll;
   scrollbar-width: none;          /* for Firefox */
   overflow-x: hidden;             /* optional: prevent sideways scroll */
@@ -137,5 +136,5 @@ html, body {
 
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
-  display: none;                  /* for Chrome, Safari */
+display: none;                  /* for Chrome, Safari */
 }
