@@ -14,7 +14,12 @@ function UserEventsPage() {
 
   return (
     <>
-      <button className="mb-4" onClick={() => navigate("/")}> ⬅️ </button>
+      <div className="back-button-container">
+        <button className="back-button" onClick={() => navigate("/")}>⇦</button>
+      </div>
+
+      <div className="back-button-spacer" />  
+
       <UserEvent />
       <UserEventList />
     </>
