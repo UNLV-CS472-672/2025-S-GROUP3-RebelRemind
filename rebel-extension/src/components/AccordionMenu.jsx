@@ -74,7 +74,7 @@ function AccordionMenu() {
 
 /***  LOAD EVENTS and FILTER ***/
 
-  const today = new Date().toLocaleDateString('en-CA');
+  // const today = new Date().toLocaleDateString('en-CA');
   useEffect(() => {
     const loadEvents = async () => {
       const [newFilteredAC, newFilteredIC, newFilteredRC, newFilteredUC] = await filterEvents(today, viewMode);
