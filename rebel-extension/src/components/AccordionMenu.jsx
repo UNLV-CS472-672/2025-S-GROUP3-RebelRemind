@@ -39,10 +39,11 @@ import Toggle from "./Toggle";
  * @returns {JSX.Element} The AccordionMenu component UI.
  */
 function AccordionMenu() {
-  const [ac_events, setACEvents] = useState([]);
-  const [ic_events, setICEvents] = useState([]);
-  const [rc_events, setRCEvents] = useState([]);
-  const [uc_events, setUCEvents] = useState([]);
+  const [filteredAC, setFilteredAcEvents] = useState([]);
+  const [filteredIC, setFilteredIcEvents] = useState([]);
+  const [filteredRC, setFilteredRcEvents] = useState([]);
+  const [filteredUC, setFilteredUcEvents] = useState([]);
+
   const [user_events, setUserEvents] = useState([]);
   const [normalizedUserEvents, setNormUserEvents] = useState([]);
   const [activeEventPopup, setActiveEventPopup] = useState(null);
@@ -61,48 +62,32 @@ function AccordionMenu() {
     chrome.storage.sync.set({ viewMode });
   }, [viewMode]);
 
-/***  LOAD EVENTS  ***/
+/***  LOAD EVENTS and FILTER ***/
 
   const today = new Date().toLocaleDateString('en-CA');
   useEffect(() => {
     const loadEvents = async () => {
-      const [data1, data2, data3, data4] = await fetchEvents(today, viewMode);
+      const [newFilteredAC, newFilteredIC, newFilteredRC, newFilteredUC] = await filterEvents(today, viewMode);
+      
+      setFilteredAcEvents(newFilteredAC);
+      setFilteredIcEvents(newFilteredIC);
+      setFilteredRcEvents(newFilteredRC);
+      setFilteredUcEvents(newFilteredUC);
 
-      if (data1 && !data1.message) setACEvents(data1);
-      if (data2 && !data2.message) setICEvents(data2);
-      if (data3 && !data3.message) setRCEvents(data3);
-      if (data4 && !data4.message) setUCEvents(data4);
+      chrome.storage.local.set({
+        filteredAC: newFilteredAC,
+        filteredIC: newFilteredIC,
+        filteredRC: newFilteredRC,
+        filteredUC: newFilteredUC,
+      });
     };
+      
 
     loadEvents();
   }, [viewMode, today]);
 
-/***  END LOAD EVENTS  ***/
+/***  END LOAD and FILTER EVENTS  ***/
 
-/***  FILTER EVENTS  ***/
-
-useEffect(() => {
-  const filtEvents = async () => {
-    const [filteredIC, filteredRC, filteredUC] = await filterEvents(ic_events, rc_events, uc_events);
-
-    if (filteredIC && !filteredIC.message) {
-      setICEvents(filteredIC);
-      chrome.storage.local.set({ filteredIC }); // save to Chrome storage for notifications
-    }
-
-    if (filteredRC && !filteredRC.message) {
-      setRCEvents(filteredRC);
-      chrome.storage.local.set({ filteredRC });
-    }
-
-    if (filteredUC && !filteredUC.message) {
-      setUCEvents(filteredUC);
-      chrome.storage.local.set({ filteredUC });
-    }
-  };
-
-  filtEvents();
-}, [ic_events, rc_events, uc_events]); // run only when these change
 
 /***  USER EVENTS  ***/
 
@@ -111,34 +96,10 @@ useEffect(() => {
       return unsubscribe;
     }, []);
 
-    // filter User Events by daily or weekly
-    function filterUserEvents(events, viewMode) {
-      const today = new Date();
-      const todayStr = today.toISOString().split('T')[0]; // 'YYYY-MM-DD'
-    
-      const weekDates = [];
-      for (let i = 0; i < 7; i++) {
-        const tempDate = new Date(today);
-        tempDate.setDate(today.getDate() + i);
-        weekDates.push(tempDate.toISOString().split('T')[0]);
-      }
-    
-      return events.filter(event => {
-        if (viewMode === "daily") {
-          return event.date === todayStr;
-        } else if (viewMode === "weekly") {
-          return weekDates.includes(event.date);
-        }
-        return false;
-      });
-    }    
-
     useEffect(() => {
-      const normalized = normalizeUserEvents(user_events);
-      const filtered = filterUserEvents(normalized, viewMode);
-      setNormUserEvents(filtered);
-    }, [user_events, viewMode]);
-    
+      setNormUserEvents(normalizeUserEvents(user_events));
+    }, [user_events]);
+
     // if user event is clicked
     useEffect(() => {
       const handleClickOutside = (e) => {
@@ -234,8 +195,13 @@ useEffect(() => {
                   >
 
                     {index === 0 && <CanvasAssignments viewMode={viewMode} />}
-                    {index === 1 && <Events events={[...ic_events, ...normalizedUserEvents]} viewMode={viewMode} setActiveEventPopup={setActiveEventPopup} />}
-                    {index === 2 && <Events events={[...uc_events, ...ac_events, ...rc_events]} viewMode={viewMode} />}
+                    {index === 1 && <Events events={[...filteredIC, ...normalizedUserEvents]} viewMode={viewMode} setActiveEventPopup={setActiveEventPopup} />}
+                    {index === 2 && <Events events={[
+                      ...(Array.isArray(filteredUC) ? filteredUC : []),
+                      ...(Array.isArray(filteredAC) ? filteredAC : []),
+                      ...(Array.isArray(filteredRC) ? filteredRC : [])
+                    ]} viewMode={viewMode} />}
+
                   </Accordion.Body>
                 </Accordion.Item>
               );

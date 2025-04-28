@@ -191,7 +191,7 @@ describe("SettingsPage", () => {
 
   it("navigates back to home when back button is clicked", () => {
     renderWithRouter(<SettingsPage />);
-    fireEvent.click(screen.getByRole("button", { name: /⬅️/i }));
+    fireEvent.click(screen.getByRole("button", { name: /⇐/i }));
     expect(mockNavigate).toHaveBeenCalledWith("/");
   });
 });
