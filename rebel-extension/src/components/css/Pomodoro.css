@@ -47,6 +47,22 @@
     transform: scale(1.02); /* Slight zoom-in effect */
   }
   
+  .pomodoro-page-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding-top: 20px;
+  }
+  
+  .pomodoro-center {
+    margin-top: 50px; /* offset from the back button */
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+  
   .input-group {
     display: flex;
     align-items: center;

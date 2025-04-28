@@ -8,10 +8,15 @@ function HomePage() {
   const navigate = useNavigate();
 
   return (
-    <>
-    <button onClick={() => navigate("/")}> ⬅️ </button>
-    <Pomodoro />
-  </>
+    <div className="pomodoro-page-wrapper">
+      <div className="back-button-container">
+        <button className="back-button" onClick={() => navigate("/")}>⇦</button>
+      </div>
+
+      <div className="pomodoro-center">
+        <Pomodoro />
+      </div>
+    </div>
   );
 }
 
