@@ -289,8 +289,9 @@ const Preferences = ({ setupMode = false }) => {
                         <NotificationToggle
                             enabled={notifications}
                             setEnabled={setNotifications}
+                            style={{ marginBottom: '1rem' }}
                         />
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1rem',  paddingTop: '1rem'}}>
                             {/* Left column preferences */}
                                
                             <div style={{ display: 'flex', flexDirection: 'column', rowGap: '1rem' }}>
