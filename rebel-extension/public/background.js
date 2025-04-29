@@ -16,6 +16,7 @@ import { getAssignments, getCourses, getCanvasPAT } from "./scripts/canvas-scrip
 import { openSidePanel } from "./scripts/sidepanel.js";
 import { fetchEvents } from "./scripts/fetch-events.js";
 import { checkDailyTask } from "./scripts/check-daily-login.js";
+import { getGoogleToken, checkCalendarExists, getOrCreateCalendar, getCalendarID, gatherEvents, syncCalendar, testCreateEvent } from "./scripts/GoogleCalendar.js";
 
 
 /**
@@ -23,7 +24,7 @@ import { checkDailyTask } from "./scripts/check-daily-login.js";
 */
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name == "getAssignments") { // alarm is triggered, update storage with new assignments
-    fetchCanvasAssignments();
+    updateAssignments();
   }
 });
 
@@ -324,7 +325,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     * Updates the Canvas assignments list that is in storage.
     */
     case "UPDATE_ASSIGNMENTS":
-      fetchCanvasAssignments();
+      updateAssignments();
       break;
 
     /**
@@ -388,6 +389,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
      * Reloads the calendar in side panel to reflect created event.
      */
     case "EVENT_CREATED":
+      chrome.storage.sync.get("preferences", (data) => {
+        if (data.preferences.googleCalendar) {
+            updateGoogleCalendar();
+        }
+      });
       chrome.runtime.sendMessage({ type: "EVENT_CREATED" }); // broadcast
       break;
 
@@ -395,11 +401,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     * Reloads the calendar in side panel to reflect updated event.
     */
     case "EVENT_UPDATED":
+      chrome.storage.sync.get("preferences", (data) => {
+        if (data.preferences.googleCalendar) {
+            updateGoogleCalendar();
+        }
+      });
       chrome.runtime.sendMessage({ type: "EVENT_UPDATED" }, (response) => {
         if (chrome.runtime.lastError) {
           // handle receiving end does not exist error
         }
       });
+      break;
+
+    /**
+    * Reloads the Google Calendar with updated data.
+    */
+    case "UPDATE_GOOGLE_CALENDAR":
+      updateGoogleCalendar();
       break;
 
     /**
@@ -426,50 +444,141 @@ chrome.runtime.onInstalled.addListener(() => {
 */
 async function fetchCanvasAssignments() {
   console.log("Fetching Assignments");
-  let allAssignments = [];
+
+  const accessToken = await getCanvasPAT();
+  if (!accessToken) {
+    console.log("No access token found.");
+    return false;
+  }
+
+  try {
+    const courseList = await getCourses(accessToken);
+
+    const assignments = await Promise.all(
+      courseList.map(course => getAssignments(course, accessToken))
+    );
+
+    const allAssignments = assignments.flat();
+    const fetchStatus = { success: true, error: null }; // fetching had no errors
+
+    await new Promise((resolve) => {
+      chrome.storage.local.set({ Canvas_Assignments: allAssignments }, () => {
+        console.log("Assignments Stored!");
+        resolve();
+      });
+    });
+
+    chrome.storage.local.set({ CanvasFetchStatus: fetchStatus });
+    chrome.runtime.sendMessage({ type: "UPDATE_ASSIGNMENTS" }, (response) => {
+      if (chrome.runtime.lastError) {
+        // handle receiving end does not exist error (when popup is closed)
+      }
+    });
+    return true;
+
+  } catch(error) {
+    console.log("Error fetching assignments", error);
+    return false;
+  }
   
-  // Await access token before continuing
-  getCanvasPAT().then((accessToken) => {
-    if (!accessToken) {
-      console.log("No access token found.");
+  // // Await access token before continuing
+  // getCanvasPAT().then((accessToken) => {
+  //   if (!accessToken) {
+  //     console.log("No access token found.");
+  //     return false;
+  //   }
+
+  //   getCourses(accessToken).then((courseList) => {
+  //     // Loop through the courses and fetch assignments
+  //     const assignmentPromises = courseList.map((course) =>
+  //       getAssignments(course, accessToken)
+  //     );
+      
+  //     // Wait for all assignments to be fetched
+  //     Promise.all(assignmentPromises)
+  //       .then((assignments) => {
+  //         // Flatten the array
+  //         allAssignments = assignments.flat();
+  //         const fetchStatus = { success: true, error: null }; // fetching had no errors
+  //         await new Promise((resolve) => {
+  //           chrome.storage.local.set({ Canvas_Assignments: allAssignments }, () => {
+  //             console.log("Assignments Stored!");
+  //             resolve();
+  //           });
+  //         });
+  //         chrome.storage.local.set({ CanvasFetchStatus: fetchStatus });
+  //         chrome.runtime.sendMessage({ type: "UPDATE_ASSIGNMENTS" }, (response) => {
+  //           if (chrome.runtime.lastError) {
+  //             // handle receiving end does not exist error (when popup is closed)
+  //           }
+  //         });
+  //         return true;
+  //       })
+  //       .catch((error) => { // error is logged instead of sending error to Chrome
+  //         console.log("Error fetching assignments", error);
+  //         return false;
+  //       });
+  //   }).catch((error) => {
+  //     console.log("Error with getCourses()", error);
+  //     return false;
+  //   });
+  // }).catch((error) => {
+  //   console.log("Error fetching access token", error);
+  //   return false;
+  // });
+}
+
+async function updateGoogleCalendar() {
+  console.log("UPDATING CALENDAR");
+  getGoogleToken().then((GoogleToken) => {
+    if (!GoogleToken) {
+      console.log("No chrome identity token found.");
       return false;
     }
 
-    getCourses(accessToken).then((courseList) => {
-      // Loop through the courses and fetch assignments
-      const assignmentPromises = courseList.map((course) =>
-        getAssignments(course, accessToken)
-      );
-      
-      // Wait for all assignments to be fetched
-      Promise.all(assignmentPromises)
-        .then((assignments) => {
-          // Flatten the array
-          allAssignments = assignments.flat();
-          const fetchStatus = { success: true, error: null }; // fetching had no errors
-          chrome.storage.local.set({ Canvas_Assignments: allAssignments }, () => {
-            console.log("Assignments Stored!");
-          });
-          chrome.storage.local.set({ CanvasFetchStatus: fetchStatus });
-          chrome.runtime.sendMessage({ type: "UPDATE_ASSIGNMENTS" }, (response) => {
-            if (chrome.runtime.lastError) {
-              // handle receiving end does not exist error (when popup is closed)
-            }
-          });
-          return true;
+    getCalendarID().then((storedCalendarID) => {
+      if (!storedCalendarID) {
+        getOrCreateCalendar(GoogleToken).then((newCalendarID) => {
+          // do work with newcalendar
+          gatherEvents().then((eventList) => {
+            syncCalendar(eventList, GoogleToken, storedCalendarID);
+            // testCreateEvent(GoogleToken, newCalendarID);
+          })
         })
-        .catch((error) => { // error is logged instead of sending error to Chrome
-          console.log("Error fetching assignments", error);
-          return false;
-        });
-    }).catch((error) => {
-      console.log("Error with getCourses()", error);
-      return false;
-    });
-  }).catch((error) => {
-    console.log("Error fetching access token", error);
-    return false;
+      }
+      else {
+        checkCalendarExists(GoogleToken, storedCalendarID).then((result) => {
+          if (!result) {
+            getOrCreateCalendar(GoogleToken).then((newCalendarID) => {
+              // do work with newcalendar
+              gatherEvents().then((eventList) => {
+                syncCalendar(eventList, GoogleToken, newCalendarID);
+                // testCreateEvent(GoogleToken, newCalendarID);
+              })
+            })
+          }
+          else {
+            // do work with storedcalendar
+            gatherEvents().then((eventList) => {
+              syncCalendar(eventList, GoogleToken, storedCalendarID);
+              // testCreateEvent(GoogleToken, storedCalendarID);
+            })
+          }
+        })
+      }
+    })
   });
+}
+
+async function updateAssignments() {
+  const success = await fetchCanvasAssignments();
+  if (success) {
+    chrome.storage.sync.get("preferences", (data) => {
+      if (data.preferences.googleCalendar) {
+        updateGoogleCalendar();
+      }
+    });
+  }
 }
 //endregion
 
