@@ -50,20 +50,10 @@ function AccordionMenu() {
   const popupRef = useRef(null);
 
   const [viewMode, setViewMode] = useState("daily");
-  const [preferences, setPreferences] = useState({ RebelCoverage: false });
-
-  const today = new Date().toLocaleDateString('en-CA');
-  // save state 
   useEffect(() => {
-    chrome.storage.sync.get(["viewMode", "preferences"], (result) => {
+    chrome.storage.sync.get("viewMode", (result) => {
       if (result.viewMode) {
         setViewMode(result.viewMode); // save state of viewMode
-      }
-      if (result.preferences){
-        setPreferences(result.preferences);
-      }
-      if (result.preferences){
-        setPreferences(result.preferences);
       }
     });
   }, []);
@@ -74,7 +64,7 @@ function AccordionMenu() {
 
 /***  LOAD EVENTS and FILTER ***/
 
-  // const today = new Date().toLocaleDateString('en-CA');
+  const today = new Date().toLocaleDateString('en-CA');
   useEffect(() => {
     const loadEvents = async () => {
       const [newFilteredAC, newFilteredIC, newFilteredRC, newFilteredUC] = await filterEvents(today, viewMode);
