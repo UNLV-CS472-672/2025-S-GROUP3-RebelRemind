@@ -134,13 +134,13 @@ async function handleDailyTask(isStartup = false) {
       const todayForFetching = now.toLocaleDateString('en-CA')
       const filterToday = (arr) =>
         safeArray(arr).filter(event => {
-          if (!event.date || !event.time) return false;
+          if (!event.startDate || !event.startTime) return false;
 
-          const isAllDay = event.time === "(ALL DAY)";
-          if (event.date !== todayForFetching) return false;
+          const isAllDay = event.startTime === "(ALL DAY)";
+          if (event.startDate !== todayForFetching) return false;
           if (isAllDay) return true;
           
-          const dateTime = new Date(`${event.date} ${event.time}`); 
+          const dateTime = new Date(`${event.startDate} ${event.startTime}`); 
           return dateTime > now;
         });
       const filterTodayCanvas = (arr) =>
@@ -212,7 +212,7 @@ async function handleDailyTask(isStartup = false) {
     //schema 
       const notificationData = {
         id: Date.now().toString(),
-        date: todayForFetching,
+        startDate: todayForFetching,
         summary: dynamicTitle,
         events: [
           ...filterToday(data1).map(e => ({ ...e, source: "Academic" })),

@@ -56,7 +56,7 @@ function UserEventPopup({ event, onClose, popupRef }) {
         >
             <h5 style={{ marginTop: 0, marginBottom: "0.5rem" }}>📝 Your Event</h5>
             <p><strong>Title:</strong> {event.name || "N/A"}</p>
-            <p><strong>Date:</strong> {formatDate(event.date) || "N/A"}</p>
+            <p><strong>Date:</strong> {formatDate(event.startDate) || "N/A"}</p>
             <p><strong>Time:</strong> {event.allDay
                 ? "All-day"
                 : `${formatTime(event.startTime)} - ${formatTime(event.endTime)}`}</p>
