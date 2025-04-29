@@ -63,15 +63,10 @@ function createFloatingWidget() {
     updateTimerDisplay();
   }
   
-  // 🧠 Only create the widget if the timer is running
-  chrome.storage.local.get("isRunning", ({ isRunning }) => {
-    console.log("[Widget] Checked isRunning:", isRunning);
-  
-    if (isRunning) {
-      console.log("[Widget] Timer is running — injecting widget ✅");
-      createFloatingWidget();
-    } else {
-      console.log("[Widget] Timer is NOT running — no widget.");
-    }
-  });
+// Only create the widget if the timer is running
+chrome.storage.local.get("isRunning", ({ isRunning }) => {
+  if (isRunning) {
+    createFloatingWidget();
+  }
+});
   

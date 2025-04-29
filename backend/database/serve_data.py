@@ -17,7 +17,7 @@ db = SQLAlchemy(app)
 
 def format_time(base_time):
     if not base_time:
-        return None
+        return ""
     formatted_time = ""
     colon_pos = 0
     am_pm_pos = 0
