@@ -1,4 +1,5 @@
 import './css/Events.css';
+import addcalendarIcon from "../assets/addcalendarIcon.png";
 
 function Events({ events, viewMode, setActiveEventPopup }) {
   if (!events || events.length === 0) {
@@ -9,6 +10,19 @@ function Events({ events, viewMode, setActiveEventPopup }) {
     const bDate = new Date(`${b.startDate} ${b.startTime}`);
     return aDate - bDate; // soonest to latest
   });
+  
+  const handleAddEvent = (event) => {  
+        chrome.storage.local.get("UNLVEvents", (data) => {
+            const existing = Array.isArray(data["UNLVEvents"]) ? data["UNLVEvents"] : [];
+            const updatedEvents = [...existing, event];
+
+            chrome.storage.local.set({ "UNLVEvents": updatedEvents }, () => {
+                alert("Event saved to calendar.");
+
+                chrome.runtime.sendMessage({ type: "EVENT_UPDATED" });
+            });
+        });
+   };
 
   if (viewMode === "weekly") {
     const grouped = {};
@@ -23,7 +37,7 @@ function Events({ events, viewMode, setActiveEventPopup }) {
     const weekdayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const todayIndex = new Date().getDay();
     const orderedWeekdays = [...weekdayNames.slice(todayIndex), ...weekdayNames.slice(0, todayIndex)];
-
+      
     return orderedWeekdays
       .filter(day => grouped[day])
       .map(day => (
@@ -33,7 +47,7 @@ function Events({ events, viewMode, setActiveEventPopup }) {
           <ul className={`event-list ${viewMode === 'daily' ? 'event-list-daily' : ''}`}>
             {grouped[day].map(event => (
               <li key={event.id} className="event-item">
-                {event.link === "customEvent" ? ( // Custom Events
+              {event.link === "customEvent" ? ( // Custom Events
                   <>
                     <a
                       className="event-link"
@@ -53,7 +67,7 @@ function Events({ events, viewMode, setActiveEventPopup }) {
                       <span className="event-time">{event.startTime}</span>
                     </a>
                   </>
-                ) : (
+                ) : (<>
                   <a
                     href={event.link}
                     target="_blank"
@@ -67,8 +81,17 @@ function Events({ events, viewMode, setActiveEventPopup }) {
                       </span>
                       {event.name}
                     </span>
-                    <span className="event-time">{event.startTime}</span>
-                  </a>
+                    </a>
+                    <span className="event-time">{event.startTime}
+                    <div>
+		              <button style={{background: 'transparent', paddingRight: '0px', paddingTop: '0px'}} 
+		              		onClick={() => handleAddEvent(event)}
+		              		aria-label="add to calendar">
+		              	<img src={addcalendarIcon} height="25px" width="25px" />
+		              </button>
+		              </div>
+                    </span>               
+                </>
                 )}
               </li>
 
@@ -77,12 +100,12 @@ function Events({ events, viewMode, setActiveEventPopup }) {
         </div>
       ));
   }
-
+  
   return (
     <ul className={`event-list ${viewMode === 'daily' ? 'event-list-daily' : ''}`}>
       {sortedEvents.map(event => (
         <li key={event.id} className="event-item">
-          {event.link === "customEvent" ? ( // Custom Events
+        {event.link === "customEvent" ? ( // Custom Events
             <>
               <a
                 className="event-link"
@@ -102,7 +125,7 @@ function Events({ events, viewMode, setActiveEventPopup }) {
                 <span className="event-time">{event.startTime}</span>
               </a>
             </>
-          ) : (
+          ) : (<>
             <a
               href={event.link}
               target="_blank"
@@ -116,8 +139,17 @@ function Events({ events, viewMode, setActiveEventPopup }) {
                 </span>
                 {event.name}
               </span>
-              <span className="event-time">{event.startTime}</span>
-            </a>
+              </a>
+              <span className="event-time">{event.startTime}
+              <div>
+		            <button style={{background: 'transparent', paddingRight: '0px', paddingTop: '0px'}} 
+		              	onClick={() => handleAddEvent(event)}
+		              	aria-label="add to calendar">
+		              <img src={addcalendarIcon} height="25px" width="25px" />
+		            </button>
+		         </div>
+              </span>
+            </>
           )}
         </li>
       ))}

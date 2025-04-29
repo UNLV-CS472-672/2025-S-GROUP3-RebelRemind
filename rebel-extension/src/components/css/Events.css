@@ -34,10 +34,10 @@
     list-style-type: disc;
     font-size: 16px;
     font-family: "Lato", "Helvetica", "Arial", sans-serif;
-    color: #212529;    
-    :hover {
-        color: #1f1f1f88 !important ;
-    }
+    color: #212529;
+    display: flex;
+    justify-content: space-between; 
+    
   }
   
   .event-link {
@@ -48,13 +48,16 @@
     flex-wrap: wrap;
     text-decoration: none;       
     color: inherit;
-
+	:hover {
+        color: #1f1f1f88 !important ;
+    }
   }
   
   .event-name {
     flex: 1;
     white-space: normal;
     word-break: break-word;
+    width: 240px;
   }
   
   .event-org {
