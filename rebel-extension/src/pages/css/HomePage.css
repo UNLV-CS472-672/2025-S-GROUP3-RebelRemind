@@ -148,6 +148,19 @@
   transition: height 0.3s ease;
 }
 
+.accordion-button {
+  --bs-accordion-btn-color: black;
+  --bs-accordion-btn-bg: gray;
+  --bs-accordion-btn-bg: lightgray;
+  --bs-accordion-active-color: black;
+  --bs-accordion-active-bg: lightgray;
+}
+
+.accordion-button:hover {
+  background: rgba(0, 0, 0, 0.28) !important; /* like --containerbg */
+  color: #fff !important;
+}
+
 .accordion-header {
   flex-shrink: 0;
   font-weight: bold;
