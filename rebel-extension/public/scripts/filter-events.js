@@ -13,8 +13,9 @@ export async function filterEvents(today, viewMode) {
       const filteredAC = preferences.academicCalendar ? ac : [];
       const filteredIC = preferences.involvementCenter ? ic : [];
       const filteredRC = preferences.rebelCoverage
-        ? rc.filter((e) => selectedSports.includes(e.sport))
-        : [];
+      ? Array.isArray(rc) ? rc.filter((e) => selectedSports.includes(e.sport))
+      : []
+      : [];
       const filteredUC = preferences.UNLVCalendar
         ? uc.filter((e) => selectedInterests.includes(e.category))
         : [];
