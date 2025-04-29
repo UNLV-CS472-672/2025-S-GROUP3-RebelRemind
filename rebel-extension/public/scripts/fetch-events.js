@@ -62,7 +62,7 @@ export function normalizeUserEvents(userEvents) {
     name: event.title || "Untitled Event",
     organization: "Your Event",
     time: event.allDay ? "(ALL DAY)" : formatTime(event.startTime),
-    date: event.date,
+    startDate: event.startDate,
     link: "customEvent",
 
     // Full metadata for popup

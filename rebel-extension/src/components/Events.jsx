@@ -6,8 +6,8 @@ function Events({ events, viewMode, setActiveEventPopup }) {
     return <div className="no-events"> No events found for this view.</div>;
   }
   const sortedEvents = [...events].sort((a, b) => {
-    const aDate = new Date(`${a.date} ${a.time}`);
-    const bDate = new Date(`${b.date} ${b.time}`);
+    const aDate = new Date(`${a.startDate} ${a.startTime}`);
+    const bDate = new Date(`${b.startDate} ${b.startTime}`);
     return aDate - bDate; // soonest to latest
   });
   
@@ -27,7 +27,7 @@ function Events({ events, viewMode, setActiveEventPopup }) {
   if (viewMode === "weekly") {
     const grouped = {};
     sortedEvents.forEach(event => {
-      const [year, month, day] = event.date.split('-');
+      const [year, month, day] = event.startDate.split('-');
       const date = new Date(year, month - 1, day);
       const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
       if (!grouped[weekday]) grouped[weekday] = [];
@@ -64,7 +64,7 @@ function Events({ events, viewMode, setActiveEventPopup }) {
                         </span>
                         {event.name}
                       </span>
-                      <span className="event-time">{event.time}</span>
+                      <span className="event-time">{event.startTime}</span>
                     </a>
                   </>
                 ) : (<>
@@ -82,7 +82,7 @@ function Events({ events, viewMode, setActiveEventPopup }) {
                       {event.name}
                     </span>
                     </a>
-                    <span className="event-time">{event.time}
+                    <span className="event-time">{event.startTime}
                     <div>
 		              <button style={{background: 'transparent', paddingRight: '0px', paddingTop: '0px'}} 
 		              		onClick={() => handleAddEvent(event)}
@@ -122,7 +122,7 @@ function Events({ events, viewMode, setActiveEventPopup }) {
                   </span>
                   {event.name}
                 </span>
-                <span className="event-time">{event.time}</span>
+                <span className="event-time">{event.startTime}</span>
               </a>
             </>
           ) : (<>
@@ -140,7 +140,7 @@ function Events({ events, viewMode, setActiveEventPopup }) {
                 {event.name}
               </span>
               </a>
-              <span className="event-time">{event.time}
+              <span className="event-time">{event.startTime}
               <div>
 		            <button style={{background: 'transparent', paddingRight: '0px', paddingTop: '0px'}} 
 		              	onClick={() => handleAddEvent(event)}

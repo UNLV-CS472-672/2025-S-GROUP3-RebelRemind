@@ -16,7 +16,7 @@
  * - Requires "notificationHistory" to be an array of entries structured as:
  *   {
  *     id: string;
- *     date: string;
+ *     startDate: string;
  *     summary: string;
  *     events: Array<{
  *       source: string;
@@ -71,7 +71,7 @@ const NotificationHistory = () => {
             <ul className={styles.ps3}>
               {entry.events.map((event, i) => (
                 <li key={i}>
-                  <strong>{event.source}:</strong> {event.name || event.title} — {event.time}
+                  <strong>{event.source}:</strong> {event.name || event.title} — {event.startTime}
                   {event.link && (
                     <a
                       href={event.link}
