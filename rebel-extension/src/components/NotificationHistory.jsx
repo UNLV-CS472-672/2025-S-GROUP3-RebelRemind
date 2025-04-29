@@ -58,19 +58,20 @@ const NotificationHistory = () => {
     return <p>No notifications yet</p>;
   }
 
+  console.log(history);
+
   return (
     <ShadowDOM.div>
+      <EventsStyle/>
       <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       />
-      <link rel="stylesheet" href="../src/components/css/Events.css" />
-      <EventsStyle/>
     <Accordion defaultActiveKey="0">
       {history.map((entry, idx) => (
         <Accordion.Item eventKey={idx.toString()} key={entry.id} >
           <Accordion.Header >
-            📅 {entry.date} — {entry.summary}
+            📅 {entry.startDate} — {entry.summary}
           </Accordion.Header>
           <Accordion.Body>
             {entry.events && entry.events.length > 0 ? (
