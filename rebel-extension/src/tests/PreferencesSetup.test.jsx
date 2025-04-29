@@ -69,4 +69,43 @@ describe('PreferencesSetup Page', () => {
         fireEvent.click(screen.getByText(/Finish Setup/i));
         expect(screen.getByText(/Get Started Page/)).toBeInTheDocument();
       });      
+
+      test('displays a thank you for notifications being enabled', () => {
+        useAuth.mockReturnValue(true);
+      
+        // Mock chrome.storage.sync.get to return notificationsEnabled: true
+        global.chrome.storage.sync.get = jest.fn((key, callback) => {
+          callback({ notificationsEnabled: true });
+        });
+      
+        render(
+          <MemoryRouter initialEntries={['/setup-preferences']}>
+            <Routes>
+              <Route path="/setup-preferences" element={<PreferencesSetup />} />
+            </Routes>
+          </MemoryRouter>
+        );
+      
+        expect(screen.getByText(/Thanks for enabling notifications!/i)).toBeInTheDocument();
+      });
+
+      test('displays a message that notifications will not be sent', () => {
+        useAuth.mockReturnValue(true);
+      
+        // Mock chrome.storage.sync.get to return notificationsEnabled: true
+        global.chrome.storage.sync.get = jest.fn((key, callback) => {
+          callback({ notificationsEnabled: false });
+        });
+      
+        render(
+          <MemoryRouter initialEntries={['/setup-preferences']}>
+            <Routes>
+              <Route path="/setup-preferences" element={<PreferencesSetup />} />
+            </Routes>
+          </MemoryRouter>
+        );
+      
+        expect(screen.getByText(/No notifications... No problem!/i)).toBeInTheDocument();
+        expect(screen.getByText(/We still will keep your RebelRemind up to date with upcoming events, but won't push any notifications./i)).toBeInTheDocument();
+      });
 });

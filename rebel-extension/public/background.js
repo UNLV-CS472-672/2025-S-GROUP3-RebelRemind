@@ -64,7 +64,7 @@ function getNextNineAM() {
 
 // Initialize from storage on extension startup
 
-chrome.runtime.onInstalled.addListener(() => {
+export function alarmInstall() {
   console.log("Extension installed: Create alarm");
 
   chrome.alarms.create("dailyCheck", {
@@ -72,10 +72,11 @@ chrome.runtime.onInstalled.addListener(() => {
     periodInMinutes: 1440 //24 hours
     // periodInMinutes: 1 //24 hours
   });
-});
+}
 
+chrome.runtime.onInstalled.addListener(alarmInstall);
 
-chrome.storage.onChanged.addListener((changes, areaName) => {
+export function storageListener(changes, areaName){
   if (areaName === "sync" && changes.notificationsEnabled){
     // Utility to calculate the next 9:00 AM time
     notificationState = changes.notificationsEnabled.newValue;
@@ -106,21 +107,22 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
       })
     }
   }
-});
+}
 
+chrome.storage.onChanged.addListener(storageListener);
 
-// Run logic when Chrome starts (fallback if alarm missed)
-chrome.runtime.onStartup.addListener(() => {
+export function chromeStartUpLisener(){
   const currentHour = new Date().getHours();
   console.log("Chrome started at", currentHour);
   if (currentHour >= 9 && notificationState) {
     console.log("Notify from chrome startup")
     handleDailyTask(true); // after 9am is true
   }
-});
+}
+// Run logic when Chrome starts (fallback if alarm missed)
+chrome.runtime.onStartup.addListener(chromeStartUpLisener);
 
-// Respond to the daily alarm
-chrome.alarms.onAlarm.addListener((alarm) => {
+export function dailyAlarmListener(alarm){
   if (alarm.name === "dailyCheck") {
     if (notificationState){
       console.log("Notify daily 9am")
@@ -137,10 +139,14 @@ chrome.alarms.onAlarm.addListener((alarm) => {
       })
     }
   }
-});
+}
+
+// Respond to the daily alarm
+chrome.alarms.onAlarm.addListener(dailyAlarmListener);
+ 
 
 // Core function to handle daily task logic
-async function handleDailyTask(isStartup = false) {
+export async function handleDailyTask(isStartup = false) {
   try {
     const shouldRun = await checkDailyTask();
     const currentHour = new Date().getHours();
