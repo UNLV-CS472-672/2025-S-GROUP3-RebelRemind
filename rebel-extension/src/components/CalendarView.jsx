@@ -203,8 +203,8 @@ const getUserEvents = async () => {
 				const userEvents = data.userEvents;
 				const userCalendarEvents = userEvents.map(event => ({
 					title: event.title,
-					start: event.allDay ? new Date (`${event.date}T00:00:00`) : new Date(`${event.date}T${event.startTime}:00`),
-					end: event.allDay ? new Date (`${event.date}T00:00:00`) : new Date(`${event.date}T${event.endTime}:00`),
+					start: event.allDay ? new Date (`${event.startDate}T00:00:00`) : new Date(`${event.startDate}T${event.startTime}:00`),
+					end: event.allDay ? new Date (`${event.startDate}T00:00:00`) : new Date(`${event.startDate}T${event.endTime}:00`),
 					allDay: event.allDay,
 					description: event.desc,
 					location: event.location,

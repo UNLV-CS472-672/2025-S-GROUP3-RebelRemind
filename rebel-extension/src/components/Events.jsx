@@ -50,7 +50,7 @@ function Events({ events, viewMode, setActiveEventPopup }) {
                         </span>
                         {event.name}
                       </span>
-                      <span className="event-time">{event.time}</span>
+                      <span className="event-time">{event.startTime}</span>
                     </a>
                   </>
                 ) : (
@@ -67,7 +67,7 @@ function Events({ events, viewMode, setActiveEventPopup }) {
                       </span>
                       {event.name}
                     </span>
-                    <span className="event-time">{event.time}</span>
+                    <span className="event-time">{event.startTime}</span>
                   </a>
                 )}
               </li>
@@ -99,7 +99,7 @@ function Events({ events, viewMode, setActiveEventPopup }) {
                   </span>
                   {event.name}
                 </span>
-                <span className="event-time">{event.time}</span>
+                <span className="event-time">{event.startTime}</span>
               </a>
             </>
           ) : (
@@ -116,7 +116,7 @@ function Events({ events, viewMode, setActiveEventPopup }) {
                 </span>
                 {event.name}
               </span>
-              <span className="event-time">{event.time}</span>
+              <span className="event-time">{event.startTime}</span>
             </a>
           )}
         </li>
