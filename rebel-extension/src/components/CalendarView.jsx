@@ -172,10 +172,11 @@ function CalendarMenu() {
 			else {
 				backgroundColor = colorList[event.eventType];
 			}
+			const textColor = getTextColor(backgroundColor);
 			return {
 				style: {
 					backgroundColor,
-					color: "black"
+					color: textColor
 				}
 			};
 		  }}
@@ -247,3 +248,17 @@ const getUserEvents = async () => {
 		});
 	})
 };
+
+/**
+ * Determine which text color to use based on background color of event.
+ */
+// ai-gen start (ChatGPT-4o, 0)
+function getTextColor(backgroundColor) {
+	const r = parseInt(backgroundColor.substring(1, 3), 16);
+	const g = parseInt(backgroundColor.substring(3, 5), 16);
+	const b = parseInt(backgroundColor.substring(5, 7), 16);
+
+	const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+	return brightness > 125 ? "black" : "white";
+}
+// ai-gen end
