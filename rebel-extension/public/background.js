@@ -274,7 +274,7 @@ async function handleDailyTask(isStartup = false) {
 }
 
 chrome.notifications.onClicked.addListener((notificationId) => {
-  if (notificationId === 'rebel-remind-daily') {  
+  if (notificationId === 'rebel-remind') {  
     chrome.tabs.create({
       url: chrome.runtime.getURL("welcome.html#/notifications")
     });
