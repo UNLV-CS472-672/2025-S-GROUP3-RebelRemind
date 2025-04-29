@@ -42,7 +42,16 @@ chrome.alarms.onAlarm.addListener((alarm) => {
  */
 
 //region notif
-// Utility to calculate the next 9:00 AM time
+let notificationState = false; // Default value
+chrome.storage.sync.get("notificationsEnabled", (data) => {
+  if (data && data.notificationsEnabled !== undefined) {
+    notificationState = data.notificationsEnabled;
+  } else {
+    notificationState = false;
+  }
+});
+
+
 function getNextNineAM() {
   const now = new Date();
   const next = new Date();
@@ -53,10 +62,10 @@ function getNextNineAM() {
   return next.getTime();
 }
 
-// Setup alarm on extension install
+// Initialize from storage on extension startup
+
 chrome.runtime.onInstalled.addListener(() => {
-  console.log("Extension installed: running first-time daily task");
-  handleDailyTask(true); // Run on install
+  console.log("Extension installed: Create alarm");
 
   chrome.alarms.create("dailyCheck", {
     when: getNextNineAM(),
@@ -65,11 +74,25 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === "sync" && changes.notificationsEnabled){
+    // Utility to calculate the next 9:00 AM time
+    notificationState = changes.notificationsEnabled.newValue;
+    if (notificationState){
+      console.log("Notify from changed preferences")
+      handleDailyTask();
+    }
+  }
+});
+
+
 // Run logic when Chrome starts (fallback if alarm missed)
 chrome.runtime.onStartup.addListener(() => {
   const currentHour = new Date().getHours();
   console.log("Chrome started at", currentHour);
   if (currentHour >= 9) {
+    console.log("Notify from chrome startup")
     handleDailyTask(true); // after 9am is true
   }
 });
@@ -77,6 +100,7 @@ chrome.runtime.onStartup.addListener(() => {
 // Respond to the daily alarm
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === "dailyCheck") {
+    console.log("Notify daily 9am")
     handleDailyTask();
   }
 });
@@ -104,20 +128,19 @@ async function handleDailyTask(isStartup = false) {
       };
       
       const assignmentList = await fetchAssignments();
-      console.log("Canvas Assignments:", assignmentList);
 
       //Constants do not touch
       const now = new Date();
       const todayForFetching = now.toLocaleDateString('en-CA')
       const filterToday = (arr) =>
         safeArray(arr).filter(event => {
-          if (!event.date || !event.time) return false;
+          if (!event.startDate || !event.startTime) return false;
 
-          const isAllDay = event.time === "(ALL DAY)";
-          if (event.date !== todayForFetching) return false;
+          const isAllDay = event.startTime === "(ALL DAY)";
+          if (event.startDate !== todayForFetching) return false;
           if (isAllDay) return true;
           
-          const dateTime = new Date(`${event.date} ${event.time}`); 
+          const dateTime = new Date(`${event.startDate} ${event.startTime}`); 
           return dateTime > now;
         });
       const filterTodayCanvas = (arr) =>
@@ -143,13 +166,9 @@ async function handleDailyTask(isStartup = false) {
       const canvas_daily = filterTodayCanvas(assignmentList).length;
 
       const allEvents = [...safeArray(data1), ...safeArray(data2), ...safeArray(data3), ...safeArray(data4)];
-      console.log(...safeArray(data1));
-      console.log(...safeArray(data2));
-      console.log(...safeArray(data3));
-      console.log(...safeArray(data4));
 
       const eventsToday = academiccalendar_daily + involvementcenter_daily + rebelcoverage_daily + unlvcalendar_daily + canvas_daily > 0;
-
+      console.log("Events today", eventsToday);
       const parts = [];
 
       if (canvas_daily > 0) {
@@ -178,7 +197,7 @@ async function handleDailyTask(isStartup = false) {
         chrome.notifications.create('', {
           type: 'basic',
           iconUrl: chrome.runtime.getURL("images/logo_128x128.png"), // must exist and be declared in manifest.json
-          title: "UNLV Events today",
+          title: "RebelRemind",
           message: dynamicTitle,
           priority: 2
         }, (notificationId) => {
@@ -191,25 +210,26 @@ async function handleDailyTask(isStartup = false) {
       }
 
     //schema 
-    const notificationData = {
-      id: Date.now().toString(),
-      date: todayForFetching,
-      summary: dynamicTitle,
-      events: [
-        ...filterToday(data1).map(e => ({ ...e, source: "Academic" })),
-        ...filterToday(data2).map(e => ({ ...e, source: "Involvement Center" })),
-        ...filterToday(data3).map(e => ({ ...e, source: "Rebel Coverage" })),
-        ...filterToday(data4).map(e => ({ ...e, source: "UNLV Calendar" })),
-        ...filterTodayCanvas(assignmentList).map(e => ({ ...e, source: "Canvas" })),
-      ]
-    };
+      const notificationData = {
+        id: Date.now().toString(),
+        startDate: todayForFetching,
+        summary: dynamicTitle,
+        events: [
+          ...filterToday(data1).map(e => ({ ...e, source: "Academic" })),
+          ...filterToday(data2).map(e => ({ ...e, source: "Involvement Center" })),
+          ...filterToday(data3).map(e => ({ ...e, source: "Rebel Coverage" })),
+          ...filterToday(data4).map(e => ({ ...e, source: "UNLV Calendar" })),
+          ...filterTodayCanvas(assignmentList).map(e => ({ ...e, source: "Canvas" })),
+        ]
+      };
     
     // Push to local store
-    chrome.storage.local.get("notificationHistory", (data) => {
-      const history = Array.isArray(data.notificationHistory) ? data.notificationHistory : [];
-      history.unshift(notificationData);
-      chrome.storage.local.set({ notificationHistory: history.slice(0, 7) }); // Last 7 days
-    });
+      chrome.storage.local.get("notificationHistory", (data) => {
+        const history = Array.isArray(data.notificationHistory) ? data.notificationHistory : [];
+        history.unshift(notificationData);
+        chrome.storage.local.set({ notificationHistory: history.slice(0, 7) }); // Last 7 days
+      });
+
     } else {
       console.log("Daily task skipped (already run or too early)");
     }
@@ -224,7 +244,6 @@ chrome.notifications.onClicked.addListener((notificationId) => {
     url: chrome.runtime.getURL("welcome.html#/notifications")
   });
 });
-
 //endregion
 
 //endregion

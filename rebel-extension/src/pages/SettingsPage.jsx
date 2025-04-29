@@ -73,7 +73,6 @@ export default function SettingsPage() {
         };
     }, []);
 
-
     /**
      * Toggle section visibility.
      * If the same section is clicked again, it collapses.
@@ -107,7 +106,8 @@ export default function SettingsPage() {
                 <div>
                     <p>Set your event preferences.</p>
                     {isAuthenticated ?
-                        <Preferences /> : <p>Please log in to your account to set your preferences.</p>
+                        <Preferences /> 
+                        : <p>Please log in to your account to set your preferences.</p>
                     }
                 </div>
             ),
@@ -206,7 +206,7 @@ export default function SettingsPage() {
         <>
             {/* Navigation Back Button */}
             <div className="back-button-container">
-                <button className="back-button" onClick={() => navigate("/")}>⬅️</button>
+                <button className="back-button" onClick={() => navigate("/")}>⇐</button>
             </div>
 
             <div className="settings-page-wrapper">

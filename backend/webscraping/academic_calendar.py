@@ -3,14 +3,14 @@ import json
 from bs4 import BeautifulSoup
 from database import BASE
 
-url = "https://catalog.unlv.edu/content.php?catoid=47&navoid=14311"
+URL = "https://catalog.unlv.edu/content.php?catoid=47&navoid=14311"
 
-def default():
+def scrape():
     """
-    Extracts calendar events from the UNLV catalog page using Selenium and BeautifulSoup,
-    and saves the data to a JSON file.
+    Extracts calendar events from the UNLV catalog page using BeautifulSoup,
+    and saves the data to in JSON format.
     """
-    response = requests.get(url)
+    response = requests.get(URL)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "html.parser")
 
@@ -39,22 +39,28 @@ def default():
         calendar_data = calendar_data[:-3]
             
         # Write the cleaned data to the output file in JSON format
-        filename="scraped_AcademicCalendar.json"
-        with open(filename, "w", encoding="utf-8") as f:
-            json.dump(calendar_data, f, indent=4) # indent for readability
-
-        # PUT calendar events into the database
-        calendar_id = 0
+        # filename="scraped_AcademicCalendar.json"
+        # with open(filename, "w", encoding="utf-8") as f:
+        #     json.dump(calendar_data, f, indent=4) # indent for readability
+        
+        # PUT calendar events into database format
+        results = []
         for event in calendar_data:
-            calendar_id += 1
             put_data = {
                 "name": event['Event'],
-                "date": event['Date']
+                "startDate": event['Date'],
+                "endDate": event['Date']
             }
-            requests.put(BASE + f"academiccalendar_add", json=put_data) # Use json= for the request body
-
+            results.append(put_data)
+        return results
     else:
         print(f"Failed to access the page. Status code: {response.status_code}")
+
+def default():
+    results = scrape()
+    # PUT calendar events into the database
+    for event in results:
+        requests.put(BASE + "academiccalendar_add", json=event)
 
 if __name__ == '__main__':
     default()

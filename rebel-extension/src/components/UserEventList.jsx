@@ -102,7 +102,7 @@ const UserEventList = () => {
      * Returns a Date object for the event including time if available.
      */
     const getEventDateTime = (event) => {
-        const date = parseDateLocal(event.date);
+        const date = parseDateLocal(event.startDate);
         if (!event.allDay && event.startTime) {
             const [h, m] = event.startTime.split(":").map(Number);
             date.setHours(h, m, 0, 0);
@@ -118,19 +118,19 @@ const UserEventList = () => {
 
     // Classification helpers
     const isToday = (event) => {
-        const date = parseDateLocal(event.date);
+        const date = parseDateLocal(event.startDate);
         date.setHours(0, 0, 0, 0);
         return date.getTime() === today.getTime();
     };
 
     const isFuture = (event) => {
-        const date = parseDateLocal(event.date);
+        const date = parseDateLocal(event.startDate);
         date.setHours(0, 0, 0, 0);
         return date > today;
     };
 
     const isPast = (event) => {
-        const date = parseDateLocal(event.date);
+        const date = parseDateLocal(event.startDate);
         date.setHours(0, 0, 0, 0);
         return date < today;
     };
@@ -225,8 +225,8 @@ const UserEventList = () => {
                                     <span className="edit-label">Date:</span>
                                     <input
                                         type="date"
-                                        value={editedEvent.date || ""}
-                                        onChange={(e) => setEditedEvent({ ...editedEvent, date: e.target.value })}
+                                        value={editedEvent.startDate || ""}
+                                        onChange={(e) => setEditedEvent({ ...editedEvent, startDate: e.target.value })}
                                         className="edit-input"
                                     />
                                 </div>
@@ -275,7 +275,7 @@ const UserEventList = () => {
                         ) : (
                             <>
                                 {/* Read-Only View */}
-                                <p><strong>Date:</strong> {formatDate(event.date) || "N/A"}</p>
+                                <p><strong>Date:</strong> {formatDate(event.startDate) || "N/A"}</p>
                                 <p><strong>Time:</strong> {event.allDay ? "All-day" : `${formatTime12hr(event.startTime)} - ${formatTime12hr(event.endTime)}`}</p>
                                 <p><strong>Location:</strong> {event.location || "N/A"}</p>
                                 <p><strong>Description:</strong> {event.desc || "No description."}</p>
@@ -295,7 +295,7 @@ const UserEventList = () => {
     };
 
     return (
-        <div className="mx-auto bg-white rounded shadow-md text-left" style={{ padding: "10px", marginTop: "20px" }}>
+        <div className="mx-auto bg-white rounded shadow-md text-left" style={{ padding: "10px", marginTop: "10px" }}>
             <h3 className="text-xl font-semibold mb-2" style={{ marginTop: "10px" }}>Your Custom Events</h3>
 
             {/* Tab Switcher */}

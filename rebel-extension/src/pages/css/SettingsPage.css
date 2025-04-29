@@ -19,22 +19,28 @@
 }
 
 .back-button {
-    background: none;
-    transition: transform 0.2s ease-in-out;
+    background: var(--containerbg, rgba(0, 0, 0, 0.28));
+    color: var(--app-text-color, white);
+    padding: 10px 16px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .back-button:hover {
-    background: none;
-    transform: scale(1.15);
-    /* slightly larger */
+    background: var(--containerbg, rgba(255, 255, 255, 0.08));
+    transform: scale(1.08);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
 }
 
-.settings-page-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
+.back-button:active {
+    background: var(--containerbg, rgba(255, 255, 255, 0.12));
+    transform: scale(1.04);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .title-container {
@@ -50,7 +56,6 @@
     max-width: 600px;
     width: 100%;
 }
-
 
 .icon {
     width: 24px;
@@ -72,9 +77,7 @@
 
 .arrow.rotated {
     transform: rotate(90deg);
-    /* rotate right arrow to point down */
 }
-
 
 .settings-item {
     display: flex;
@@ -94,7 +97,6 @@
 
 .settings-content {
     background-color: #f9f9f9;
-    /* match open background */
     padding: 16px 10px 20px 16px;
     font-size: 14px;
     animation: fadeIn 0.2s ease-in;
@@ -103,14 +105,11 @@
     color: black;
 }
 
-
-/* Smooth fade in */
 @keyframes fadeIn {
     from {
         opacity: 0;
         transform: translateY(-4px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -122,5 +121,5 @@
     flex-wrap: wrap;
     gap: 12px;
     margin-top: 1rem;
-  }
-  
+}
+
