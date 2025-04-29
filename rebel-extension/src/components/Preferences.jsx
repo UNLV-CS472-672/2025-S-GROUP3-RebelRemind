@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import CanvasTokenManager from "../components/CanvasTokenManager.jsx";
 import { FaQuestionCircle } from 'react-icons/fa';
+import NotificationToggle from "../components/NotificationToggle";
 
 /**
  * Preferences Component
@@ -79,6 +80,9 @@ const Preferences = ({ setupMode = false }) => {
         rebelCoverage: false,
         googleCalendar: false,
     };
+    const [notifications, setNotifications] = useState(false);
+    const [initialNotifications, setInitialNotifications] = useState(false);
+
 
     const [preferences, setPreferences] = useState(defaultPreferences);
 
@@ -116,6 +120,7 @@ const Preferences = ({ setupMode = false }) => {
     useEffect(() => {
         chrome.storage.sync.get([
             "preferences",
+            "notificationsEnabled",
             "involvedClubs",
             "rebelMenSports",
             "rebelWomenSports",
@@ -123,6 +128,9 @@ const Preferences = ({ setupMode = false }) => {
         ], (data) => {
             setPreferences(data.preferences || defaultPreferences);
             setInitialPreferences(data.preferences || defaultPreferences);
+
+            setNotifications(data.notificationsEnabled || false);
+            setInitialNotifications(data.notificationsEnabled || false);
 
             setInvolvedClubs(data.involvedClubs || []);
             setInitialClubs(data.involvedClubs || []);
@@ -149,10 +157,11 @@ const Preferences = ({ setupMode = false }) => {
             JSON.stringify(involvedClubs) !== JSON.stringify(initialClubs) ||
             JSON.stringify(selectedMenSports) !== JSON.stringify(initialMenSports) ||
             JSON.stringify(selectedWomenSports) !== JSON.stringify(initialWomenSports) ||
-            JSON.stringify(selectedInterests) !== JSON.stringify(initialInterests);
+            JSON.stringify(selectedInterests) !== JSON.stringify(initialInterests) ||
+            JSON.stringify(notifications) !== JSON.stringify(initialNotifications);
 
         setUnsaved(hasChanges);
-    }, [loaded, preferences, involvedClubs, selectedMenSports, selectedWomenSports, selectedInterests]);
+    }, [loaded, notifications, preferences, involvedClubs, selectedMenSports, selectedWomenSports, selectedInterests]);
 
     // =================== EFFECT: Close help popups on outside click ===================
 
@@ -187,6 +196,7 @@ const Preferences = ({ setupMode = false }) => {
         }));
     };
 
+
     /**
      * Save current preferences and selections to Chrome Storage.
      * Also updates the initial values so "unsaved" doesn't show.
@@ -197,6 +207,7 @@ const Preferences = ({ setupMode = false }) => {
         chrome.storage.sync.set(
             {
                 preferences,
+                notificationsEnabled: notifications,  
                 involvedClubs,
                 rebelMenSports: selectedMenSports,
                 rebelWomenSports: selectedWomenSports,
@@ -204,6 +215,7 @@ const Preferences = ({ setupMode = false }) => {
             },
             () => {
                 setInitialPreferences(preferences);
+                setInitialNotifications(notifications); 
                 setInitialClubs(involvedClubs);
                 setInitialMenSports(selectedMenSports);
                 setInitialWomenSports(selectedWomenSports);
@@ -274,8 +286,13 @@ const Preferences = ({ setupMode = false }) => {
                 <div style={{ padding: '0.2rem' }}>
                     {/* Preferences Grid */}
                     <div>
+                        <NotificationToggle
+                            enabled={notifications}
+                            setEnabled={setNotifications}
+                        />
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1rem' }}>
                             {/* Left column preferences */}
+                               
                             <div style={{ display: 'flex', flexDirection: 'column', rowGap: '1rem' }}>
                                 {preferencesList.slice(0, 3).map(({ key, label }) => (
                                     <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
