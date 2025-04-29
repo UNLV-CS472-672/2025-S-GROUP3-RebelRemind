@@ -9,6 +9,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Events from "./Events";
 import Toggle from "./Toggle";
 
+import canvasIcon from "../assets/canvas.png";
+import unlvIcon from "../assets/UNLVIcon.png";
+import calIcon from "../assets/calIcon.png";
 /**
  * AccordionMenu.jsx
  *
@@ -180,12 +183,38 @@ function AccordionMenu() {
                   className="accordion-item"
                   style={{ flexGrow: itemFlexGrow }}
                 >
-                  <Accordion.Header onClick={() => toggleKey(key)}>
-                    {index === 0 && "📚 Upcoming Assignments"}
-                    {index === 1 && "📅 Your Events"}
-                    {index === 2 && "🎉 UNLV Events"}
-                  </Accordion.Header>
-
+                <Accordion.Header onClick={() => toggleKey(key)}>
+                  {index === 0 && (
+                    <>
+                      <img 
+                        src= {canvasIcon}
+                        alt= "canvasIcon" 
+                        style={{ height: '20px', marginRight: '8px' }} 
+                      />
+                      Upcoming Assignments
+                    </>
+                  )}
+                  {index === 1 && (
+                    <>
+                      <img 
+                        src={calIcon}
+                        alt="calIcon" 
+                        style={{  height: '20px', marginRight: '8px'}} 
+                      />
+                      Your Events
+                    </>
+                  )}
+                  {index === 2 && (
+                    <>
+                      <img 
+                        src={unlvIcon}
+                        alt="unlvIcon" 
+                        style={{ marginLeft: '-6px', height: '20px' }} 
+                      />    
+                      UNLV Events
+                    </>
+                  )}
+                </Accordion.Header>
                   <Accordion.Body
                     className="accordion-body"
                     style={{

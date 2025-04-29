@@ -12,13 +12,13 @@ export async function filterEvents(today, viewMode) {
     
       const filteredAC = preferences.academicCalendar ? ac : [];
       const filteredIC = preferences.involvementCenter
-        ? ic.filter((e) => involvedClubs.includes(e.organization)) // <- notice this!
+        ? Array.isArray(ic) ? ic.filter((e) => involvedClubs.includes(e.organization)) : []
         : [];
       const filteredRC = preferences.rebelCoverage ? rc : [];
       const filteredUC = preferences.UNLVCalendar
-        ? uc.filter((e) => selectedInterests.includes(e.category))
+        ? Array.isArray(uc) ? uc.filter((e) => selectedInterests.includes(e.category)) : []
         : [];
-    
+          
       resolve([filteredAC, filteredIC, filteredRC, filteredUC]);
     });
     

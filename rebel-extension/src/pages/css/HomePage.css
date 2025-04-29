@@ -173,5 +173,5 @@ button {
 }
 
 button:hover {
-  background-color: #b01030;
+  background-color: lightgray !important;
 }
