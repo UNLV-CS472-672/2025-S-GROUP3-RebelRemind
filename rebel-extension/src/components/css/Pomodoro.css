@@ -58,8 +58,6 @@
   
   .pomodoro-center {
     margin-top: 50px; /* offset from the back button */
-    display: flex;
-    justify-content: center;
     width: 100%;
   }
   
