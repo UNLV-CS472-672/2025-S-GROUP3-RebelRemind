@@ -414,7 +414,7 @@ const Preferences = ({ setupMode = false }) => {
                     )}
 
                     {/* Action Buttons */}
-                    <div className="mt-3" style={{ display: "flex", justifyContent: "space-between" }}>
+                    <div className="mt-3" style={{ display: "flex", justifyContent: "space-around" }}>
                         <button className="rounded" onClick={() => {
                             const confirmReset = window.confirm("Are you sure you want to reset all your preferences?");
                             if (!confirmReset) return;
