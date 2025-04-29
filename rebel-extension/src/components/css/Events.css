@@ -20,7 +20,7 @@
   .event-list {
     padding-left: 1.25rem;
     margin-bottom: 1rem;
-    padding-left: 32px !important;
+    padding-left: 1rem !important;
   }
   .event-list-daily {
     list-style: none !important;
@@ -57,7 +57,7 @@
     flex: 1;
     white-space: normal;
     word-break: break-word;
-    width: 240px;
+    width: 220px;
   }
   
   .event-org {
@@ -145,5 +145,56 @@
   
   .checkboxWrapper:hover .checkboxTooltip {
     opacity: 1;
+  }
+  
+  .tooltip-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .tooltip-text {
+    visibility: hidden;
+    opacity: 0;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 4px 8px;
+    border-radius: 6px;
+    position: absolute;
+    
+    /* === Positioning changes === */
+    top: 25px;   /* Place tooltip below the button */
+    right: 15px;     /* Align tooltip to the left of the button */
+    transform: translateX(0); /* No shifting horizontally */
+    
+    white-space: nowrap;
+    z-index: 999;
+    font-size: 12px;
+    transition: opacity 0.2s ease-in-out;
+    pointer-events: none;
+  }
+  
+  .tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
+  
+  .addCalbtn, .removeCalbtn {
+    background: transparent;
+    border: none;
+    padding-right: 0px;
+    padding-top: 0px;
+    cursor: pointer;
+    font-size: 20px; /* For the "X" to look nice */
+  }
+
+  .addCalbtn:hover, .removeCalbtn:hover {
+    background: transparent !important;
+  }
+  
+  .removeCalbtn {
+    text-align: center;
+    color: red; /* optional: make the X red for clarity */
+    width: 39px;
   }
   
