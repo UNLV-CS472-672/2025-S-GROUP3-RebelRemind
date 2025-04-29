@@ -242,6 +242,11 @@ async function handleDailyTask(isStartup = false) {
           }
         });
       }
+      else{
+        chrome.storage.local.set({ lastRunDate: today }, () => {
+          resolve(false);
+        });
+      }
 
     //schema 
       const notificationData = {
