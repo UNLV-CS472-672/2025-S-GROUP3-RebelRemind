@@ -134,7 +134,18 @@ export default function SettingsPage() {
                     ) : (
                         <p>Please log in to your account to link your Canvas account.</p>
                     )}
+                    <span style={{ textAlign: "left", fontWeight: "bold", fontSize: "1rem" }}>Canvas Personal Access Token</span>
+                    <p></p>
+                    <p>Your Canvas Personal Access Token is stored locally on your browser and used to integrate our app with Canvas!
+                        We do not store this token, or any of your personal information externally.
+                    </p>
+                    <p style={{ fontWeight: "bold" }}>On Canvas, go to Account {">"} Settings {">"} Approved Integrations {">"}  New Access Token {">"}  Enter "Rebel Remind" as the Purpose</p>
+                    <p>Copy and paste your token here. Make sure to be wary of the expiration date you set! Be sure to securely save it. If you log out of our app,
+                        it will delete your token!
+                    </p>
+
                 </div>
+
             )
         },
         {
