@@ -4,16 +4,20 @@
     --event-card-bg: rgba(255, 255, 255, 0.12);
     --event-card-blur: blur(12px);
     --event-border: rgba(255, 255, 255, 0.2);
+    --form-bg: rgba(20, 20, 20, 0.7);
+    --form-text: #fdfdfd;
+    --form-border: rgba(255, 255, 255, 0.25);
+    --form-placeholder: rgba(255, 255, 255, 0.7);
   }
   
   /* ---------- CONTAINERS ---------- */
   
   .mx-auto.bg-white {
-    background-color: var(--event-card-bg) !important;
-    color: var(--user-events-text) !important;
+    background-color: var(--form-bg) !important;
+    color: var(--form-text) !important;
     backdrop-filter: var(--event-card-blur);
     -webkit-backdrop-filter: var(--event-card-blur);
-    border: 1px solid var(--event-border);
+    border: 1px solid var(--form-border);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   }
   
@@ -31,9 +35,9 @@
   .event-desc-input {
     width: 92%;
     padding: 0.5rem;
-    background-color: rgba(255, 255, 255, 0.15);
-    color: var(--user-events-text);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background-color: var(--form-bg);
+    color: var(--form-text);
+    border: 1px solid var(--form-border);
     border-radius: 4px;
     backdrop-filter: blur(4px);
     font-size: 1rem;
@@ -82,7 +86,7 @@
   .time-label {
     width: 50px;
     margin-right: 0.2rem;
-    color: var(--user-events-text);
+    color: var(--form-text);
     font-size: 0.95rem;
     text-align: right;
   }
@@ -105,9 +109,19 @@
   .event-input::placeholder,
   .edit-input::placeholder,
   .edit-textarea::placeholder {
-    color: var(--user-events-text);
-    opacity: 0.85; 
+    color: var(--form-placeholder);
   }
+
+  .event-input {
+    background-color: var(--form-bg);
+    color: var(--form-text);
+    border: 1px solid var(--form-border);
+  }
+
+  .edit-label {
+    color: var(--form-text);
+  }
+
   
   
   /* ---------- EVENT LIST ---------- */
@@ -229,5 +243,42 @@
     margin-right: 10px;
     font-weight: bold;
     color: var(--user-events-text);
+  }
+  
+  .back-button-container {
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+  }
+  
+  .back-button {
+    background: var(--containerbg, rgba(0, 0, 0, 0.28));
+    color: var(--app-text-color, white);
+    padding: 10px 16px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .back-button:hover {
+    background: var(--containerbg, rgba(255, 255, 255, 0.08)) !important;
+    color: var(--app-text-color, white) !important;
+    transform: scale(1.08);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+  }
+  
+  .back-button:active {
+    background: var(--containerbg, rgba(255, 255, 255, 0.12)) !important;
+    color: var(--app-text-color, white) !important;
+    transform: scale(1.04);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  .back-button-spacer {
+    height: 32px; /* or however much vertical push you want */
   }
   

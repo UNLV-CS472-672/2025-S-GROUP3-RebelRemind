@@ -5,13 +5,8 @@
  * It renders the Preferences component in setup mode, showing all sections and disabling 
  * interactions until their corresponding preferences are enabled.
  *
- * 🧠 Logic:
- * - If the user is authenticated via `useAuth()`, show the full preferences setup UI.
- * - If not authenticated, prompt the user to log in via Google using the `LoginButton`.
- *
  * 🧩 Components Used:
  * - <Preferences setupMode={true} />: Interactive configuration with tooltips and gated sections
- * - <LoginButton />: Triggers UNLV Google OAuth login
  *
  * 📍 Navigation:
  * - After finishing setup, users are navigated to `/get-started` for final instructions.
@@ -25,25 +20,51 @@
  */
 
 import React from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Preferences from "../components/Preferences.jsx";
 import LoginButton from "../components/LoginButton";
-import useAuth from "../../public/hooks/useAuth";
 import "./css/PreferencesSetup.css"
 
 const PreferencesSetup = () => {
     const navigate = useNavigate();
-    const isAuthenticated = useAuth(); // Determines if user is logged in
+    const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(null);
+
+    useEffect(() => {
+        chrome.storage.sync.get("notificationsEnabled", (data) => {
+          if (data && data.notificationsEnabled !== undefined) {
+            setIsNotificationsEnabled(data.notificationsEnabled);
+          } else {
+            setIsNotificationsEnabled(false);
+          }
+        });
+      }, []);
 
     return (
-        isAuthenticated ?
             <div className="page-background-pref">
                 <div className="preferences-container">
+                    
                     <h1 style={{ textAlign: "center", marginBottom: "1rem" }}>🛠️ Setup Your Rebel Remind Preferences</h1>
-                    <p style={{ textAlign: "center", color: "#555", marginBottom: "2rem" }}>
-                        Select what you'd like Rebel Remind to notify you about. You can change these anytime!
-                    </p>
-
+                    { isNotificationsEnabled ? (
+                    <>
+                        <p style={{ textAlign: "center", color: "#555", marginBottom: "2rem" }} >
+                            Thanks for enabling notifications! 
+                        </p>
+                        <p style={{ textAlign: "center", color: "#555", marginBottom: "2rem" }}>
+                            Select what you'd like Rebel Remind to notify you about. You can change these anytime!
+                        </p>
+                    </>
+                    ):(
+                    <>
+                        <p> No notifications... No problem! </p>
+                        <p style={{ textAlign: "center", color: "#555", marginBottom: "2rem" }}>
+                            We still will keep your RebelRemind up to date with upcoming events, but won't push any notifications.
+                        </p>
+                        <p style={{ textAlign: "center", color: "#555", marginBottom: "2rem" }}>
+                            Select what preferences interest you. You can change these anytime!
+                        </p>
+                    </>
+                    )}
                     {/* Preferences component */}
                     <Preferences setupMode={true} />
 
@@ -57,16 +78,6 @@ const PreferencesSetup = () => {
                     </button>
                 </div>
             </div>
-            :
-            <>
-                <div className="page-background">
-                    <div className="welcome-container">
-                        <h1>🛑 Before we get started...</h1>
-                        <h3>Please login with Google. This will help us confirm you are a UNLV student and be used for future integrations.</h3>
-                        <LoginButton />
-                    </div>
-            </div >
-            </>
     );
 };
 

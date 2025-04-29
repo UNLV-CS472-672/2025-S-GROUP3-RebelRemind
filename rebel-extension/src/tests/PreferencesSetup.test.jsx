@@ -24,11 +24,26 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 
+
+beforeAll(() => {
+  global.chrome = {
+    storage: {
+      sync: {
+        get: jest.fn((key, callback) => {
+          callback({ notificationsEnabled: true }); // or false, depending on your test
+        }),
+        set: jest.fn(),
+      },
+    },
+  };
+});
+
+
 jest.mock('../../public/hooks/useAuth', () => ({
     __esModule: true,
     default: jest.fn()
   }));
-  
+
 jest.mock('../components/LoginButton', () => () => <div>LoginButton</div>);
 jest.mock('../components/Preferences', () => () => <div>PreferencesComponent</div>);
 
@@ -54,31 +69,4 @@ describe('PreferencesSetup Page', () => {
         fireEvent.click(screen.getByText(/Finish Setup/i));
         expect(screen.getByText(/Get Started Page/)).toBeInTheDocument();
       });      
-
-    test('renders setup page when authenticated', () => {
-        useAuth.mockReturnValue(true);
-
-        render(
-            <MemoryRouter>
-                <PreferencesSetup />
-            </MemoryRouter>
-        );
-
-        expect(screen.getByText(/Setup Your Rebel Remind Preferences/i)).toBeInTheDocument();
-        expect(screen.getByText(/PreferencesComponent/i)).toBeInTheDocument();
-        expect(screen.getByText(/Finish Setup/i)).toBeInTheDocument();
-    });
-
-    test('renders login prompt when not authenticated', () => {
-        useAuth.mockReturnValue(false);
-
-        render(
-            <MemoryRouter>
-                <PreferencesSetup />
-            </MemoryRouter>
-        );
-
-        expect(screen.getByText(/Before we get started/i)).toBeInTheDocument();
-        expect(screen.getByText(/LoginButton/i)).toBeInTheDocument();
-    });
 });
