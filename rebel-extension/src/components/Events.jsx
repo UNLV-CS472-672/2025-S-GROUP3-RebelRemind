@@ -65,7 +65,7 @@ function Events({ events, viewMode, setActiveEventPopup = null , yourEvents = fa
             const updatedEvents = [...existing, event];
 
             chrome.storage.local.set({ "savedUNLVEvents": updatedEvents }, () => {
-                alert("Event saved to calendar.");
+                // alert("Event saved to calendar.");
 
                 chrome.runtime.sendMessage({ type: "EVENT_UPDATED" });
             });
