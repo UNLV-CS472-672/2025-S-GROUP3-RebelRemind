@@ -27,11 +27,6 @@
  *     }>
  *   }
  *
- * Example usage:
- * ```jsx
- * <NotificationHistory />
- * ```
- *
  * Note:
  * This component is intended for use inside a Chrome Extension environment
  * where `chrome.storage.local` is available.
@@ -41,8 +36,12 @@
  * Prompted ChatGPT for dynamic UI of notification 
  */
 import React, { useEffect, useState } from "react";
-import styles from "./css/Toast.module.css";
-import "./css/NotificationHistory.css";
+import Accordion from "react-bootstrap/Accordion";
+import Events from "../components/Events";
+import EventsStyle from "../components/EventsStyle";
+import ShadowDOM from "react-shadow";
+
+
 
 const NotificationHistory = () => {
   const [history, setHistory] = useState([]);
@@ -56,39 +55,35 @@ const NotificationHistory = () => {
   }, []);
 
   if (history.length === 0) {
-    return <p className={styles.textMuted}>No notifications yet</p>;
+    return <p>No notifications yet</p>;
   }
 
+  console.log(history);
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%" }}>
-      {history.map((entry) => (
-        <div className={styles.toast} key={entry.id}>
-          <div className={styles.toastHeader}>
-            <strong className={styles.meAuto}>📅 {entry.date}</strong>
-            <small className={`${styles.textMuted} ${styles.ms1}`}>{entry.summary}</small>
-          </div>
-          <div className={styles.toastBody}>
-            <ul className={styles.ps3}>
-              {entry.events.map((event, i) => (
-                <li key={i}>
-                  <strong>{event.source}:</strong> {event.name || event.title} — {event.startTime}
-                  {event.link && (
-                    <a
-                      href={event.link}
-                      target="_blank"
-                      rel="noreferrer"
-                      className={styles.ms1}
-                    >
-                      ↗
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+    <ShadowDOM.div>
+      <EventsStyle/>
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      />
+    <Accordion defaultActiveKey="0">
+      {history.map((entry, idx) => (
+        <Accordion.Item eventKey={idx.toString()} key={entry.id} >
+          <Accordion.Header >
+            📅 {entry.startDate} — {entry.summary}
+          </Accordion.Header>
+          <Accordion.Body>
+            {entry.events && entry.events.length > 0 ? (
+              <Events events={entry.events} viewMode={"daily"} />
+            ) : (
+              <p>No events for this notification.</p>
+            )}
+          </Accordion.Body>
+        </Accordion.Item>
       ))}
-    </div>
+    </Accordion>
+    </ShadowDOM.div>
   );
 };
 
