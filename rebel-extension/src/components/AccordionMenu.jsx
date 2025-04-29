@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { fetchEvents, subscribeToUserEvents, normalizeUserEvents } from "../../public/scripts/fetch-events.js";
+import { subscribeToUserEvents, normalizeUserEvents } from "../../public/scripts/fetch-events.js";
 import { filterEvents } from "../../public/scripts/filter-events";
 import UserEventPopup from "./UserEventPopup";
 
@@ -91,7 +91,6 @@ function AccordionMenu() {
 
 /***  END LOAD and FILTER EVENTS  ***/
 
-
 /***  USER EVENTS  ***/
 
     useEffect(() => {
@@ -99,9 +98,33 @@ function AccordionMenu() {
       return unsubscribe;
     }, []);
 
+    // filter User Events by daily or weekly (brought back, was overwritten)
+    function filterUserEvents(events, viewMode) {
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+
+      const weekDates = [];
+      for (let i = 0; i < 7; i++) {
+        const tempDate = new Date(today);
+        tempDate.setDate(today.getDate() + i);
+        weekDates.push(tempDate.toISOString().split('T')[0]);
+      }
+
+      return events.filter(event => {
+        if (viewMode === "daily") {
+          return event.startDate === todayStr;
+        } else if (viewMode === "weekly") {
+          return weekDates.includes(event.startDate);
+        }
+        return false;
+      });
+    }    
+
     useEffect(() => {
-      setNormUserEvents(normalizeUserEvents(user_events));
-    }, [user_events]);
+      const normalized = normalizeUserEvents(user_events);
+      const filtered = filterUserEvents(normalized, viewMode);
+      setNormUserEvents(filtered);
+    }, [user_events, viewMode]);
 
     // if user event is clicked
     useEffect(() => {
@@ -224,10 +247,10 @@ function AccordionMenu() {
                   >
 
                     {index === 0 && <CanvasAssignments viewMode={viewMode} />}
-                    {index === 1 && <Events events={[...filteredIC, ...normalizedUserEvents]} viewMode={viewMode} setActiveEventPopup={setActiveEventPopup} />}
+                    {index === 1 && <Events events={[...filteredIC, ...normalizedUserEvents]} viewMode={viewMode} setActiveEventPopup={setActiveEventPopup} yourEvents={true}/>}
                     {index === 2 && <Events events={[
                       ...(Array.isArray(filteredUC) ? filteredUC : []),
-                      ...(Array.isArray(filteredAC) ? filteredAC : []),
+                      ...(Array.isArray(filteredAC) ? filteredAC.map(event => ({ ...event, academicCalendar: true })) : []),
                       ...(Array.isArray(filteredRC) ? filteredRC : [])
                     ]} viewMode={viewMode} />}
 

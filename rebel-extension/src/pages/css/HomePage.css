@@ -143,9 +143,13 @@
 .accordion-body {
   flex-grow: 1;
   overflow-y: auto;
-  padding: 10px;
-  min-height: 0; /* Required for scrollbars to behave correctly */
+  padding: 5px;
+  min-height: 0;
   transition: height 0.3s ease;
+}
+
+.accordion-body::-webkit-scrollbar {
+  display: none;
 }
 
 .accordion-header {
@@ -187,10 +191,6 @@ button {
   cursor: pointer;
   font-weight: bold;
   transition: background-color 0.2s ease;
-}
-
-button:hover {
-  background-color: lightgray !important;
 }
 
 /* --- MISC --- */
