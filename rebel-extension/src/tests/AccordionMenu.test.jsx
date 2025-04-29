@@ -40,7 +40,7 @@ jest.mock("../components/Events", () => (props) => {
         onClick={() =>
           setActiveEventPopup({
             name: "Test Event",
-            date: "2025-04-22",
+            startDate: "2025-04-22",
             allDay: false,
             startTime: "14:00",
             endTime: "15:00",

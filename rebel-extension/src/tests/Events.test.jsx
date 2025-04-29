@@ -3,26 +3,26 @@ import Events from '../components/Events';
 
 describe('Events component', () => {
   const mockDailyEvents = [
-    { id: 1, name: 'Event A', time: '10:00 AM', link: 'https://example.com', organization: 'Org A', date: '2025-04-21' },
-    { id: 2, name: 'Event B', time: '2:00 PM', link: 'https://example.com', organization: 'Org B', date: '2025-04-21' },
+    { id: 1, name: 'Event A', startTime: '10:00 AM', link: 'https://example.com', organization: 'Org A', startDate: '2025-04-21' },
+    { id: 2, name: 'Event B', startTime: '2:00 PM', link: 'https://example.com', organization: 'Org B', startDate: '2025-04-21' },
   ];
 
   const mockWeeklyEvents = [
     {
       id: 1,
       name: 'Weekly Event Sunday',
-      time: '1:00 PM',
+      startTime: '1:00 PM',
       link: 'https://example.com',
       organization: 'Org A',
-      date: '2025-04-20', // Sunday
+      startDate: '2025-04-20', // Sunday
     },
     {
       id: 2,
       name: 'Weekly Event Monday',
-      time: '3:00 PM',
+      startTime: '3:00 PM',
       link: 'https://example.com',
       organization: 'Org B',
-      date: '2025-04-21', // Monday
+      startDate: '2025-04-21', // Monday
     },
   ];
 

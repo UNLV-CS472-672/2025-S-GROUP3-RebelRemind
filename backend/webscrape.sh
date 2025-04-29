@@ -4,7 +4,7 @@
 SCRIPT_DIR="webscraping"
 
 # List of Python modules to run (without .py extension)
-scripts=("academic_calendar" "involvement_center" "rebel_coverage" "unlv_calendar")
+scripts=("academic_calendar" "involvement_center" "organizations" "rebel_coverage" "unlv_calendar")
 
 # Loop through and execute each module
 for script in "${scripts[@]}"; do

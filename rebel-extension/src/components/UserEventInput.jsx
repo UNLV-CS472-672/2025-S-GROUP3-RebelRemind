@@ -49,7 +49,7 @@ const UserEventInput = () => {
         const newEvent = {
             title: eventTitle,
             desc: eventDesc,
-            date: eventDate,
+            startDate: eventDate,
             startTime: isAllDay ? "" : eventStartTime,
             endTime: isAllDay ? "" : eventEndTime,
             location: eventLocation,
