@@ -49,7 +49,7 @@ const UserEventInput = () => {
         const newEvent = {
             title: eventTitle,
             desc: eventDesc,
-            date: eventDate,
+            startDate: eventDate,
             startTime: isAllDay ? "" : eventStartTime,
             endTime: isAllDay ? "" : eventEndTime,
             location: eventLocation,
@@ -85,7 +85,7 @@ const UserEventInput = () => {
     };
 
     return (
-        <div className="mx-auto bg-white rounded shadow-md text-center" style={{ padding: "10px" }}>
+        <div className="mx-auto bg-white rounded shadow-md text-center" style={{ padding: "10px", marginTop: "30px" }}>
             <h3 className="text-xl font-semibold" style={{ marginTop: "10px", marginBottom: "10px" }}>
                 Create an Event
             </h3>
@@ -158,10 +158,9 @@ const UserEventInput = () => {
                 </div>
             </div>
 
-            <button
+            <button 
                 onClick={saveEvent}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
-                style={{ marginBottom: "10px" }}
+                className="back-button"
             >
                 Save Event
             </button>

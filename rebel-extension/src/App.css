@@ -9,7 +9,7 @@
 }
 
 .accordion {
-  padding: 1rem;
+  padding: 0 1rem 1rem;
   width: 450px;
 }
 
@@ -125,4 +125,16 @@ Residual CSS from obselete library, keeping for backtracking/testing, remove lat
 
 .login-button:focus {
   outline: none; /* Remove focus outline */
+}
+
+
+html, body {
+  overflow-y: scroll;
+  scrollbar-width: none;          /* for Firefox */
+  overflow-x: hidden;             /* optional: prevent sideways scroll */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+display: none;                  /* for Chrome, Safari */
 }

@@ -152,7 +152,7 @@ export async function handleDailyTask(isStartup = false) {
     const currentHour = new Date().getHours();
 
     // Only run if the task hasn't already run, and it's after 9AM (if startup fallback)
-    if (shouldRun && (isStartup || currentHour >= 9)) {
+    if (shouldRun) {
       console.log("Triggering daily task");
 
       const fetchAssignments = async () => {
@@ -174,13 +174,13 @@ export async function handleDailyTask(isStartup = false) {
       const todayForFetching = now.toLocaleDateString('en-CA')
       const filterToday = (arr) =>
         safeArray(arr).filter(event => {
-          if (!event.date || !event.time) return false;
+          if (!event.startDate || !event.startTime) return false;
 
-          const isAllDay = event.time === "(ALL DAY)";
-          if (event.date !== todayForFetching) return false;
+          const isAllDay = event.startTime === "(ALL DAY)";
+          if (event.startDate !== todayForFetching) return false;
           if (isAllDay) return true;
           
-          const dateTime = new Date(`${event.date} ${event.time}`); 
+          const dateTime = new Date(`${event.startDate} ${event.startTime}`); 
           return dateTime > now;
         });
       const filterTodayCanvas = (arr) =>
@@ -248,11 +248,16 @@ export async function handleDailyTask(isStartup = false) {
           }
         });
       }
+      else{
+        chrome.storage.local.set({ lastRunDate: today }, () => {
+          resolve(false);
+        });
+      }
 
     //schema 
       const notificationData = {
         id: Date.now().toString(),
-        date: todayForFetching,
+        startDate: todayForFetching,
         summary: dynamicTitle,
         events: [
           ...filterToday(data1).map(e => ({ ...e, source: "Academic" })),
@@ -280,7 +285,7 @@ export async function handleDailyTask(isStartup = false) {
 }
 
 chrome.notifications.onClicked.addListener((notificationId) => {
-  if (notificationId === 'rebel-remind-daily') {  
+  if (notificationId === 'rebel-remind') {  
     chrome.tabs.create({
       url: chrome.runtime.getURL("welcome.html#/notifications")
     });

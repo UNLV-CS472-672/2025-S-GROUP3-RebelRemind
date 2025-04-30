@@ -25,6 +25,5 @@ Rebel Remind brings clarity to the chaos. It **centralizes** student notificatio
 
 Current Version
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/b4707e29-201c-4bb8-a56e-1cc03915175f" alt="Rebel Remind Logo" width="400"/>
-</p>
+![image](https://github.com/user-attachments/assets/237d8090-adeb-4e1b-9d87-bec9167a92db)
+

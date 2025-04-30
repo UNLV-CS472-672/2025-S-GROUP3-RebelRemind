@@ -16,7 +16,7 @@
  * - Requires "notificationHistory" to be an array of entries structured as:
  *   {
  *     id: string;
- *     date: string;
+ *     startDate: string;
  *     summary: string;
  *     events: Array<{
  *       source: string;
@@ -37,9 +37,11 @@
  */
 import React, { useEffect, useState } from "react";
 import Accordion from "react-bootstrap/Accordion";
-import styles from "./css/Toast.module.css";
 import Events from "../components/Events";
-import "./css/NotificationHistory.css";
+import EventsStyle from "../components/EventsStyle";
+import ShadowDOM from "react-shadow";
+
+
 
 const NotificationHistory = () => {
   const [history, setHistory] = useState([]);
@@ -53,26 +55,35 @@ const NotificationHistory = () => {
   }, []);
 
   if (history.length === 0) {
-    return <p className={styles.textMuted}>No notifications yet</p>;
+    return <p>No notifications yet</p>;
   }
 
+  console.log(history);
+
   return (
+    <ShadowDOM.div>
+      <EventsStyle/>
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      />
     <Accordion defaultActiveKey="0">
       {history.map((entry, idx) => (
-        <Accordion.Item eventKey={idx.toString()} key={entry.id}>
-          <Accordion.Header>
-            📅 {entry.date} — {entry.summary}
+        <Accordion.Item eventKey={idx.toString()} key={entry.id} >
+          <Accordion.Header >
+            📅 {entry.startDate} — {entry.summary}
           </Accordion.Header>
-          <Accordion.Body className="accordion-panel-scroll">
+          <Accordion.Body>
             {entry.events && entry.events.length > 0 ? (
               <Events events={entry.events} viewMode={"daily"} />
             ) : (
-              <p className={styles.textMuted}>No events for this notification.</p>
+              <p>No events for this notification.</p>
             )}
           </Accordion.Body>
         </Accordion.Item>
       ))}
     </Accordion>
+    </ShadowDOM.div>
   );
 };
 

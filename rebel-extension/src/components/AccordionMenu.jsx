@@ -1,81 +1,187 @@
 import { useEffect, useState, useRef } from "react";
-import { fetchEvents } from "../../public/scripts/fetch-events.js";
+import { subscribeToUserEvents, normalizeUserEvents } from "../../public/scripts/fetch-events.js";
+import { filterEvents } from "../../public/scripts/filter-events";
+import UserEventPopup from "./UserEventPopup";
 
 import Accordion from 'react-bootstrap/Accordion';
 import CanvasAssignments from "./CanvasAssignments";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Events from "./Events";
 import Toggle from "./Toggle";
+
+import canvasIcon from "../assets/canvas.png";
+import unlvIcon from "../assets/UNLVIcon.png";
+import calIcon from "../assets/calIcon.png";
 /**
- * Accordion Menu Component - Creates a drop-down style menu that displays the three (3) main submenus of the extension.
- * Uses React Bootstrap to display and format the menu.
+ * AccordionMenu.jsx
+ *
+ * This component renders the main collapsible menu for the Rebel Remind popup UI.
+ * It uses React Bootstrap's Accordion to show three dynamic sections:
+ *  - 📚 Upcoming Assignments (Canvas assignments)
+ *  - 📅 Your Events (Involvement Center + custom user events)
+ *  - 🎉 UNLV Events (Union, Academic, and Rec Center events)
  *
  * Features:
- * - Upon opening the extension, it displays a collapsed collection of submenus
- * 	- Upcoming Assignments
- * 	- Your Events
- *	- UNLV Events
+ * ✅ Dynamically loads and filters events from remote APIs and Chrome storage
+ * ✅ Persists open/closed accordion state via chrome.storage.sync
+ * ✅ Syncs view mode ("daily" or "weekly") across popup reloads
+ * ✅ Supports user-created events with live updates and modal details
+ * ✅ Automatically resizes open panels to evenly split height
+ * ✅ Stores filtered events for notification use
  *
- * Authored by: Jeremy Besitula
+ * Subcomponents:
+ * - CanvasAssignments.jsx – Loads Canvas tasks from API
+ * - Events.jsx – Renders a list of passed events
+ * - Toggle.jsx – Switches between daily/weekly modes
+ * - UserEventPopup.jsx – Displays event details in a modal when clicked
+ *
+ * Originally Authored by: Jeremy Besitula
  * 
- * Put into component AccordionMenu.jsx by Jeremy Besitula
+ * Edited by the rest of team in subsequent PR's
+ * 
  * @returns {JSX.Element} The AccordionMenu component UI.
  */
- function AccordionMenu() {
-  const [ac_events, setACEvents] = useState([]);
-  const [ic_events, setICEvents] = useState([]);
-  const [rc_events, setRCEvents] = useState([]);
-  const [uc_events, setUCEvents] = useState([]);
-  const [viewMode, setViewMode] = useState("daily");
+function AccordionMenu() {
+  const [filteredAC, setFilteredAcEvents] = useState([]);
+  const [filteredIC, setFilteredIcEvents] = useState([]);
+  const [filteredRC, setFilteredRcEvents] = useState([]);
+  const [filteredUC, setFilteredUcEvents] = useState([]);
 
-  const today = new Date().toLocaleDateString('en-CA');
-  // save state 
+  const [user_events, setUserEvents] = useState([]);
+  const [normalizedUserEvents, setNormUserEvents] = useState([]);
+  const [activeEventPopup, setActiveEventPopup] = useState(null);
+  const popupRef = useRef(null);
+
+  const [viewMode, setViewMode] = useState("daily");
   useEffect(() => {
     chrome.storage.sync.get("viewMode", (result) => {
       if (result.viewMode) {
-        setViewMode(result.viewMode);
+        setViewMode(result.viewMode); // save state of viewMode
       }
     });
   }, []);
-  
+
   useEffect(() => {
     chrome.storage.sync.set({ viewMode });
   }, [viewMode]);
 
-  // HOTFIX: Billy's PR 4 didn't account for the {viewMode} toggle in Kamila's PR 5
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const [res1, res2, res3, res4] = await Promise.all([
-          fetch(`http://franklopez.tech:5050/academiccalendar_${viewMode}/${today}`),
-          fetch(`http://franklopez.tech:5050/involvementcenter_${viewMode}/${today}`),
-          fetch(`http://franklopez.tech:5050/rebelcoverage_${viewMode}/${today}`),
-          fetch(`http://franklopez.tech:5050/unlvcalendar_${viewMode}/${today}`)
-        ]);
+/***  LOAD EVENTS and FILTER ***/
 
-        const [data1, data2, data3, data4] = await Promise.all([
-          res1.json(), res2.json(), res3.json(), res4.json()
-        ]);
-        setACEvents(!data1.message ? data1 : []);
-        setICEvents(!data2.message ? data2 : []);
-        setRCEvents(!data3.message ? data3 : []);
-        setUCEvents(!data4.message ? data4 : []);
-      } catch (err) {
-        console.error('Error fetching events:', err);
+  const today = new Date().toLocaleDateString('en-CA');
+  useEffect(() => {
+    const loadEvents = async () => {
+      const [newFilteredAC, newFilteredIC, newFilteredRC, newFilteredUC] = await filterEvents(today, viewMode);
+      
+      setFilteredAcEvents(newFilteredAC);
+      setFilteredIcEvents(newFilteredIC);
+      setFilteredRcEvents(newFilteredRC);
+      setFilteredUcEvents(newFilteredUC);
+
+      chrome.storage.local.set({
+        filteredAC: newFilteredAC,
+        filteredIC: newFilteredIC,
+        filteredRC: newFilteredRC,
+        filteredUC: newFilteredUC,
+      });
+    };
+      
+
+    loadEvents();
+  }, [viewMode, today]);
+
+/***  END LOAD and FILTER EVENTS  ***/
+
+/***  USER EVENTS  ***/
+
+    useEffect(() => {
+      const unsubscribe = subscribeToUserEvents(setUserEvents);
+      return unsubscribe;
+    }, []);
+
+    // filter User Events by daily or weekly (brought back, was overwritten)
+    function filterUserEvents(events, viewMode) {
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+
+      const weekDates = [];
+      for (let i = 0; i < 7; i++) {
+        const tempDate = new Date(today);
+        tempDate.setDate(today.getDate() + i);
+        weekDates.push(tempDate.toISOString().split('T')[0]);
       }
+
+      return events.filter(event => {
+        if (viewMode === "daily") {
+          return event.startDate === todayStr;
+        } else if (viewMode === "weekly") {
+          return weekDates.includes(event.startDate);
+        }
+        return false;
+      });
+    }    
+
+    useEffect(() => {
+      const normalized = normalizeUserEvents(user_events);
+      const filtered = filterUserEvents(normalized, viewMode);
+      setNormUserEvents(filtered);
+    }, [user_events, viewMode]);
+
+    // if user event is clicked
+    useEffect(() => {
+      const handleClickOutside = (e) => {
+        if (popupRef.current && !popupRef.current.contains(e.target)) {
+          setActiveEventPopup(null);
+        }
+      };
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+/***  END USER EVENTS  ***/
+
+/***  DYNAMIC MENU SIZING  ***/
+
+    const [openKeys, setOpenKeys] = useState([]);
+    const [isAccordionReady, setIsAccordionReady] = useState(false);
+
+    useEffect(() => {
+      chrome.storage.sync.get("openKeys", (result) => {
+        if (result.openKeys) {
+          setOpenKeys(result.openKeys);
+        } else {
+          setOpenKeys(["0", "1", "2"]); // first-time default
+        }
+        setIsAccordionReady(true); // signal ready
+      });
+    }, []);
+
+    const toggleKey = (key) => {
+      const newKeys = openKeys.includes(key)
+        ? openKeys.filter(k => k !== key)
+        : [...openKeys, key];
+
+      setOpenKeys(newKeys);
+      chrome.storage.sync.set({ openKeys: newKeys });
     };
 
-    fetchEvents();
-  }, [viewMode]);
+    const isOpen = (key) => openKeys.includes(key);
+
+    // Dynamically determine height per open item
+    const totalHeight = 465; // not the full 470 height so that the rounded bottom can be seen
+    const headerHeight = 52;
+    const openCount = openKeys.length;
+    const bodyHeight = openCount > 0 ? (totalHeight - (3 * headerHeight)) / openCount : 0;
+
+/***  END DYNAMIC MENU SIZING  ***/
 
   return (
-    <div className="accordion-scroll-wrapper">
-        <div className="accordion-header" style={{ 
+    <div>
+      <div className="accordion-header" style={{
         paddingTop: "0.4rem",
-        display: "flex", 
-        justifyContent: "space-between", 
-        alignItems: "center", 
-        marginBottom: "0.5rem", 
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "0.5rem",
         paddingRight: "1rem",
       }}>
         <p className="accordion-text" style={{ margin: 0, fontSize: "1rem", fontWeight: 600 }}>
@@ -86,39 +192,85 @@ import Toggle from "./Toggle";
           onChange={() => setViewMode(prev => (prev === "daily" ? "weekly" : "daily"))}
         />
       </div>
-      <Accordion defaultActiveKey={["0", "1", "2"]} alwaysOpen>
-      	<Accordion.Item eventKey="0">
-      	<Accordion.Header>📚 Upcoming Assignments</Accordion.Header>
+      <div className="accordion-wrapper">
+        {isAccordionReady && (
+          <Accordion activeKey={openKeys} alwaysOpen className="accordion">
+            {["0", "1", "2"].map((key, index) => {
+              const isSectionOpen = isOpen(key);
+              const itemFlexGrow = isSectionOpen ? 1 : 0;
 
-          <Accordion.Body className="accordion-panel-scroll">
-          {/* • <strong> 🗺️ History 405:</strong> Homework 3 due by this Sunday <strong> <br />
-          • <strong> 💻 CS 472:</strong> DP II</strong> due by next week Tuesday. */}
-          <CanvasAssignments viewMode={viewMode}>
+              return (
+                <Accordion.Item
+                  eventKey={key}
+                  key={key}
+                  className="accordion-item"
+                  style={{ flexGrow: itemFlexGrow }}
+                >
+                <Accordion.Header onClick={() => toggleKey(key)}>
+                  {index === 0 && (
+                    <>
+                      <img 
+                        src= {canvasIcon}
+                        alt= "canvasIcon" 
+                        style={{ height: '20px', marginRight: '8px' }} 
+                      />
+                      Upcoming Assignments
+                    </>
+                  )}
+                  {index === 1 && (
+                    <>
+                      <img 
+                        src={calIcon}
+                        alt="calIcon" 
+                        style={{  height: '20px', marginRight: '8px'}} 
+                      />
+                      Your Events
+                    </>
+                  )}
+                  {index === 2 && (
+                    <>
+                      <img 
+                        src={unlvIcon}
+                        alt="unlvIcon" 
+                        style={{ marginLeft: '-6px', height: '20px' }} 
+                      />    
+                      UNLV Events
+                    </>
+                  )}
+                </Accordion.Header>
+                  <Accordion.Body
+                    className="accordion-body"
+                    style={{
+                      display: isSectionOpen ? "block" : "none",
+                      height: `${bodyHeight}px`, // height not maxHeight to ensure equal distribution
+                    }}
+                  >
 
-            </CanvasAssignments>
-          </Accordion.Body>
-        </Accordion.Item>
-        <Accordion.Item eventKey="1">
-          <Accordion.Header>📅 Your Events</Accordion.Header>
-          <Accordion.Body className="accordion-panel-scroll">
-            {/* Additional category filtering
-             will go here for 
-                  -involvement center */}
-            <Events events={ic_events} viewMode={viewMode} />
-          </Accordion.Body>
-        </Accordion.Item>
-        <Accordion.Item eventKey="2">
-          <Accordion.Header>🎉 UNLV Events</Accordion.Header>
-          <Accordion.Body className="accordion-panel-scroll">
-            {/* Additional category filtering
-             will go here for 
-                  -UNLV cal
-                  - academic cal 
-                  -  rebel cov */}
-            <Events events={[...uc_events, ...ac_events, ...rc_events]} viewMode={viewMode} />
-          </Accordion.Body>
-        </Accordion.Item>
-      </Accordion>
+                    {index === 0 && <CanvasAssignments viewMode={viewMode} />}
+                    {index === 1 && <Events events={[...filteredIC, ...normalizedUserEvents]} viewMode={viewMode} setActiveEventPopup={setActiveEventPopup} yourEvents={true}/>}
+                    {index === 2 && <Events events={[
+                      ...(Array.isArray(filteredUC) ? filteredUC : []),
+                      ...(Array.isArray(filteredAC) ? filteredAC.map(event => ({ ...event, academicCalendar: true })) : []),
+                      ...(Array.isArray(filteredRC) ? filteredRC : [])
+                    ]} viewMode={viewMode} />}
+
+                  </Accordion.Body>
+                </Accordion.Item>
+              );
+            })}
+          </Accordion>
+        )}
+
+        {/* 💬 Popup for Custom Event */}
+        {activeEventPopup && (
+          <UserEventPopup
+          event={activeEventPopup}
+          onClose={() => setActiveEventPopup(null)}
+          popupRef={popupRef}
+          />
+        )}
+      </div>
+
     </div>
   );
 }

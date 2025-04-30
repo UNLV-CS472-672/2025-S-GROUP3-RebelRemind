@@ -1,21 +1,100 @@
+import { useEffect, useState } from "react";
 import './css/Events.css';
+import addcalendarIcon from "../assets/addcalendarIcon.png";
 
-function Events({ events, viewMode }) {
- if (!events || events.length === 0) {
+function Events({ events, viewMode, setActiveEventPopup = null , yourEvents = false}) {
+  if (!events || events.length === 0) {
     return <div className="no-events"> No events found for this view.</div>;
   }
-  const sortedEvents = [...events].sort((a, b) => {
-    const aDate = new Date(`${a.date} ${a.time}`);
-    const bDate = new Date(`${b.date} ${b.time}`);
+
+  const [localEvents, setLocalEvents] = useState(events);
+
+  useEffect(() => {
+    const updateWithStorage = () => {
+      chrome.storage.local.get("UNLVEvents", (data) => {
+        const storedEvents = Array.isArray(data["UNLVEvents"]) ? data["UNLVEvents"] : [];
+  
+        const updated = events.map(event => {
+          const isAdded = storedEvents.some(
+            (e) => e.name === event.name && e.startTime === event.startTime && e.startDate === event.startDate
+          );
+          return { ...event, added: isAdded };
+        });
+  
+        setLocalEvents(updated);
+      });
+    };
+  
+    updateWithStorage(); // run immediately on mount
+  
+    const handleMessage = (message) => {
+      if (message.type === "EVENT_UPDATED") {
+        updateWithStorage(); // update again when an event is added/removed
+      }
+    };
+
+    chrome.runtime.onMessage.addListener(handleMessage);
+    return () => chrome.runtime.onMessage.removeListener(handleMessage);
+  }, [events]); 
+
+  
+  function formatDate(dateString) {
+    const [year, month, day] = dateString.split("-").map(Number);
+    const date = new Date(year, month - 1, day); // force local time
+  
+    const options = { month: 'long' };
+    const monthName = date.toLocaleDateString('en-US', options);
+  
+    let suffix = "th";
+    if (day % 10 === 1 && day !== 11) suffix = "st";
+    else if (day % 10 === 2 && day !== 12) suffix = "nd";
+    else if (day % 10 === 3 && day !== 13) suffix = "rd";
+  
+    return `${monthName} ${day}${suffix}`;
+  }  
+
+  const sortedEvents = [...localEvents].sort((a, b) => {
+    const aDate = new Date(`${a.startDate} ${a.startTime}`);
+    const bDate = new Date(`${b.startDate} ${b.startTime}`);
     return aDate - bDate; // soonest to latest
   });
+
+  const handleAddEvent = (event) => {  
+    chrome.storage.local.get("UNLVEvents", (data) => {
+      const existing = Array.isArray(data["UNLVEvents"]) ? data["UNLVEvents"] : [];
+  
+      // Remove `added` so we don't store it
+      const { added, ...cleanedEvent } = event;
+  
+      const updatedEvents = [...existing, cleanedEvent];
+  
+      chrome.storage.local.set({ "UNLVEvents": updatedEvents }, () => {
+        chrome.runtime.sendMessage({ type: "EVENT_UPDATED" });
+      });
+    });
+  };  
+
+function handleRemoveEvent(event) {
+    chrome.storage.local.get("UNLVEvents", (data) => {
+        const existing = Array.isArray(data["UNLVEvents"]) ? data["UNLVEvents"] : [];
+
+        const updatedEvents = existing.filter(
+            (e) => !(e.name === event.name && e.startTime === event.startTime)
+        );
+
+        chrome.storage.local.set({ "UNLVEvents": updatedEvents }, () => {
+            chrome.runtime.sendMessage({ type: "EVENT_UPDATED" });
+        });
+    });
+}
+
 
   if (viewMode === "weekly") {
     const grouped = {};
     sortedEvents.forEach(event => {
-      const [year, month, day] = event.date.split('-');
+      const [year, month, day] = event.startDate.split('-');
       const date = new Date(year, month - 1, day);
-            const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
+      const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
       if (!grouped[weekday]) grouped[weekday] = [];
       grouped[weekday].push(event);
     });
@@ -23,7 +102,7 @@ function Events({ events, viewMode }) {
     const weekdayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const todayIndex = new Date().getDay();
     const orderedWeekdays = [...weekdayNames.slice(todayIndex), ...weekdayNames.slice(0, todayIndex)];
-    
+      
     return orderedWeekdays
       .filter(day => grouped[day])
       .map(day => (
@@ -33,13 +112,88 @@ function Events({ events, viewMode }) {
           <ul className={`event-list ${viewMode === 'daily' ? 'event-list-daily' : ''}`}>
             {grouped[day].map(event => (
               <li key={event.id} className="event-item">
-                <a href={event.link} target="_blank" rel="noopener noreferrer" className="event-link">
-                  <span className="event-name">
-                    <span className="event-org">{event.organization}{event.organization?':':''} </span>{event.name}
-                  </span>
-                  <span className="event-time">{event.time}</span>
-                </a>
+              {event.academicCalendar ? (
+              // Format for Academic Calendar event
+              <>
+              <div className="event-name" style={{marginRight: "10px"}}>
+                <span className="event-org" style={{fontWeight: "bold"}}>
+                  Academic Calendar: 
+                </span>
+                {" " + event.name}
+              </div>
+              <div className="event-time">
+                {formatDate(event.startDate)}
+              </div>
+            </>
+            ) :
+              event.link === "customEvent" ? ( // Custom Events
+                  <>
+                    <a
+                      className="event-link"
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setActiveEventPopup(event);
+                      }}
+                    >
+                      <span className="event-name">
+                        <span className="event-org">
+                          {event.organization}
+                          {event.organization ? ':' : ''}{" "}
+                        </span>
+                        {event.name}
+                      </span>
+                      </a>
+                      <span className="event-time">{event.time /* NOT startTime (unformatted) */}</span> 
+                  </>
+                ) : (<>
+                  <a
+                    href={event.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="event-link"
+                  >
+                    <span className="event-name">
+                      <span className="event-org">
+                        {event.organization}
+                        {event.organization ? ':' : ''}{" "}
+                      </span>
+                      {event.name}
+                    </span>
+                    </a>
+                    <span className="event-time">{event.startTime}
+                    {!yourEvents && (
+                      <div className="tooltip-container">
+                      {!event.added ? (
+                        // Show Add to Calendar
+                        <button
+                          className="addCalbtn"
+                          onClick={() => handleAddEvent(event)}
+                          aria-label="add to calendar"
+                        >
+                          <img src={addcalendarIcon} height="25px" width="25px" alt="Add to Calendar" />
+                        </button>
+                      ) : (
+                        // Show Remove from Calendar
+                        <button
+                          className="removeCalbtn"
+                          onClick={() => handleRemoveEvent(event)}
+                          aria-label="remove from calendar"
+                        >
+                          ✖
+                        </button>
+                      )}
+                      {/* Tooltip text */}
+                      <span className="tooltip-text">
+                        {!event.added ? "Add to Calendar" : "Remove from Calendar"}
+                      </span>
+                    </div>                    
+                    )}
+                    </span>               
+                </>
+                )}
               </li>
+
             ))}
           </ul>
         </div>
@@ -50,12 +204,86 @@ function Events({ events, viewMode }) {
     <ul className={`event-list ${viewMode === 'daily' ? 'event-list-daily' : ''}`}>
       {sortedEvents.map(event => (
         <li key={event.id} className="event-item">
-          <a href={event.link} target="_blank" rel="noopener noreferrer" className="event-link">
-            <span className="event-name">
-                <span className="event-org">{event.organization}{event.organization?':':''} </span>{event.name}
+        
+        {event.academicCalendar ? (
+        // Format for Academic Calendar event
+        <>
+          <div className="event-name" style={{marginRight: "10px"}}>
+            <span className="event-org" style={{fontWeight: "bold"}}>
+              Academic Calendar: 
             </span>
-            <span className="event-time">{event.time}</span>
-          </a>
+            {event.name}
+          </div>
+          <div className="event-time">
+            {formatDate(event.startDate)}
+          </div>
+        </>
+      ) : event.link === "customEvent" ? ( // Custom Events
+            <>
+              <a
+                className="event-link"
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveEventPopup(event);
+                }}
+              >
+                <span className="event-name">
+                  <span className="event-org">
+                    {event.organization}
+                    {event.organization ? ':' : ''}{" "}
+                  </span>
+                  {event.name}
+                </span>
+                </a>
+                <span className="event-time">{event.time}</span>
+            </>
+          ) : (<>
+            <a
+              href={event.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="event-link"
+            >
+              <span className="event-name">
+                <span className="event-org">
+                  {event.organization}
+                  {event.organization ? ':' : ''}{" "}
+                </span>
+                {event.name}
+              </span>
+              </a>
+              <span className="event-time">{event.startTime}
+              {!yourEvents && (
+                <div className="tooltip-container">
+                {!event.added ? (
+                  // Show Add to Calendar
+                  <button
+                    className="addCalbtn"
+                    onClick={() => handleAddEvent(event)}
+                    aria-label="add to calendar"
+                  >
+                    <img src={addcalendarIcon} height="25px" width="25px" alt="Add to Calendar" />
+                  </button>
+                ) : (
+                  // Show Remove from Calendar
+                  <button
+                    className="removeCalbtn"
+                    onClick={() => handleRemoveEvent(event)}
+                    aria-label="remove from calendar"
+                  >
+                    ✖
+                  </button>
+                )}
+                {/* Tooltip text */}
+                <span className="tooltip-text">
+                  {!event.added ? "Add to Calendar" : "Remove from Calendar"}
+                </span>
+              </div>              
+              )}
+              </span>
+            </>
+          )}
         </li>
       ))}
     </ul>
