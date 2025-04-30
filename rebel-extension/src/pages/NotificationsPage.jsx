@@ -26,7 +26,7 @@ import "./css/NotificationsPage.css";
 const Notifications = () => {
   return (
   <div className="page-background">
-    <div className="notification-container">
+    <div className="notification-container" style={{ padding: "1rem", height: "80vh", overflowY: "hidden" }}>
       <h1 className="page-title">Rebel Remind Notifications</h1>
       <div className="toast-scroll-area">
         <NotificationHistory />
