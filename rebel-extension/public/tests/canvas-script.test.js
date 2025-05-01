@@ -12,7 +12,7 @@
  * Authored by: Gunnar Dalton
  */
 
-import { getAssignments, getCourses, getCanvasPAT } from "../scripts/canvas-script";
+import { getAssignments, getCourses, getCanvasPAT, generateInitialColor } from "../scripts/canvas-script";
 
 beforeEach(() => {
     jest.clearAllMocks(); // Clear mocks between tests
@@ -39,11 +39,13 @@ describe("getCanvasPAT", () => {
 
         expect(global.chrome.storage.local.get).toHaveBeenCalledWith("canvasPAT", expect.any(Function));
     }); 
+
     test("No Access Token in Storage", async () => {
         global.chrome.storage.local.get.mockImplementation((key, callback) => callback({})); // mock chrome.storage with no token
         await expect(getCanvasPAT()).resolves.toBe(false);
     });
 });
+
 describe("getAssignments", () => {
     test("Fetch Assignment List (Single Page)", async () => {
         // ai-gen start (ChatGPT-4o, 2)
@@ -60,6 +62,7 @@ describe("getAssignments", () => {
         expect(fetch).toHaveBeenCalledWith("https://unlv.instructure.com/api/v1/calendar_events?type=assignment&all_events=true&per_page=100&context_codes[]=course_12345", expect.any(Object));
         // ai-gen end
     });
+
     test("Fetch Assignment List (Multi Page)", async () => {
         fetch
             .mockResolvedValueOnce({ // first page
@@ -87,6 +90,7 @@ describe("getAssignments", () => {
         expect(fetch).toHaveBeenCalledWith("https://unlv.instructure.com/api/v1/calendar_events?type=assignment&all_events=true&per_page=100&context_codes[]=course_12345", expect.any(Object));
         expect(fetch).toHaveBeenCalledWith("https://unlv.instructure.com/api/v1/calendar_events?type=assignment&all_events=true&context_codes[]=course_12345&page=2&per_page=100", expect.any(Object))
     });
+
     test("Bad Access Token", async () => { // check for bad API response
         const consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
         fetch.mockResolvedValueOnce({
@@ -101,6 +105,7 @@ describe("getAssignments", () => {
         );
         consoleLogSpy.mockRestore();
     });
+
     test("Bad link to second page of assignment list", async() => {
         fetch
             .mockResolvedValueOnce({ // first page
@@ -141,6 +146,7 @@ describe("getCourses", () => {
         expect(fetch).toHaveBeenCalledTimes(1);
         expect(fetch).toHaveBeenCalledWith("https://unlv.instructure.com/api/v1/courses?per_page=100", expect.any(Object));
     });
+
     test("Fetch Course List (Multi Page)", async () => {
         fetch
         .mockResolvedValueOnce({ // first page
@@ -165,6 +171,7 @@ describe("getCourses", () => {
             expect(fetch).toHaveBeenCalledWith("https://unlv.instructure.com/api/v1/courses?per_page=100", expect.any(Object));
             expect(fetch).toHaveBeenCalledWith("https://unlv.instructure.com/api/v1/courses?page=2&per_page=100", expect.any(Object));
     });
+
     test("Bad Access Token", async () => { // check for bad API response
         const consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
         fetch.mockResolvedValueOnce({
@@ -180,6 +187,7 @@ describe("getCourses", () => {
         );
         consoleLogSpy.mockRestore();
     });
+
     test("Bad link to second page of course list", async() => {
         fetch
         .mockResolvedValueOnce({ // first page
@@ -203,6 +211,7 @@ describe("getCourses", () => {
             expect(fetch).toHaveBeenCalledTimes(1);
             expect(fetch).toHaveBeenCalledWith("https://unlv.instructure.com/api/v1/courses?per_page=100", expect.any(Object));
     });
+
     test("Non 401 error received", async() => {
         const consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
         fetch.mockResolvedValueOnce({
@@ -217,4 +226,62 @@ describe("getCourses", () => {
         );
         consoleLogSpy.mockRestore();
     });
+
+    test("Add all new courses to color list", async() => {
+        fetch.mockResolvedValueOnce({
+            ok: true,
+            json: async () => [{ id: 1, name: "CS 101", access_restricted_by_date: true }, 
+                { id: 2, name: "CS 102", access_restricted_by_date: false }, 
+                { id: 3, name: "CS 103", access_restricted_by_date: false }, 
+                { id: 4, name: "CS 104", access_restricted_by_date: true }],
+            headers: { get: () => null }
+        });
+        global.chrome.storage.local.get.mockImplementation((key, callback) => { 
+            callback({ colorList: { UNLVEvents: "#b10202", InvolvementCenter: "#666666", userEvents: "#0000ff", CanvasCourses: {} }});
+        })
+        const result = await getCourses("test_access_token");
+
+        expect(chrome.storage.local.set).toHaveBeenCalledWith({ colorList: { UNLVEvents: "#b10202", InvolvementCenter: "#666666", userEvents: "#0000ff", CanvasCourses: {
+            2: { color: expect.any(String), name: "CS 102"},
+            3: { color: expect.any(String), name: "CS 103"}
+        } }});
+    });
+
+    test("Add a new course to color list", async() => {
+        fetch.mockResolvedValueOnce({
+            ok: true,
+            json: async () => [{ id: 1, name: "CS 101", access_restricted_by_date: true }, 
+                { id: 2, name: "CS 102", access_restricted_by_date: false }, 
+                { id: 3, name: "CS 103", access_restricted_by_date: false }, 
+                { id: 4, name: "CS 104", access_restricted_by_date: false }],
+            headers: { get: () => null }
+        });
+        global.chrome.storage.local.get.mockImplementation((key, callback) => { 
+            callback({ colorList: { UNLVEvents: "#b10202", InvolvementCenter: "#666666", userEvents: "#0000ff", CanvasCourses: { 2: { color: "#333333", name: "CS 102" } } }});
+        })
+        const result = await getCourses("test_access_token");
+
+        expect(chrome.storage.local.set).toHaveBeenCalledWith({ colorList: { UNLVEvents: "#b10202", InvolvementCenter: "#666666", userEvents: "#0000ff", CanvasCourses: {
+            2: { color: "#333333", name: "CS 102"},
+            3: { color: expect.any(String), name: "CS 103"},
+            4: { color: expect.any(String), name: "CS 104"}
+        } }});
+    });
+});
+
+describe("generateInitialColor", () => {
+    // ai-gen start (ChatGPT-4o, 1)
+    test("Color is calculated as a hex color for a course", async() => {
+        expect(generateInitialColor(12345)).toMatch(/^#[0-9a-fA-F]{6}$/);
+    });
+
+    test("All cases of h values are tested", async() => {
+        expect(generateInitialColor(1089)).toMatch(/^#[0-9a-fA-F]{6}$/);
+        expect(generateInitialColor(1000)).toMatch(/^#[0-9a-fA-F]{6}$/);
+        expect(generateInitialColor(1010)).toMatch(/^#[0-9a-fA-F]{6}$/);
+        expect(generateInitialColor(1030)).toMatch(/^#[0-9a-fA-F]{6}$/);
+        expect(generateInitialColor(1050)).toMatch(/^#[0-9a-fA-F]{6}$/);
+        expect(generateInitialColor(1070)).toMatch(/^#[0-9a-fA-F]{6}$/);
+    });
+    // ai-gen end
 });

@@ -31,6 +31,7 @@ import UserProfile from "../components/UserProfile";
 import useAuth from "../../public/hooks/useAuth";
 import CanvasTokenManager from "../components/CanvasTokenManager";
 import Preferences from "../components/Preferences";
+import CalendarColorChange from '../components/CalendarEventColorChanging';
 import './css/SettingsPage.css';
 
 export default function SettingsPage() {
@@ -119,6 +120,9 @@ export default function SettingsPage() {
                 <div>
                     <p>Theme and layout options.</p>
                     <ColorPicker />
+                    <br></br>
+                    <p>Calendar event customization.</p>
+                    <CalendarColorChange />
                 </div>
             ),
         },
