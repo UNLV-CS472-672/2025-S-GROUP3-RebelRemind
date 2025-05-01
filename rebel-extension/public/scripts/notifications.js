@@ -87,7 +87,7 @@ export function storageListener(changes, areaName){
   }
 }
 
-export function chromeStartUpLisener(){
+export function chromeStartUpListener(){
   const currentHour = new Date().getHours();
   
     let notificationState = false;
