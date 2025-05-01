@@ -15,7 +15,7 @@ import { authenticateUser } from "./scripts/identity-script.js";
 import { getAssignments, getCourses, getCanvasPAT } from "./scripts/canvas-script.js";
 import { openSidePanel } from "./scripts/sidepanel.js";
 
-import { alarmInstall, storageListener, chromeStartUpLisener, dailyAlarmListener, onClickNotification} from "./scripts/notifications.js";
+import { alarmInstall, storageListener, chromeStartUpListener, dailyAlarmListener, onClickNotification} from "./scripts/notifications.js";
 
 
 /**
@@ -48,7 +48,7 @@ chrome.runtime.onInstalled.addListener(alarmInstall);
 chrome.storage.onChanged.addListener(storageListener);
 
 // Run logic when Chrome starts (fallback if alarm missed)
-chrome.runtime.onStartup.addListener(chromeStartUpLisener);
+chrome.runtime.onStartup.addListener(chromeStartUpListener);
 
 // Respond to the daily alarm
 chrome.alarms.onAlarm.addListener(dailyAlarmListener);
