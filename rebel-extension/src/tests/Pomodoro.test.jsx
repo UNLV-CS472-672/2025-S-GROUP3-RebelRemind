@@ -237,4 +237,136 @@ test('clamps invalid or negative minute input to 0', () => {
   expect(minutesInput.value).toBe('0');
 });
 
+// Added tests for pomodoro study log timer functionality
 
+test('displays message when no study sessions today', async () => {
+  chrome.storage.local.get.mockImplementationOnce((_, cb) => {
+    cb({ pomodoroLogs: [], pomodoroPastLogs: [] });
+  });
+
+  render(<PomodoroTimer />);
+  fireEvent.click(screen.getByText(/Daily/i));
+
+  await waitFor(() => {
+    expect(screen.getByText(/No study sessions today/i)).toBeInTheDocument();
+  });
+});
+
+test('toggles mute/unmute state correctly', async () => {
+  render(<PomodoroTimer />);
+  const button = screen.getByRole('button', { name: /🔊|🔇/ });
+
+  fireEvent.click(button); // toggle mute
+  expect(button.textContent).toBe("🔇");
+
+  fireEvent.click(button); // toggle back
+  expect(button.textContent).toBe("🔊");
+});
+
+test('renders today’s logs when present', async () => {
+  const now = new Date();
+  const timestamp = now.toISOString();
+
+  chrome.storage.local.get.mockImplementation((keys, callback) => {
+    callback({
+      pomodoroLogs: [{ type: "work", timestamp, durationMinutes: 50 }],
+      pomodoroPastLogs: [],
+      minutes: 25,
+      seconds: 0,
+      isRunning: false
+    });
+  });
+
+  render(<PomodoroTimer />);
+  await screen.findByText(/Total Time Studied/);
+
+  expect(screen.getByText(/Studied for 50 mins/)).toBeInTheDocument();
+});
+
+
+test('switches between Daily and Weekly tabs and renders respective content', async () => {
+  const today = new Date().toISOString();
+
+  chrome.storage.local.get.mockImplementation((keys, callback) => {
+    callback({
+      pomodoroLogs: [{ type: "work", timestamp: today, durationMinutes: 25 }],
+      pomodoroPastLogs: [],
+      minutes: 25,
+      seconds: 0,
+      isRunning: false
+    });
+  });
+
+  render(<PomodoroTimer />);
+
+  // Wait for daily tab to render
+  expect(await screen.findByText(/Total Time Studied/i)).toBeInTheDocument();
+
+  // Click Weekly tab and wait for Week section
+  fireEvent.click(screen.getByText(/Weekly/i));
+  expect(await screen.findByText(/Week of/i)).toBeInTheDocument();
+
+  // Click back to Daily tab
+  fireEvent.click(screen.getByText(/Daily/i));
+  expect(await screen.findByText(/Total Time Studied/i)).toBeInTheDocument();
+});
+
+
+test('renders weekly summary and expands when clicked', async () => {
+  const logTime = new Date('2025-04-28T12:00:00.000Z').toISOString(); // Monday
+
+  chrome.storage.local.get.mockImplementation((keys, callback) => {
+    callback({
+      pomodoroLogs: [{ type: "work", timestamp: logTime, durationMinutes: 30 }],
+      pomodoroPastLogs: [],
+      minutes: 25,
+      seconds: 0,
+      isRunning: false
+    });
+  });
+
+  render(<PomodoroTimer />);
+  fireEvent.click(screen.getByText(/Weekly/i));
+
+  const weekHeader = await screen.findByText(/Week of/i);
+  expect(weekHeader).toBeInTheDocument();
+
+  fireEvent.click(weekHeader);
+
+  const allDays = await screen.findAllByText(/Monday:|Tuesday:/i);
+  expect(allDays.length).toBeGreaterThan(0); // or:
+  expect(allDays[0]).toBeInTheDocument();
+});
+
+
+test('toggles mute state and updates alarmRef', () => {
+  render(<PomodoroTimer />);
+  const button = screen.getByRole('button', { name: /🔊/ });
+
+  // Click to mute
+  fireEvent.click(button);
+  expect(button).toHaveTextContent('🔇');
+
+  // Click to unmute
+  fireEvent.click(button);
+  expect(button).toHaveTextContent('🔊');
+});
+
+
+test('renders weekly summary container even if logs are empty', async () => {
+  chrome.storage.local.get.mockImplementation((_, cb) => {
+    cb({
+      pomodoroLogs: [],
+      pomodoroPastLogs: [],
+      minutes: 25,
+      seconds: 0,
+      isRunning: false
+    });
+  });
+
+  render(<PomodoroTimer />);
+  fireEvent.click(screen.getByText(/Weekly/i));
+
+  const container = await screen.findByText(/Your Study Log/);
+  expect(container).toBeInTheDocument();
+});
