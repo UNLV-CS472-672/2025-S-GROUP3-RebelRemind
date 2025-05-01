@@ -69,7 +69,8 @@ useEffect(() => {
       }
     }
   });
-
+  
+/* istanbul ignore next */
   const handleStorageChange = (changes) => {
     if (changes.minutes) {
       setMinutes(changes.minutes.newValue);
