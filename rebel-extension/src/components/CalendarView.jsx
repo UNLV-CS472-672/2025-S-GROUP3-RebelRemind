@@ -194,7 +194,6 @@ function CalendarMenu() {
 							</div>
 						</>
 					);
-					// setmodalBody(eventStart + eventEnd + eventLocation + eventOrg);
 				}
 				else{
 					setmodalBody(
@@ -209,7 +208,6 @@ function CalendarMenu() {
 							</div>
 						</>
 					);
-					// setmodalBody(eventDate + eventLocation + eventOrg);
 				}
 		}
 	};
@@ -359,6 +357,9 @@ const getUserEvents = async () => {
 	})
 };
 
+/**
+ * Gets the list of Involvement Center events from storage and formats it in the correct way to be handled by the calendar.
+ */
 const getInolvementCenterEvents = async() => {
 	return new Promise ((resolve) => {
 		chrome.storage.local.get("filteredIC", (data) => {
@@ -383,6 +384,9 @@ const getInolvementCenterEvents = async() => {
 	})
 }
 
+/**
+ * Gets the list of saved UNLV events from storage and formats it in the correct way to be handled by the calendar.
+ */
 const getSavedUNLVEvents = async() => {
 	return new Promise ((resolve) => {
 		chrome.storage.local.get("savedUNLVEvents", (data) => {

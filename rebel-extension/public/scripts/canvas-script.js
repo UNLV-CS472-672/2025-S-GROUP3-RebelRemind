@@ -161,8 +161,11 @@ export async function getCourses(accessToken) {
     }
 }
 
+/**
+ * Create an initial color for each Canvas course based on the ID
+ */
 // ai-gen start (ChatGPT-4o, 0)
-function generateInitialColor(courseID) {
+export function generateInitialColor(courseID) {
     let hash = 0;
     const idString = courseID.toString();
     for (let i = 0; i < idString.length; i++) {
@@ -203,7 +206,7 @@ function generateInitialColor(courseID) {
         g = 0;
         b = c;
     }
-    else if (300 <= h && h < 360) {
+    else {
         r = c;
         g = 0; 
         b = x;

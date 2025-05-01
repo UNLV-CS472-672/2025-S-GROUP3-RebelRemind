@@ -1,14 +1,14 @@
 /**
  * Script for Handling Google Calendar API Requests
  *
- * This script contains a function for 
+ * This script contains functions that get a Google authentication token and use it to sync Rebel Remind events to a Google Calendar on the user's account.
  * It does not contain event listeners, as they are managed in background.js.
  *
  * Authored by: Gunnar Dalton
  */
 
 /**
- * 
+ * Get the token from Google for Google Calendar access.
  */
 export function getGoogleToken() {
     return new Promise((resolve) => {
@@ -25,7 +25,7 @@ export function getGoogleToken() {
 }
 
 /**
- * 
+ * Get the calendar ID from storage if one has been stored.
  */
 export async function getCalendarID() {
     return new Promise((resolve) => {
@@ -41,7 +41,7 @@ export async function getCalendarID() {
 }
 
 /**
- * 
+ * Check if the calendar with the specified calendar ID exists on Google.
  */
 export async function checkCalendarExists(token, calendarID) {
     const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarID}`;
@@ -57,7 +57,7 @@ export async function checkCalendarExists(token, calendarID) {
 }
 
 /**
- * 
+ * Get the calendar ID of the calendar in the account's list or create a new calendar if one is not there.
  */
 export async function getOrCreateCalendar(token) {
     let url = "https://www.googleapis.com/calendar/v3/users/me/calendarList";
@@ -91,7 +91,7 @@ export async function getOrCreateCalendar(token) {
 }
 
 /**
- * 
+ * Gather all events from storage and format them correctly for Google Calendar.
  */
 export async function gatherEvents() {
     // user events, Canvas, filtered Involvement center, saved UNLV events
@@ -131,6 +131,7 @@ export async function gatherEvents() {
         });
     });
 
+    
     const getUserEvents = new Promise((resolve) => {
         chrome.storage.local.get("userEvents", (data) => {
             if (data.userEvents) {
@@ -139,14 +140,9 @@ export async function gatherEvents() {
                     summary: event.title,
                     id: `userevent${eventHash(event.title, event.date)}`,
                     description: event.desc,
-                    start: {
-                        dateTime: event.allDay ? `${event.startDate}T00:00:00` : `${event.startDate}T${event.startTime}:00`,
-                        timeZone: "America/Los_Angeles"
-                    },
-                    end: {
-                        dateTime: event.allDay ? `${event.startDate}T00:00:00` : `${event.startDate}T${event.endTime}:00`,
-                        timeZone: "America/Los_Angeles"
-                    },
+                    location: event.location,
+                    start: event.allDay ? { date: event.startDate, timeZone: "America/Los_Angeles" } : { dateTime: `${event.startDate}T${event.startTime}:00`, timeZone: "America/Los_Angeles" },
+                    end: event.allDay ? { date: event.startDate, timeZone: "America/Los_Angeles" } : { dateTime: `${event.startDate}T${event.endTime}:00`, timeZone: "America/Los_Angeles"},
                     extendedProperties: {
                         private: {
                             managedBy: "Rebel Remind"
@@ -223,10 +219,10 @@ export async function gatherEvents() {
 }
 
 /**
- * 
+ * Generate a hash based on the title and date of an event for use in the ID field.
  */
 // ai-gen start (ChatGPT-4o, 1)
-function eventHash(title, date) {
+export function eventHash(title, date) {
     const preHashString = `${title}-${date}`;
     let hash = 0;
     for (let i = 0; i < preHashString.length; i++) {
@@ -238,9 +234,9 @@ function eventHash(title, date) {
 // ai-gen end
 
 /**
- * 
+ * Add or update events in the Google Calendar.
  */
-async function addOrUpdateEvents(token, calendarID, event) {
+export async function addOrUpdateEvents(token, calendarID, event) {
     let url = `https://www.googleapis.com/calendar/v3/calendars/${calendarID}/events?eventId=${event.id}`;
     const response = await fetch(url, {
         method: "POST",
@@ -265,9 +261,9 @@ async function addOrUpdateEvents(token, calendarID, event) {
 }
 
 /**
- * 
+ * Get the list of events currently in the calendar.
  */
-async function getExistingEvents(token, calendarID) {
+export async function getExistingEvents(token, calendarID) {
     let url = `https://www.googleapis.com/calendar/v3/calendars/${calendarID}/events?maxResults=2500`;
     const response = await fetch(url, {
         method: "GET",
@@ -276,15 +272,20 @@ async function getExistingEvents(token, calendarID) {
         }
     });
     const list = await response.json();
-    return (list.items || []).filter(event => 
-        event.extendedProperties?.private?.managedBy === "Rebel Remind"
-    );
+    if (list.items.length) {
+        return list.items.filter(event => 
+            event.extendedProperties?.private?.managedBy === "Rebel Remind"
+        );
+    }
+    else {
+        return [];
+    }
 }
 
 /**
- * 
+ * Delete any event from the calendar that is no longer found in Rebel Remind.
  */
-async function deleteEvent(token, calendarID, eventID) {
+export async function deleteEvent(token, calendarID, eventID) {
     let url = `https://www.googleapis.com/calendar/v3/calendars/${calendarID}/events/${eventID}`
     const response = await fetch(url, {
         method: "DELETE",
@@ -295,7 +296,7 @@ async function deleteEvent(token, calendarID, eventID) {
 }
 
 /**
- * 
+ * Make calls to other functions to fully sync Rebel Remind with Google Calendar.
  */
 export async function syncCalendar(events, token, calendarID) {
     const existingEvents = await getExistingEvents(token, calendarID);
@@ -309,49 +310,5 @@ export async function syncCalendar(events, token, calendarID) {
     // ai-gen end
     for (const event of events) {
         await addOrUpdateEvents(token, calendarID, event);
-    }
-}
-
-export async function testCreateEvent(token, calendarID) {
-    const testEvent = {
-        id: "testputevent45678", // This ID will allow us to PUT (update or insert)
-        summary: "Test PUT Event",
-        description: "This is a test event added using PUT",
-        start: {
-            dateTime: "2025-05-01T16:00:00-07:00", // Use full ISO with timezone offset
-            timeZone: "America/Los_Angeles"
-        },
-        end: {
-            dateTime: "2025-05-01T18:00:00-07:00",
-            timeZone: "America/Los_Angeles"
-        },
-        extendedProperties: {
-            private: {
-                managedBy: "Rebel Remind"
-            }
-        }
-    };
-
-    const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarID}/events?eventId=${testEvent.id}`;
-
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(testEvent)
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            console.error("❌ Failed to PUT test event:", result);
-        } else {
-            console.log("✅ Successfully PUT test event:", result);
-        }
-    } catch (error) {
-        console.error("❌ Error during testPutEvent:", error);
     }
 }
