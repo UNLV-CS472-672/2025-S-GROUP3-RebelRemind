@@ -56,6 +56,7 @@ const UserEventList = () => {
         chrome.storage.local.set({ "userEvents": updatedEvents }, () => {
             setUserEvents(updatedEvents);
             setExpandedEventKey(null);
+            chrome.runtime.sendMessage({ type: "EVENT_UPDATED" });
         });
     };
 

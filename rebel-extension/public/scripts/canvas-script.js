@@ -48,7 +48,7 @@ export async function getAssignments(courseID, accessToken) {
         }
         // ai-gen start (ChatGPT-4o, 2)
         const selectedKeys = ["title", "context_name", "html_url"];
-        const nestedKeys = ["due_at", "id", "user_submitted"];
+        const nestedKeys = ["due_at", "id", "user_submitted", "course_id"];
 
         const calendarFormattedAssignments = allAssignments.map(assignment => {
             const filteredMain = Object.fromEntries(
@@ -90,7 +90,7 @@ export function getCanvasPAT() {
 export async function getCourses(accessToken) {
     let url = `https://unlv.instructure.com/api/v1/courses?per_page=100`;
     let allCourses = []; // Stores all courses student has been enrolled in.
-    let activeCourses = []; // Stores only courses student is currently enrolled in.
+    let activeCoursesIDs = []; // Stores only course IDs of courses student is currently enrolled in.
 
     try {
         while (url) { // Loops through pages Canvas data.
@@ -136,13 +136,84 @@ export async function getCourses(accessToken) {
 
         for(const course of allCourses) {
             if(!course.access_restricted_by_date) { // Finds courses that student is actively enrolled in.
-                activeCourses.push(course.id);
+                activeCoursesIDs.push(course.id);
             }
         }
-        return activeCourses;
+        
+        chrome.storage.local.get("colorList", (data) => {
+            let colorList = data.colorList;
+            let courseColorList = colorList.CanvasCourses;
+            for(const course of allCourses) {
+                if(!course.access_restricted_by_date) { // Finds courses that student is actively enrolled in.
+                    if(!courseColorList[course.id]) {
+                        courseColorList[course.id] = { color: generateInitialColor(course.id), name: course.name };
+                    }
+                }
+            }
+            colorList.CanvasCourses = courseColorList;
+            chrome.storage.local.set({ colorList: colorList });
+        });
+        return activeCoursesIDs;
 
     } catch (error) {
         console.log("Error fetching courses:", error);
         return false;
     }
 }
+
+/**
+ * Create an initial color for each Canvas course based on the ID
+ */
+// ai-gen start (ChatGPT-4o, 0)
+export function generateInitialColor(courseID) {
+    let hash = 0;
+    const idString = courseID.toString();
+    for (let i = 0; i < idString.length; i++) {
+        hash = idString.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const h = hash % 360;
+    let s = 70;
+    let l = 60;
+    s /= 100;
+    l /= 100;
+    let c = (1 - Math.abs(2 * l - 1)) * s;
+    let x  = c * (1 - Math.abs((h / 60) % 2 - 1));
+    let m = l - c / 2;
+    let r = 0, g = 0, b = 0;
+
+    if (0 <= h && h < 60) {
+        r = c;
+        g = x;
+        b = 0;
+    }
+    else if (60 <= h && h < 120) {
+        r = x;
+        g = c;
+        b = 0;
+    }
+    else if (120 <= h && h < 180) {
+        r = 0; 
+        g = c; 
+        b = x;
+    }
+    else if (180 <= h && h < 240) {
+        r = 0;
+        g = x;
+        b = c;
+    }
+    else if (240 <= h && h < 300) {
+        r = x;
+        g = 0;
+        b = c;
+    }
+    else {
+        r = c;
+        g = 0; 
+        b = x;
+    }
+    r = Math.round((r + m) * 255);
+    g = Math.round((g + m) * 255);
+    b = Math.round((b + m) * 255);
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+// ai-gen end

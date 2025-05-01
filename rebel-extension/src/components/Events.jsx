@@ -11,8 +11,8 @@ function Events({ events, viewMode, setActiveEventPopup = null , yourEvents = fa
 
   useEffect(() => {
     const updateWithStorage = () => {
-      chrome.storage.local.get("UNLVEvents", (data) => {
-        const storedEvents = Array.isArray(data["UNLVEvents"]) ? data["UNLVEvents"] : [];
+      chrome.storage.local.get("savedUNLVEvents", (data) => {
+        const storedEvents = Array.isArray(data["savedUNLVEvents"]) ? data["savedUNLVEvents"] : [];
   
         const updated = events.map(event => {
           const isAdded = storedEvents.some(
@@ -60,29 +60,27 @@ function Events({ events, viewMode, setActiveEventPopup = null , yourEvents = fa
   });
 
   const handleAddEvent = (event) => {  
-    chrome.storage.local.get("UNLVEvents", (data) => {
-      const existing = Array.isArray(data["UNLVEvents"]) ? data["UNLVEvents"] : [];
-  
-      // Remove `added` so we don't store it
-      const { added, ...cleanedEvent } = event;
-  
-      const updatedEvents = [...existing, cleanedEvent];
-  
-      chrome.storage.local.set({ "UNLVEvents": updatedEvents }, () => {
-        chrome.runtime.sendMessage({ type: "EVENT_UPDATED" });
-      });
-    });
-  };  
+        chrome.storage.local.get("savedUNLVEvents", (data) => {
+            const existing = Array.isArray(data["savedUNLVEvents"]) ? data["savedUNLVEvents"] : [];
+            const updatedEvents = [...existing, event];
+
+            chrome.storage.local.set({ "savedUNLVEvents": updatedEvents }, () => {
+                // alert("Event saved to calendar.");
+
+                chrome.runtime.sendMessage({ type: "EVENT_UPDATED" });
+            });
+        });
+   };
 
 function handleRemoveEvent(event) {
-    chrome.storage.local.get("UNLVEvents", (data) => {
-        const existing = Array.isArray(data["UNLVEvents"]) ? data["UNLVEvents"] : [];
+    chrome.storage.local.get("savedUNLVEvents", (data) => {
+        const existing = Array.isArray(data["savedUNLVEvents"]) ? data["savedUNLVEvents"] : [];
 
         const updatedEvents = existing.filter(
             (e) => !(e.name === event.name && e.startTime === event.startTime)
         );
 
-        chrome.storage.local.set({ "UNLVEvents": updatedEvents }, () => {
+        chrome.storage.local.set({ "savedUNLVEvents": updatedEvents }, () => {
             chrome.runtime.sendMessage({ type: "EVENT_UPDATED" });
         });
     });

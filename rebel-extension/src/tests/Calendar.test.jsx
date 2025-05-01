@@ -15,12 +15,7 @@ global.chrome = {
   },
   storage: {
     local: {
-      get: jest.fn((key, callback) => {
-        callback({ title: "Test_Assignment",
-		   start: new Date(),
-	           end: new Date(),
-		   description: "Description 1" });
-      }),
+      get: jest.fn()
     },
   },
 };
@@ -72,13 +67,21 @@ describe('Calendar View Component', () => {
 
   // To check that the calendar can actually handle events if given one
   it('passes calendarEvents to the Calendar component', async () => {
-    const calendarEventsMock = [
-      { start: new Date(), end: new Date(), title: 'Test Event' }
-    ];
+    global.chrome.storage.local.get.mockImplementation((key, callback) => { 
+      callback({Canvas_Assignments: [
+        { due_at: "2025-03-31T07:59:59Z", title: "Assignment 1", context_name: "CS 101", course_id: "12345" } 
+      ], colorList: {UNLVEvents: "#b10202", InvolvementCenter: "#666666", userEvents: "#0000ff", CanvasCourses: { 12345: { color: "#449876", name: "CS 101" }}},
+      userEvents: [{ allDay: false, date: "2025-04-30", desc: "Tom's Birthday Party, don't forget a present", endTime: "22:00", startDate: "2025-04-30", startTime: "20:00", title: "Birthday Party", location: "Tom's House" },
+        { allDay: true, desc: "Study Hard", location: "", endTime: "", startDate: "2025-04-28", startTime: "", title: "Final Exams" }
+      ], 
+      filteredIC: [{ name: "Monthly Meeting", organization: "Layer Zero", location: "TBE B174", startDate: "2025-05-05", endDate: "2025-05-05", startTime: "5:30 PM", endTime: "7:30 PM"}],
+      savedUNLVEvents: [{ name: "Tech Seminar", location: "CHB A106", startDate: "2025-04-29", startTime: "2:30 PM", endDate: "2025-04-29", endTime: "6:30 PM" }]
+    }); 
+  });
     
     // Render the calendar while explicitly passing the events prop
     await act(async () => {
-    render(<CalendarView events={calendarEventsMock} />);
+    render(<CalendarView />);
     });
 
     // Check that the Calendar component receives and uses the events prop
