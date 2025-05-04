@@ -24,7 +24,7 @@ function GroupByWeek({
           <div key={day} className="weekday-section">
             <div className="weekday-title">{viewMode === 'weekly' ? day : null}</div>
             <ul className={`event-list ${viewMode === 'daily' ? 'event-list-daily' : ''}`}>              {items.map(item => (
-                <li key={item.id} className="event-item">
+                <li key={item.id} className="event-item-canvas">
                   <div className="event-link">
                     <a
                       href={item.link || "#"}

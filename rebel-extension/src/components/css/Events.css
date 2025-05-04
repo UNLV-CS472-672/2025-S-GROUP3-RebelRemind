@@ -37,7 +37,11 @@
     color: #212529;
     display: flex;
     justify-content: space-between; 
-    
+  }
+
+  .event-item-canvas {
+    display: block;
+    padding-bottom: 1rem
   }
   
   .event-link {
