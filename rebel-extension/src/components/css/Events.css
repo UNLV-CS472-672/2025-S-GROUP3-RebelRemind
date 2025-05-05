@@ -52,11 +52,11 @@
     flex-wrap: wrap;
     text-decoration: none;       
     color: inherit;
-	:hover {
-        color: #1f1f1f88 !important ;
-    }
   }
   
+  .event-link:hover {
+    color: #1f1f1f88 !important ;
+}
   .event-name {
     flex: 1;
     white-space: normal;
