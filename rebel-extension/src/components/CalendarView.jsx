@@ -134,7 +134,7 @@ function CalendarMenu() {
 							<div>{eventEnd}</div>
 							<div>{eventLocation}</div>
 							<div>{eventOrg}</div>
-							<div>
+							<div style={{ whiteSpace: "normal", wordWrap: "break-word", overflowWrap: "break-word" }}>
 								More Details:&#9;
 								<a href={eventLink} target="_blank" rel="noopener noreferrer">
 									{eventLink}
@@ -150,8 +150,8 @@ function CalendarMenu() {
 							<div>{eventDate}</div>
 							<div>{eventLocation}</div>
 							<div>{eventOrg}</div>
-							<div>
-								More Details:{' '}
+							<div style={{ whiteSpace: "normal", wordWrap: "break-word", overflowWrap: "break-word" }}>
+								More Details:&#9;
 								<a href={eventLink} target="_blank" rel="noopener noreferrer">
 									{eventLink}
 								</a>
@@ -186,7 +186,7 @@ function CalendarMenu() {
 							<div>{eventStart}</div>
 							<div>{eventEnd}</div>
 							<div>{eventLocation}</div>
-							<div>
+							<div style={{ whiteSpace: "normal", wordWrap: "break-word", overflowWrap: "break-word" }}>
 								More Details:&#9;
 								<a href={eventLink} target="_blank" rel="noopener noreferrer">
 									{eventLink}
@@ -200,8 +200,8 @@ function CalendarMenu() {
 						<>
 							<div>{eventDate}</div>
 							<div>{eventLocation}</div>
-							<div>
-								More Details:{' '}
+							<div style={{ whiteSpace: "normal", wordWrap: "break-word", overflowWrap: "break-word" }}>
+								More Details:&#9;
 								<a href={eventLink} target="_blank" rel="noopener noreferrer">
 									{eventLink}
 								</a>
