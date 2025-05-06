@@ -264,7 +264,7 @@ async function updateGoogleCalendar() {
         getOrCreateCalendar(GoogleToken).then((newCalendarID) => {
           // do work with newcalendar
           gatherEvents().then((eventList) => {
-            syncCalendar(eventList, GoogleToken, storedCalendarID);
+            syncCalendar(eventList, GoogleToken, newCalendarID);
           })
         })
       }
