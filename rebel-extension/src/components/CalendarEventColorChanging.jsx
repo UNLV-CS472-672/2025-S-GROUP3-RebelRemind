@@ -123,7 +123,7 @@ function CalendarColorChange() {
                     /> 
                 </div>
             )}
-            {CanvasIntegrationPreference && (
+            {CanvasIntegrationPreference && colorList.CanvasCourses != {} && (
                 <div>
                     <br></br>
                     <h2>Canvas Courses</h2>

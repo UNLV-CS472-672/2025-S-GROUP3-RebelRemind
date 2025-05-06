@@ -272,13 +272,15 @@ export async function getExistingEvents(token, calendarID) {
         }
     });
     const list = await response.json();
-    if (list.items.length) {
-        return list.items.filter(event => 
-            event.extendedProperties?.private?.managedBy === "Rebel Remind"
-        );
-    }
-    else {
-        return [];
+    if (list) {
+        if (list.items.length) {
+            return list.items.filter(event => 
+                event.extendedProperties?.private?.managedBy === "Rebel Remind"
+            );
+        }
+        else {
+            return [];
+        }
     }
 }
 

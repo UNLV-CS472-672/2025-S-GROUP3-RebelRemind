@@ -83,6 +83,7 @@ function AccordionMenu() {
         filteredRC: newFilteredRC,
         filteredUC: newFilteredUC,
       });
+      chrome.runtime.sendMessage({ type: "EVENT_UPDATED" });
     };
       
 
