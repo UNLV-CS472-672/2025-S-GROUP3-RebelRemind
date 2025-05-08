@@ -71,6 +71,7 @@ const CanvasTokenManager = () => {
                 <button
                     onClick={() => setShowToken(!showToken)}
                     className="canvasShowBT"
+                    style={{borderRadius: "6px"}}
                 >
                     {showToken ? "🙈 Hide" : "👁 Show"}
                 </button>
@@ -80,6 +81,7 @@ const CanvasTokenManager = () => {
             <button
                 onClick={saveCanvasToken}
                 className="canvasSubmitBT"
+                style={{borderRadius: "6px", marginTop: "10px"}}
             >
                 Save Token
             </button>

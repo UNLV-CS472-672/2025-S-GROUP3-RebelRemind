@@ -77,7 +77,7 @@ function handleRemoveEvent(event) {
         const existing = Array.isArray(data["savedUNLVEvents"]) ? data["savedUNLVEvents"] : [];
 
         const updatedEvents = existing.filter(
-            (e) => !(e.name === event.name && e.startTime === event.startTime)
+            (e) => !(e.name === event.name && e.startTime === event.startTime && e.startDate === event.startDate)
         );
 
         chrome.storage.local.set({ "savedUNLVEvents": updatedEvents }, () => {
@@ -210,7 +210,7 @@ function handleRemoveEvent(event) {
             <span className="event-org" style={{fontWeight: "bold"}}>
               Academic Calendar: 
             </span>
-            {event.name}
+            {" " + event.name}
           </div>
           <div className="event-time">
             {formatDate(event.startDate)}

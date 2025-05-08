@@ -145,13 +145,13 @@ const UserEventList = () => {
      * Validates and saves an event after it's been edited.
      */
     const saveEdit = (originalEvent) => {
-        const { title, date, startTime, endTime } = editedEvent;
+        const { title, startDate, startTime, endTime } = editedEvent;
         const isAllDay = !startTime?.trim() && !endTime?.trim();
 
         if (!title?.trim()) {
             alert("Please enter a valid title.");
             return;
-        } else if (!date?.trim()) {
+        } else if (!startDate?.trim()) {
             alert("Please enter a date.");
             return;
         } else if (!isAllDay) {

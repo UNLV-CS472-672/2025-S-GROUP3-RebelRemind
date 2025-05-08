@@ -102,13 +102,13 @@ function AccordionMenu() {
     // filter User Events by daily or weekly (brought back, was overwritten)
     function filterUserEvents(events, viewMode) {
       const today = new Date();
-      const todayStr = today.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+      const todayStr = today.toLocaleDateString('en-CA'); // always returns YYYY-MM-DD in local time
 
       const weekDates = [];
       for (let i = 0; i < 7; i++) {
         const tempDate = new Date(today);
         tempDate.setDate(today.getDate() + i);
-        weekDates.push(tempDate.toISOString().split('T')[0]);
+        weekDates.push(tempDate.toLocaleDateString('en-CA')); // <- FIXED
       }
 
       return events.filter(event => {

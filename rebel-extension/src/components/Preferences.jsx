@@ -58,7 +58,7 @@ const Preferences = ({ setupMode = false }) => {
     const [allClubs, setAllClubs] = useState([]);
 
     // Sports and interests state
-    const allSports = ["Baseball", "Men's Basketball", "Football", "Men's Golf", "Men's Soccer", "Swimming & Diving", "Men's Tennis", "Women's Basketball", "Women's Cross Country", "Women's Golf", "Women's Soccer", "Softball", "Women's Tennis", "Women's Track & Field", "Women's Volleyball"];
+    const allSports = ["Baseball", "Football", "Softball", "Swimming & Diving", "Men's Basketball", "Men's Golf", "Men's Soccer", "Men's Tennis", "Women's Basketball", "Women's Cross Country", "Women's Golf", "Women's Soccer", "Women's Tennis", "Women's Track & Field", "Women's Volleyball"];
     const allInterests = ["Arts", "Academics", "Career", "Culture", "Diversity", "Health", "Social", "Sports", "Tech", "Community"];
     const [selectedSports, setSelectedSports] = useState([]);
     const [selectedInterests, setSelectedInterests] = useState([]);
@@ -198,14 +198,14 @@ const Preferences = ({ setupMode = false }) => {
         chrome.storage.sync.set(
             {
                 preferences,
-                notificationsEnabled: notifications,  
+                notificationsEnabled: notifications,
                 involvedClubs,
                 selectedSports,
                 selectedInterests,
             },
             () => {
                 setInitialPreferences(preferences);
-                setInitialNotifications(notifications); 
+                setInitialNotifications(notifications);
                 setInitialClubs(involvedClubs);
                 setInitialSports(selectedSports);
                 setInitialInterests(selectedInterests);
@@ -225,7 +225,7 @@ const Preferences = ({ setupMode = false }) => {
             });
         }
         else {
-            chrome.runtime.sendMessage({ type: "CLEAR_CANVAS_ALARM"}); // Stops Canvas alarm if integration is shut off
+            chrome.runtime.sendMessage({ type: "CLEAR_CANVAS_ALARM" }); // Stops Canvas alarm if integration is shut off
         }
     };
 
@@ -263,6 +263,9 @@ const Preferences = ({ setupMode = false }) => {
     };
 
     // =================== RENDER ===================
+    const splitIndex = allSports.indexOf("Women's Basketball");
+    const leftSports = allSports.slice(0, splitIndex);
+    const rightSports = allSports.slice(splitIndex);
 
     return (
         <>
@@ -275,9 +278,9 @@ const Preferences = ({ setupMode = false }) => {
                             setEnabled={setNotifications}
                             style={{ marginBottom: '1rem' }}
                         />
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1rem',  paddingTop: '1rem'}}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '1rem', paddingTop: '1rem' }}>
                             {/* Left column preferences */}
-                               
+
                             <div style={{ display: 'flex', flexDirection: 'column', rowGap: '1rem' }}>
                                 {preferencesList.slice(0, 3).map(({ key, label }) => (
                                     <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -383,19 +386,32 @@ const Preferences = ({ setupMode = false }) => {
                                 <span>{showSports ? "▲" : "▼"}</span>
                             </div>
                             {showSports && (
-                                <div style={{ marginTop: "1rem", display: "grid", gridTemplateColumns: "1fr", columnGap: "1rem" }}>
-                                    <div>
-                                        <p>Sports</p>
-                                        {allSports.map((sport) => (
-                                            <label key={sport} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedSports.includes(sport)}
-                                                    onChange={() => toggleSport(sport)}
-                                                />
-                                                {sport}
-                                            </label>
-                                        ))}
+                                <div style={{ display: "flex", justifyContent: "center" }}>
+                                    <div style={{ fontSize: "13px", width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: "0.01rem", marginTop: "0.5rem" }}>
+                                        <div>
+                                            {leftSports.map((sport) => (
+                                                <label key={sport} style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.5rem" }}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedSports.includes(sport)}
+                                                        onChange={() => toggleSport(sport)}
+                                                    />
+                                                    {sport}
+                                                </label>
+                                            ))}
+                                        </div>
+                                        <div>
+                                            {rightSports.map((sport) => (
+                                                <label key={sport} style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.5rem" }}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedSports.includes(sport)}
+                                                        onChange={() => toggleSport(sport)}
+                                                    />
+                                                    {sport}
+                                                </label>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             )}
@@ -438,7 +454,7 @@ const Preferences = ({ setupMode = false }) => {
                 </div>
                 :
 
-            /***  SETUP PREFERENCES PAGE ***/
+                /***  SETUP PREFERENCES PAGE ***/
 
                 <div style={{ padding: '0.2rem', width: '100%' }}>
                     {/* Preferences Grid */}
@@ -705,16 +721,17 @@ const Preferences = ({ setupMode = false }) => {
                     >
                         <div style={{
                             marginTop: "0.5rem", opacity: preferences.rebelCoverage ? 1 : 0.5,
-                            pointerEvents: preferences.rebelCoverage ? "auto" : "none",
+                            pointerEvents: preferences.rebelCoverage ? "auto" : "none", marginLeft: "auto",
+                            marginRight: "auto"
                         }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <span style={{ fontWeight: "bold", fontSize: "1rem" }}>Rebel Sports Coverage</span>
                             </div>
-                            <div style={{ marginTop: "0.5rem", display: "grid", gridTemplateColumns: "1fr", columnGap: "1rem", width: '50%', margin: 'auto' }}>
+                            <div style={{display: "flex", justifyContent: "center"}}>
+                            <div style={{ width: "50%", alignItems: "center", display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: "1rem", marginTop: "0.5rem" }}>
                                 <div>
-                                    <p style={{ fontWeight: "bold" }}>Sports</p>
-                                    {allSports.map((sport) => (
-                                        <label key={sport} style={{ display: "flex", marginTop: "0.5rem", alignItems: "center", gap: "0.5rem" }}>
+                                    {leftSports.map((sport) => (
+                                        <label key={sport} style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.5rem" }}>
                                             <input
                                                 type="checkbox"
                                                 checked={selectedSports.includes(sport)}
@@ -723,6 +740,19 @@ const Preferences = ({ setupMode = false }) => {
                                             {sport}
                                         </label>
                                     ))}
+                                </div>
+                                <div>
+                                    {rightSports.map((sport) => (
+                                        <label key={sport} style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.5rem" }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedSports.includes(sport)}
+                                                onChange={() => toggleSport(sport)}
+                                            />
+                                            {sport}
+                                        </label>
+                                    ))}
+                                </div>
                                 </div>
                             </div>
                         </div>
